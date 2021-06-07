@@ -22,6 +22,72 @@
 #include <mutex>
 
 ////////////////////////////////////////////////////////////////////////////////
+<<<<<<< HEAD
+=======
+/// manage the success or failure of a target construct
+static void HandleDefaultTargetOffload() {
+  PM->TargetOffloadMtx.lock();
+  if (PM->TargetOffloadPolicy == tgt_default) {
+    if (omp_get_num_devices() > 0) {
+      DP("Default TARGET OFFLOAD policy is now mandatory "
+         "(devices were found)\n");
+      PM->TargetOffloadPolicy = tgt_mandatory;
+    } else {
+      DP("Default TARGET OFFLOAD policy is now disabled "
+         "(no devices were found)\n");
+      PM->TargetOffloadPolicy = tgt_disabled;
+    }
+  }
+  PM->TargetOffloadMtx.unlock();
+}
+
+static int IsOffloadDisabled() {
+  if (PM->TargetOffloadPolicy == tgt_default)
+    HandleDefaultTargetOffload();
+  return PM->TargetOffloadPolicy == tgt_disabled;
+}
+
+static void HandleTargetOutcome(bool success, ident_t *loc = nullptr) {
+  switch (PM->TargetOffloadPolicy) {
+  case tgt_disabled:
+    if (success) {
+      FATAL_MESSAGE0(1, "expected no offloading while offloading is disabled");
+    }
+    break;
+  case tgt_default:
+    FATAL_MESSAGE0(1, "default offloading policy must be switched to "
+                      "mandatory or disabled");
+    break;
+  case tgt_mandatory:
+    if (!success) {
+      if (getInfoLevel() & OMP_INFOTYPE_DUMP_TABLE)
+        for (auto &Device : PM->Devices)
+          dumpTargetPointerMappings(loc, Device);
+      else
+        FAILURE_MESSAGE("Run with LIBOMPTARGET_DEBUG=%d to dump host-target "
+                        "pointer mappings.\n",
+                        OMP_INFOTYPE_DUMP_TABLE);
+
+      SourceInfo info(loc);
+      if (info.isAvailible())
+        fprintf(stderr, "%s:%d:%d: ", info.getFilename(), info.getLine(),
+                info.getColumn());
+      else
+        FAILURE_MESSAGE("Source location information not present. Compile with "
+                        "-g or -gline-tables-only.\n");
+      FATAL_MESSAGE0(
+          1, "failure of target construct while offloading is mandatory");
+    } else {
+      if (getInfoLevel() & OMP_INFOTYPE_DUMP_TABLE)
+        for (auto &Device : PM->Devices)
+          dumpTargetPointerMappings(loc, Device);
+    }
+    break;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 /// adds requires flags
 EXTERN void __tgt_register_requires(int64_t flags) {
   TIMESCOPE();
@@ -441,6 +507,19 @@ EXTERN void __kmpc_push_target_tripcount(int64_t device_id,
                                          uint64_t loop_tripcount) {
   __kmpc_push_target_tripcount_mapper(nullptr, device_id, loop_tripcount);
 }
+<<<<<<< HEAD
+=======
+
+EXTERN void __kmpc_push_target_tripcount_mapper(ident_t *loc, int64_t device_id,
+                                                uint64_t loop_tripcount) {
+  TIMESCOPE_WITH_IDENT(loc);
+  if (IsOffloadDisabled())
+    return;
+
+  if (device_id == OFFLOAD_DEVICE_DEFAULT) {
+    device_id = omp_get_default_device();
+  }
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 EXTERN void __kmpc_push_target_tripcount_mapper(ident_t *loc, int64_t device_id,
                                                 uint64_t loop_tripcount) {

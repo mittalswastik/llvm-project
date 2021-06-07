@@ -4805,6 +4805,7 @@ void Clang::ConstructJob(Compilation &C, const JobAction &JA,
 
   // LLVM Code Generator Options.
 
+<<<<<<< HEAD
   for (const Arg *A : Args.filtered(options::OPT_frewrite_map_file_EQ)) {
     StringRef Map = A->getValue();
     if (!llvm::sys::fs::exists(Map)) {
@@ -4812,6 +4813,20 @@ void Clang::ConstructJob(Compilation &C, const JobAction &JA,
     } else {
       A->render(Args, CmdArgs);
       A->claim();
+=======
+  if (Args.hasArg(options::OPT_frewrite_map_file) ||
+      Args.hasArg(options::OPT_frewrite_map_file_EQ)) {
+    for (const Arg *A : Args.filtered(options::OPT_frewrite_map_file,
+                                      options::OPT_frewrite_map_file_EQ)) {
+      StringRef Map = A->getValue();
+      if (!llvm::sys::fs::exists(Map)) {
+        D.Diag(diag::err_drv_no_such_file) << Map;
+      } else {
+        CmdArgs.push_back("-frewrite-map-file");
+        CmdArgs.push_back(A->getValue());
+        A->claim();
+      }
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
     }
   }
 

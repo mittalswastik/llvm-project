@@ -15660,6 +15660,7 @@ PPCTargetLowering::getRegForInlineAsmConstraint(const TargetRegisterInfo *TRI,
     else
       return std::make_pair(0U, &PPC::LRRCRegClass);
   }
+<<<<<<< HEAD
 
   // Handle special cases of physical registers that are not properly handled
   // by the base class.
@@ -15675,6 +15676,8 @@ PPCTargetLowering::getRegForInlineAsmConstraint(const TargetRegisterInfo *TRI,
         return std::make_pair(PPC::VSL0 + VSNum, &PPC::VSRCRegClass);
       return std::make_pair(PPC::V0 + VSNum - 32, &PPC::VSRCRegClass);
     }
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
     // For float registers, we can't defer to the base class as it will match
     // the SPILLTOVSRRC class.

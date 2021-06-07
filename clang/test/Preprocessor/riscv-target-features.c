@@ -101,6 +101,7 @@
 // CHECK-C-EXT: __riscv_compressed 1
 
 // RUN: %clang -target riscv32-unknown-linux-gnu -menable-experimental-extensions \
+<<<<<<< HEAD
 // RUN: -march=rv32ib0p93 -x c -E -dM %s \
 // RUN: -o - | FileCheck --check-prefix=CHECK-B-EXT %s
 // RUN: %clang -target riscv64-unknown-linux-gnu -menable-experimental-extensions \
@@ -118,6 +119,25 @@
 // CHECK-B-EXT: __riscv_zbr 93000
 // CHECK-B-EXT: __riscv_zbs 93000
 // CHECK-B-EXT: __riscv_zbt 93000
+=======
+// RUN:   -march=rv32iv0p10 -x c -E -dM %s \
+// RUN:   -o - | FileCheck --check-prefix=CHECK-V-EXT %s
+// RUN: %clang -target riscv64-unknown-linux-gnu -menable-experimental-extensions \
+// RUN:   -march=rv64iv0p10 -x c -E -dM %s \
+// RUN:   -o - | FileCheck --check-prefix=CHECK-V-EXT %s
+// RUN: %clang -target riscv32-unknown-linux-gnu -menable-experimental-extensions -march=rv32izvamo0p10 -x c -E -dM %s \
+// RUN: -o - | FileCheck --check-prefix=CHECK-V-EXT %s
+// RUN: %clang -target riscv64-unknown-linux-gnu -menable-experimental-extensions -march=rv32izvamo0p10 -x c -E -dM %s \
+// RUN: -o - | FileCheck --check-prefix=CHECK-V-EXT %s
+// RUN: %clang -target riscv32-unknown-linux-gnu -menable-experimental-extensions -march=rv32izvlsseg0p10 -x c -E -dM %s \
+// RUN: -o - | FileCheck --check-prefix=CHECK-V-EXT %s
+// RUN: %clang -target riscv64-unknown-linux-gnu -menable-experimental-extensions -march=rv32izvlsseg0p10 -x c -E -dM %s \
+// RUN: -o - | FileCheck --check-prefix=CHECK-V-EXT %s
+// CHECK-V-EXT: __riscv_v 10000
+// CHECK-V-EXT: __riscv_vector 1
+// CHECK-V-EXT: __riscv_zvamo 10000
+// CHECK-V-EXT: __riscv_zvlsseg 10000
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 // RUN: %clang -target riscv32-unknown-linux-gnu -menable-experimental-extensions \
 // RUN: -march=rv32izba0p93 -x c -E -dM %s \

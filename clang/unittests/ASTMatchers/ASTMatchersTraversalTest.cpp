@@ -618,6 +618,7 @@ void foo()
                                   varDecl(hasName("lPtrDecay"))))))));
 }
 
+<<<<<<< HEAD
 TEST(Matcher, MatchesCoroutine) {
   FileContentMappings M;
   M.push_back(std::make_pair("/coro_header", R"cpp(
@@ -695,6 +696,8 @@ void check_match_co_yield() {
                                    true, {"-std=c++20", "-I/"}, M));
 }
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 TEST(Matcher, isClassMessage) {
   EXPECT_TRUE(matchesObjC(
       "@interface NSString +(NSString *) stringWithFormat; @end "
@@ -2854,6 +2857,7 @@ B func1() { return 42; }
         Code, traverse(TK_IgnoreUnlessSpelledInSource, M),
         std::make_unique<VerifyIdIsBoundTo<Expr>>("allExprs", 1)));
   }
+<<<<<<< HEAD
 
   Code = R"cpp(
 void foo()
@@ -2896,6 +2900,8 @@ void foo()
         matchesConditionally(Code, traverse(TK_IgnoreUnlessSpelledInSource, M),
                              true, {"-std=c++17"}));
   }
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 }
 
 TEST(Traversal, traverseNoImplicit) {
@@ -3259,6 +3265,36 @@ struct CtorInitsNonTrivial : NonTrivial
   }
 
   Code = R"cpp(
+  struct Range {
+    int* begin() const;
+    int* end() const;
+  };
+  Range getRange(int);
+
+  void rangeFor()
+  {
+    for (auto i : getRange(42))
+    {
+    }
+  }
+  )cpp";
+  {
+    auto M = integerLiteral(equals(42));
+    EXPECT_TRUE(matches(Code, traverse(TK_AsIs, M)));
+    EXPECT_TRUE(matches(Code, traverse(TK_IgnoreUnlessSpelledInSource, M)));
+  }
+  {
+    auto M = callExpr(hasDescendant(integerLiteral(equals(42))));
+    EXPECT_TRUE(matches(Code, traverse(TK_AsIs, M)));
+    EXPECT_TRUE(matches(Code, traverse(TK_IgnoreUnlessSpelledInSource, M)));
+  }
+  {
+    auto M = compoundStmt(hasDescendant(integerLiteral(equals(42))));
+    EXPECT_TRUE(matches(Code, traverse(TK_AsIs, M)));
+    EXPECT_TRUE(matches(Code, traverse(TK_IgnoreUnlessSpelledInSource, M)));
+  }
+
+  Code = R"cpp(
   void rangeFor()
   {
     int arr[2];
@@ -3329,6 +3365,7 @@ struct CtorInitsNonTrivial : NonTrivial
         matchesConditionally(Code, traverse(TK_IgnoreUnlessSpelledInSource, M),
                              true, {"-std=c++20"}));
   }
+<<<<<<< HEAD
   {
     auto M = cxxForRangeStmt(hasInitStatement(declStmt(
         hasSingleDecl(varDecl(hasName("a"))), hasParent(cxxForRangeStmt()))));
@@ -3338,6 +3375,8 @@ struct CtorInitsNonTrivial : NonTrivial
         matchesConditionally(Code, traverse(TK_IgnoreUnlessSpelledInSource, M),
                              true, {"-std=c++20"}));
   }
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
   Code = R"cpp(
   struct Range {

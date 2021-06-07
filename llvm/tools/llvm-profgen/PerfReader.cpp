@@ -7,7 +7,10 @@
 //===----------------------------------------------------------------------===//
 #include "PerfReader.h"
 #include "ProfileGenerator.h"
+<<<<<<< HEAD
 #include "llvm/Support/FileSystem.h"
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 static cl::opt<bool> ShowMmapEvents("show-mmap-events", cl::ReallyHidden,
                                     cl::init(false), cl::ZeroOrMore,
@@ -93,8 +96,12 @@ void VirtualUnwinder::unwindBranchWithinFrame(UnwindState &State) {
 std::shared_ptr<StringBasedCtxKey> FrameStack::getContextKey() {
   std::shared_ptr<StringBasedCtxKey> KeyStr =
       std::make_shared<StringBasedCtxKey>();
+<<<<<<< HEAD
   KeyStr->Context =
       Binary->getExpandedContextStr(Stack, KeyStr->WasLeafInlined);
+=======
+  KeyStr->Context = Binary->getExpandedContextStr(Stack);
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   if (KeyStr->Context.empty())
     return nullptr;
   KeyStr->genHashCode();
@@ -143,11 +150,17 @@ void VirtualUnwinder::collectSamplesFromFrameTrie(
   if (!Cur->isDummyRoot()) {
     if (!Stack.pushFrame(Cur)) {
       // Process truncated context
+<<<<<<< HEAD
       // Start a new traversal ignoring its bottom context
       T EmptyStack(Binary);
       collectSamplesFromFrame(Cur, EmptyStack);
       for (const auto &Item : Cur->Children) {
         collectSamplesFromFrameTrie(Item.second.get(), EmptyStack);
+=======
+      for (const auto &Item : Cur->Children) {
+        // Start a new traversal ignoring its bottom context
+        collectSamplesFromFrameTrie(Item.second.get());
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
       }
       return;
     }

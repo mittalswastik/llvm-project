@@ -238,6 +238,45 @@ void FastISel::flushLocalValueMap() {
   SavedInsertPt = FuncInfo.InsertPt;
 }
 
+<<<<<<< HEAD
+=======
+bool FastISel::hasTrivialKill(const Value *V) {
+  // Don't consider constants or arguments to have trivial kills.
+  const Instruction *I = dyn_cast<Instruction>(V);
+  if (!I)
+    return false;
+
+  // No-op casts are trivially coalesced by fast-isel.
+  if (const auto *Cast = dyn_cast<CastInst>(I))
+    if (Cast->isNoopCast(DL) && !hasTrivialKill(Cast->getOperand(0)))
+      return false;
+
+  // Even the value might have only one use in the LLVM IR, it is possible that
+  // FastISel might fold the use into another instruction and now there is more
+  // than one use at the Machine Instruction level.
+  Register Reg = lookUpRegForValue(V);
+  if (Reg && !MRI.use_empty(Reg))
+    return false;
+
+  // GEPs with all zero indices are trivially coalesced by fast-isel.
+  if (const auto *GEP = dyn_cast<GetElementPtrInst>(I))
+    if (GEP->hasAllZeroIndices() && !hasTrivialKill(GEP->getOperand(0)))
+      return false;
+
+  // Casts and extractvalues may be trivially coalesced by fast-isel.
+  if (I->getOpcode() == Instruction::BitCast ||
+      I->getOpcode() == Instruction::PtrToInt ||
+      I->getOpcode() == Instruction::IntToPtr ||
+      I->getOpcode() == Instruction::ExtractValue)
+    return false;
+
+  // Only instructions with a single use in the same basic block are considered
+  // to have trivial kills.
+  return I->hasOneUse() &&
+         cast<Instruction>(*I->user_begin())->getParent() == I->getParent();
+}
+
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 Register FastISel::getRegForValue(const Value *V) {
   EVT RealVT = TLI.getValueType(DL, V->getType(), /*AllowUnknown=*/true);
   // Don't handle non-simple values in FastISel.

@@ -220,6 +220,7 @@ public:
   /// Return true if a constant is ConstantData or a ConstantAggregate or
   /// ConstantExpr that contain only ConstantData.
   bool isManifestConstant() const;
+<<<<<<< HEAD
 
 private:
   enum PossibleRelocationsTy {
@@ -238,6 +239,8 @@ private:
 
   /// Determine what potential relocations may be needed by this constant.
   PossibleRelocationsTy getRelocationInfo() const;
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 };
 
 } // end namespace llvm

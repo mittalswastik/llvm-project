@@ -27,11 +27,14 @@ constexpr const char *PseudoProbeDescMetadataName = "llvm.pseudo_probe_desc";
 
 enum class PseudoProbeType { Block = 0, IndirectCall, DirectCall };
 
+<<<<<<< HEAD
 enum class PseudoProbeAttributes {
   Reserved = 0x1, // Reserved for future use.
   Dangling = 0x2, // The probe is dangling.
 };
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 // The saturated distrution factor representing 100% for block probes.
 constexpr static uint64_t PseudoProbeFullDistributionFactor =
     std::numeric_limits<uint64_t>::max();
@@ -80,6 +83,7 @@ struct PseudoProbe {
   uint32_t Id;
   uint32_t Type;
   uint32_t Attr;
+<<<<<<< HEAD
   // Distribution factor that estimates the portion of the real execution count.
   // A saturated distribution factor stands for 1.0 or 100%. A pesudo probe has
   // a factor with the value ranged from 0.0 to 1.0.
@@ -88,15 +92,21 @@ struct PseudoProbe {
   bool isDangling() const {
     return Attr & (uint32_t)PseudoProbeAttributes::Dangling;
   }
+=======
+  float Factor;
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 };
 
 Optional<PseudoProbe> extractProbe(const Instruction &Inst);
 
 void setProbeDistributionFactor(Instruction &Inst, float Factor);
 
+<<<<<<< HEAD
 bool moveAndDanglePseudoProbes(BasicBlock *From, Instruction *To);
 
 bool removeRedundantPseudoProbes(BasicBlock *Block);
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 } // end namespace llvm
 
 #endif // LLVM_IR_PSEUDOPROBE_H

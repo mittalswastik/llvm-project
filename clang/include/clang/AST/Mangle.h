@@ -107,11 +107,16 @@ public:
   virtual bool shouldMangleCXXName(const NamedDecl *D) = 0;
   virtual bool shouldMangleStringLiteral(const StringLiteral *SL) = 0;
 
+<<<<<<< HEAD
   virtual bool isUniqueInternalLinkageDecl(const NamedDecl *ND) {
     return false;
   }
 
   virtual void needsUniqueInternalLinkageNames() { }
+=======
+  virtual bool isDeviceMangleContext() const { return false; }
+  virtual void setDeviceMangleContext(bool) {}
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
   // FIXME: consider replacing raw_ostream & with something like SmallString &.
   void mangleName(GlobalDecl GD, raw_ostream &);

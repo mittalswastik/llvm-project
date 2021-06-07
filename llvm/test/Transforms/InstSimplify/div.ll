@@ -25,11 +25,11 @@ define <2 x i32> @zero_dividend_vector_undef_elt(<2 x i32> %A) {
   ret <2 x i32> %B
 }
 
-; Division-by-zero is poison. UB in any vector lane means the whole op is poison.
+; Division-by-zero is undef. UB in any vector lane means the whole op is undef.
 
 define <2 x i8> @sdiv_zero_elt_vec_constfold(<2 x i8> %x) {
 ; CHECK-LABEL: @sdiv_zero_elt_vec_constfold(
-; CHECK-NEXT:    ret <2 x i8> poison
+; CHECK-NEXT:    ret <2 x i8> undef
 ;
   %div = sdiv <2 x i8> <i8 1, i8 2>, <i8 0, i8 -42>
   ret <2 x i8> %div
@@ -37,7 +37,7 @@ define <2 x i8> @sdiv_zero_elt_vec_constfold(<2 x i8> %x) {
 
 define <2 x i8> @udiv_zero_elt_vec_constfold(<2 x i8> %x) {
 ; CHECK-LABEL: @udiv_zero_elt_vec_constfold(
-; CHECK-NEXT:    ret <2 x i8> poison
+; CHECK-NEXT:    ret <2 x i8> undef
 ;
   %div = udiv <2 x i8> <i8 1, i8 2>, <i8 42, i8 0>
   ret <2 x i8> %div
@@ -193,6 +193,7 @@ define i32 @div1() {
   ret i32 %urem
 }
 
+<<<<<<< HEAD
 define i8 @sdiv_minusone_divisor() {
 ; CHECK-LABEL: @sdiv_minusone_divisor
 ; CHECK-NEXT:   ret i8 poison
@@ -200,4 +201,6 @@ define i8 @sdiv_minusone_divisor() {
   ret i8 %v
 }
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 !0 = !{i32 0, i32 3}

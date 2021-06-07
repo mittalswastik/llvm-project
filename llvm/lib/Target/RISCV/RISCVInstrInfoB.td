@@ -61,6 +61,7 @@ def shfl_uimm : Operand<XLenVT>, ImmLeaf<XLenVT, [{
   }];
 }
 
+<<<<<<< HEAD
 def BCLRXForm : SDNodeXForm<imm, [{
   // Find the lowest 0.
   return CurDAG->getTargetConstant(N->getAPIntValue().countTrailingOnes(),
@@ -73,6 +74,8 @@ def BSETINVXForm : SDNodeXForm<imm, [{
                                    SDLoc(N), N->getValueType(0));
 }]>;
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 // Checks if this mask has a single 0 bit and cannot be used with ANDI.
 def BCLRMask : ImmLeaf<XLenVT, [{
   if (Subtarget->is64Bit())
@@ -765,6 +768,7 @@ def : Pat<(xor GPR:$rs1, BSETINVMask:$mask),
 def : Pat<(and (srl GPR:$rs1, uimmlog2xlen:$shamt), (XLenVT 1)),
           (BEXTI GPR:$rs1, uimmlog2xlen:$shamt)>;
 
+<<<<<<< HEAD
 def : Pat<(or GPR:$r, BSETINVTwoBitsMask:$i),
           (BSETI (BSETI GPR:$r, (BSETINVTwoBitsMaskLow BSETINVTwoBitsMask:$i)),
                  (BSETINVTwoBitsMaskHigh BSETINVTwoBitsMask:$i))>;
@@ -779,6 +783,8 @@ def : Pat<(xor GPR:$r, BSETINVORIMask:$i),
                  (BSETINVTwoBitsMaskHigh BSETINVORIMask:$i))>;
 }
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 // There's no encoding for roli in the the 'B' extension as it can be
 // implemented with rori by negating the immediate.
 let Predicates = [HasStdExtZbbOrZbp] in {
@@ -956,6 +962,7 @@ def : Pat<(riscv_rolw GPR:$rs1, uimm5:$rs2),
 } // Predicates = [HasStdExtZbbOrZbp, IsRV64]
 
 let Predicates = [HasStdExtZbp, IsRV64] in {
+<<<<<<< HEAD
 def : Pat<(riscv_rorw (riscv_grevw GPR:$rs1, 24), 16), (GREVIW GPR:$rs1, 8)>;
 def : Pat<(riscv_rolw (riscv_grevw GPR:$rs1, 24), 16), (GREVIW GPR:$rs1, 8)>;
 def : PatGprGpr<riscv_grevw, GREVW>;
@@ -964,6 +971,12 @@ def : PatGprGpr<riscv_shflw, SHFLW>;
 def : PatGprGpr<riscv_unshflw, UNSHFLW>;
 def : PatGprImm<riscv_grevw, GREVIW, uimm5>;
 def : PatGprImm<riscv_gorcw, GORCIW, uimm5>;
+=======
+def : Pat<(riscv_rorw (riscv_greviw GPR:$rs1, 24), (i64 16)), (GREVIW GPR:$rs1, 8)>;
+def : Pat<(riscv_rolw (riscv_greviw GPR:$rs1, 24), (i64 16)), (GREVIW GPR:$rs1, 8)>;
+def : Pat<(riscv_greviw GPR:$rs1, timm:$shamt), (GREVIW GPR:$rs1, timm:$shamt)>;
+def : Pat<(riscv_gorciw GPR:$rs1, timm:$shamt), (GORCIW GPR:$rs1, timm:$shamt)>;
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 } // Predicates = [HasStdExtZbp, IsRV64]
 
 let Predicates = [HasStdExtZbt, IsRV64] in {

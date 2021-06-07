@@ -44,12 +44,21 @@ public:
     return TTI::TCC_Basic;
   }
 
+<<<<<<< HEAD
   InstructionCost getCmpSelInstrCost(unsigned Opcode, Type *ValTy, Type *CondTy,
                                      CmpInst::Predicate VecPred,
                                      TTI::TargetCostKind CostKind,
                                      const llvm::Instruction *I = nullptr) {
     if (Opcode == Instruction::Select)
       return SCEVCheapExpansionBudget.getValue();
+=======
+  int getCmpSelInstrCost(unsigned Opcode, Type *ValTy, Type *CondTy,
+                         CmpInst::Predicate VecPred,
+                         TTI::TargetCostKind CostKind,
+                         const llvm::Instruction *I = nullptr) {
+    if (Opcode == Instruction::Select)
+      return SCEVCheapExpansionBudget;
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
     return BaseT::getCmpSelInstrCost(Opcode, ValTy, CondTy, VecPred, CostKind,
                                      I);

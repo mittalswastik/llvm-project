@@ -165,6 +165,7 @@ cond.end:
   %sub = sub nsw i32 %v3, %cond
   ret i32 %sub
 }
+<<<<<<< HEAD
 
 @g = extern_weak global i32
 define void @pr50370(i32 %x) {
@@ -197,3 +198,5 @@ entry:
   store i32 %B, i32* undef, align 4
   ret void
 }
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d

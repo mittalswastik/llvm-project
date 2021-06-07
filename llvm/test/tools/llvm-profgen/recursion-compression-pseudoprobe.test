@@ -1,4 +1,5 @@
 ; Firstly test uncompression(--compress-recursion=0)
+<<<<<<< HEAD
 ; RUN: llvm-profgen --format=text --perfscript=%S/Inputs/recursion-compression-pseudoprobe.perfscript --binary=%S/Inputs/recursion-compression-pseudoprobe.perfbin --output=%t --compress-recursion=0 --profile-summary-cold-count=0
 ; RUN: FileCheck %s --input-file %t -check-prefix=CHECK-UNCOMPRESS
 ; RUN: llvm-profgen --format=text --perfscript=%S/Inputs/recursion-compression-pseudoprobe.perfscript --binary=%S/Inputs/recursion-compression-pseudoprobe.perfbin --output=%t --show-unwinder-output --profile-summary-cold-count=0 | FileCheck %s --check-prefix=CHECK-UNWINDER
@@ -9,6 +10,18 @@
 ; CHECK-UNCOMPRESS:  3: 1
 ; CHECK-UNCOMPRESS:  4: 1
 ; CHECK-UNCOMPRESS:  7: 1 fb:1
+=======
+; RUN: llvm-profgen --perfscript=%S/Inputs/recursion-compression-pseudoprobe.perfscript --binary=%S/Inputs/recursion-compression-pseudoprobe.perfbin --output=%t --compress-recursion=0 --csprof-cold-thres=0
+; RUN: FileCheck %s --input-file %t -check-prefix=CHECK-UNCOMPRESS
+; RUN: llvm-profgen --perfscript=%S/Inputs/recursion-compression-pseudoprobe.perfscript --binary=%S/Inputs/recursion-compression-pseudoprobe.perfbin --output=%t --show-unwinder-output --csprof-cold-thres=0 | FileCheck %s --check-prefix=CHECK-UNWINDER
+; RUN: FileCheck %s --input-file %t
+
+; CHECK-UNCOMPRESS: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:6 @ fa]:4:1
+; CHECK-UNCOMPRESS:  1: 1
+; CHECK-UNCOMPRESS:  3: 1
+; CHECK-UNCOMPRESS:  5: 1
+; CHECK-UNCOMPRESS:  8: 1 fa:1
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ; CHECK-UNCOMPRESS:  !CFGChecksum: 120515930909
 ; CHECK-UNCOMPRESS: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:6 @ fa:8 @ fa]:4:1
 ; CHECK-UNCOMPRESS:  1: 1
@@ -16,6 +29,7 @@
 ; CHECK-UNCOMPRESS:  4: 1
 ; CHECK-UNCOMPRESS:  7: 1 fb:1
 ; CHECK-UNCOMPRESS:  !CFGChecksum: 120515930909
+<<<<<<< HEAD
 ; CHECK-UNCOMPRESS: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:6 @ fa]:4:1
 ; CHECK-UNCOMPRESS:  1: 1
 ; CHECK-UNCOMPRESS:  3: 1
@@ -38,6 +52,15 @@
 ; CHECK-UNCOMPRESS:  6: 1 fa:1
 ; CHECK-UNCOMPRESS:  !CFGChecksum: 72617220756
 ; CHECK-UNCOMPRESS: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb]:3:1
+=======
+; CHECK-UNCOMPRESS: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:6 @ fa:8 @ fa:7 @ fb:6 @ fa]:4:1
+; CHECK-UNCOMPRESS:  1: 1
+; CHECK-UNCOMPRESS:  3: 1
+; CHECK-UNCOMPRESS:  4: 1
+; CHECK-UNCOMPRESS:  7: 1 fb:1
+; CHECK-UNCOMPRESS:  !CFGChecksum: 120515930909
+; CHECK-UNCOMPRESS: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb]:3:1
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ; CHECK-UNCOMPRESS:  1: 1
 ; CHECK-UNCOMPRESS:  2: 1
 ; CHECK-UNCOMPRESS:  5: 1 fb:1
@@ -47,11 +70,33 @@
 ; CHECK-UNCOMPRESS:  2: 1
 ; CHECK-UNCOMPRESS:  5: 1 fb:1
 ; CHECK-UNCOMPRESS:  !CFGChecksum: 72617220756
+<<<<<<< HEAD
 ; CHECK-UNCOMPRESS: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb]:3:1
+=======
+; CHECK-UNCOMPRESS: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb]:3:1
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ; CHECK-UNCOMPRESS:  1: 1
 ; CHECK-UNCOMPRESS:  2: 1
 ; CHECK-UNCOMPRESS:  5: 1 fb:1
 ; CHECK-UNCOMPRESS:  !CFGChecksum: 72617220756
+<<<<<<< HEAD
+=======
+; CHECK-UNCOMPRESS: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb]:3:1
+; CHECK-UNCOMPRESS:  1: 1
+; CHECK-UNCOMPRESS:  3: 1
+; CHECK-UNCOMPRESS:  6: 1 fa:1
+; CHECK-UNCOMPRESS:  !CFGChecksum: 72617220756
+; CHECK-UNCOMPRESS: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:6 @ fa:8 @ fa:7 @ fb]:3:1
+; CHECK-UNCOMPRESS:  1: 1
+; CHECK-UNCOMPRESS:  3: 1
+; CHECK-UNCOMPRESS:  6: 1 fa:1
+; CHECK-UNCOMPRESS:  !CFGChecksum: 72617220756
+; CHECK-UNCOMPRESS: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:6 @ fa:8 @ fa:7 @ fb:6 @ fa:7 @ fb]:3:1
+; CHECK-UNCOMPRESS:  1: 1
+; CHECK-UNCOMPRESS:  3: 1
+; CHECK-UNCOMPRESS:  6: 1 fa:1
+; CHECK-UNCOMPRESS:  !CFGChecksum: 72617220756
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ; CHECK-UNCOMPRESS: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:5 @ fb:6 @ fa:8 @ fa:7 @ fb:6 @ fa:7 @ fb:6 @ fa]:2:1
 ; CHECK-UNCOMPRESS:  1: 1
 ; CHECK-UNCOMPRESS:  3: 1
@@ -74,24 +119,41 @@
 ; CHECK:  4: 1
 ; CHECK:  7: 1 fb:1
 ; CHECK:  !CFGChecksum: 120515930909
+<<<<<<< HEAD
 ; CHECK: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:6 @ fa:8 @ fa]:4:1
 ; CHECK:  1: 1
 ; CHECK:  3: 1
 ; CHECK:  4: 1
 ; CHECK:  7: 1 fb:1
 ; CHECK:  !CFGChecksum: 120515930909
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ; CHECK: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:6 @ fa]:4:1
 ; CHECK:  1: 1
 ; CHECK:  3: 1
 ; CHECK:  5: 1
 ; CHECK:  8: 1 fa:1
 ; CHECK:  !CFGChecksum: 120515930909
+<<<<<<< HEAD
 ; CHECK: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:6 @ fa:8 @ fa:7 @ fb:6 @ fa:7 @ fb]:3:1
+=======
+; CHECK: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:6 @ fa:8 @ fa]:4:1
 ; CHECK:  1: 1
 ; CHECK:  3: 1
-; CHECK:  6: 1 fa:1
-; CHECK:  !CFGChecksum: 72617220756
+; CHECK:  4: 1
+; CHECK:  7: 1 fb:1
+; CHECK:  !CFGChecksum: 120515930909
 ; CHECK: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:6 @ fa:8 @ fa:7 @ fb]:3:1
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
+; CHECK:  1: 1
+; CHECK:  3: 1
+; CHECK:  6: 1 fa:1
+; CHECK:  !CFGChecksum: 72617220756
+<<<<<<< HEAD
+; CHECK: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:6 @ fa:8 @ fa:7 @ fb]:3:1
+=======
+; CHECK: [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb:6 @ fa:8 @ fa:7 @ fb:6 @ fa:7 @ fb]:3:1
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ; CHECK:  1: 1
 ; CHECK:  3: 1
 ; CHECK:  6: 1 fa:1
@@ -99,7 +161,10 @@
 
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ; CHECK-UNWINDER: Binary(recursion-compression-pseudoprobe.perfbin)'s Range Counter:
 ; CHECK-UNWINDER: main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5
 ; CHECK-UNWINDER:   (7a0, 7a7): 1

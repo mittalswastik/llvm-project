@@ -106,6 +106,7 @@ struct Config {
     // ::). All nested namespaces are affected as well.
     std::vector<std::string> FullyQualifiedNamespaces;
   } Style;
+<<<<<<< HEAD
 
   /// Configures code completion feature.
   struct {
@@ -113,6 +114,8 @@ struct Config {
     /// scopes.
     bool AllScopes = true;
   } Completion;
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 };
 
 } // namespace clangd

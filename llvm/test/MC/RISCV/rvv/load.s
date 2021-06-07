@@ -8,6 +8,7 @@
 # RUN: llvm-mc -triple=riscv64 -filetype=obj --mattr=+experimental-v %s \
 # RUN:   | llvm-objdump -d - | FileCheck %s --check-prefix=CHECK-UNKNOWN
 
+<<<<<<< HEAD
 vle1.v v0, (a0)
 # CHECK-INST: vle1.v v0, (a0)
 # CHECK-ENCODING: [0x07,0x00,0xb5,0x02]
@@ -19,6 +20,13 @@ vle1.v v8, (a0)
 # CHECK-ENCODING: [0x07,0x04,0xb5,0x02]
 # CHECK-ERROR: instruction requires the following: 'V' (Vector Instructions)
 # CHECK-UNKNOWN: 07 04 b5 02 <unknown>
+=======
+vle1.v v8, (a0)
+# CHECK-INST: vle1.v v8, (a0)
+# CHECK-ENCODING: [0x07,0x04,0xb5,0x00]
+# CHECK-ERROR: instruction requires the following: 'V' (Vector Instructions)
+# CHECK-UNKNOWN: 07 04 b5 00 <unknown>
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 vle8.v v8, (a0), v0.t
 # CHECK-INST: vle8.v v8, (a0), v0.t

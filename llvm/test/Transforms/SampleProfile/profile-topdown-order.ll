@@ -1,6 +1,7 @@
 ;; Test for different function processing orders affecting inlining in sample profile loader.
 
 ;; There is an SCC _Z5funcAi -> _Z8funcLeafi -> _Z5funcAi in the program.
+<<<<<<< HEAD
 ;; With -use-profiled-call-graph=0, the top-down processing order of
 ;; that SCC is (_Z8funcLeafi, _Z5funcAi), which is determinined based on
 ;; the static call graph. With -use-profiled-call-graph=1, call edges
@@ -9,6 +10,16 @@
 ;; are affected.
 ; RUN: opt < %s -passes=sample-profile -use-profiled-call-graph=0 -sample-profile-file=%S/Inputs/profile-topdown-order.prof -S | FileCheck %s -check-prefix=STATIC
 ; RUN: opt < %s -passes=sample-profile -use-profiled-call-graph=1 -sample-profile-file=%S/Inputs/profile-topdown-order.prof -S | FileCheck %s -check-prefix=DYNAMIC
+=======
+;; With -use-profile-top-down-order=0, the top-down processing order of
+;; that SCC is (_Z8funcLeafi, _Z5funcAi), which is determinined based on
+;; the static call graph. With -use-profile-top-down-order=1, call edges
+;; from profile are considered, thus the order becomes (_Z5funcAi, _Z8funcLeafi).
+;; While _Z8funcLeafi is not supposed to be inlined, the outlined entry counts
+;; are affected.
+; RUN: opt < %s -passes=sample-profile -use-profile-top-down-order=0 -sample-profile-file=%S/Inputs/profile-topdown-order.prof -S | FileCheck %s -check-prefix=STATIC
+; RUN: opt < %s -passes=sample-profile -use-profile-top-down-order=1 -sample-profile-file=%S/Inputs/profile-topdown-order.prof -S | FileCheck %s -check-prefix=DYNAMIC
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 
 ; STATIC:  define dso_local i32 @_Z8funcLeafi{{.*}} !prof ![[#PROF:]]

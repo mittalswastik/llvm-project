@@ -662,10 +662,13 @@ public:
   /// llvm.lifetime.end marker.
   bool isLifetimeStartOrEnd() const;
 
+<<<<<<< HEAD
   /// Return true if the instruction is a llvm.launder.invariant.group or
   /// llvm.strip.invariant.group.
   bool isLaunderOrStripInvariantGroup() const;
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   /// Return true if the instruction is a DbgInfoIntrinsic or PseudoProbeInst.
   bool isDebugOrPseudoInst() const;
 

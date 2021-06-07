@@ -178,6 +178,7 @@ static void symbolizeInput(const opt::InputArgList &Args, uint64_t AdjustVMA,
     // caller function in the inlining chain. This contradicts the existing
     // behavior of addr2line. Symbolizer.symbolizeInlinedCode() overrides only
     // the topmost function, which suits our needs better.
+<<<<<<< HEAD
     Expected<DIInliningInfo> ResOrErr = Symbolizer.symbolizeInlinedCode(
         ModuleName, {AdjustedOffset, object::SectionedAddress::UndefSection});
     Expected<DILineInfo> Res0OrErr =
@@ -186,6 +187,16 @@ static void symbolizeInput(const opt::InputArgList &Args, uint64_t AdjustVMA,
             : ((ResOrErr->getNumberOfFrames() == 0) ? DILineInfo()
                                                     : ResOrErr->getFrame(0));
     print({ModuleName, Offset}, Res0OrErr, Printer);
+=======
+    auto ResOrErr = Symbolizer.symbolizeInlinedCode(
+        ModuleName, {Offset, object::SectionedAddress::UndefSection});
+    if (!ResOrErr || ResOrErr->getNumberOfFrames() == 0) {
+      error(ResOrErr);
+      Printer << DILineInfo();
+    } else {
+      Printer << ResOrErr->getFrame(0);
+    }
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   } else {
     Expected<DILineInfo> ResOrErr = Symbolizer.symbolizeCode(
         ModuleName, {AdjustedOffset, object::SectionedAddress::UndefSection});

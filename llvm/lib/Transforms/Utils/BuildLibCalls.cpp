@@ -166,6 +166,7 @@ static bool setArgsNoUndef(Function &F) {
   return Changed;
 }
 
+<<<<<<< HEAD
 static bool setArgNoUndef(Function &F, unsigned ArgNo) {
   if (F.hasParamAttribute(ArgNo, Attribute::NoUndef))
     return false;
@@ -174,6 +175,8 @@ static bool setArgNoUndef(Function &F, unsigned ArgNo) {
   return true;
 }
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 static bool setRetAndArgsNoUndef(Function &F) {
   return setRetNoUndef(F) | setArgsNoUndef(F);
 }

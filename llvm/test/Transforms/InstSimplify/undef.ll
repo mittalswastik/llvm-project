@@ -90,7 +90,11 @@ define i64 @test10() {
 
 define i64 @test11() {
 ; CHECK-LABEL: @test11(
+<<<<<<< HEAD
 ; CHECK:         ret i64 poison
+=======
+; CHECK:         ret i64 undef
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ;
   %r = shl i64 undef, undef
   ret i64 %r
@@ -106,7 +110,11 @@ define i64 @test11b(i64 %a) {
 
 define i64 @test12() {
 ; CHECK-LABEL: @test12(
+<<<<<<< HEAD
 ; CHECK:         ret i64 poison
+=======
+; CHECK:         ret i64 undef
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ;
   %r = ashr i64 undef, undef
   ret i64 %r
@@ -122,7 +130,11 @@ define i64 @test12b(i64 %a) {
 
 define i64 @test13() {
 ; CHECK-LABEL: @test13(
+<<<<<<< HEAD
 ; CHECK:         ret i64 poison
+=======
+; CHECK:         ret i64 undef
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ;
   %r = lshr i64 undef, undef
   ret i64 %r
@@ -235,7 +247,11 @@ define i32 @test23(i32 %a) {
 
 define i32 @test24() {
 ; CHECK-LABEL: @test24(
+<<<<<<< HEAD
 ; CHECK:         ret i32 poison
+=======
+; CHECK:         ret i32 undef
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ;
   %b = udiv i32 undef, 0
   ret i32 %b
@@ -243,7 +259,11 @@ define i32 @test24() {
 
 define i32 @test25() {
 ; CHECK-LABEL: @test25(
+<<<<<<< HEAD
 ; CHECK:         ret i32 poison
+=======
+; CHECK:         ret i32 undef
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ;
   %b = lshr i32 0, undef
   ret i32 %b
@@ -251,7 +271,11 @@ define i32 @test25() {
 
 define i32 @test26() {
 ; CHECK-LABEL: @test26(
+<<<<<<< HEAD
 ; CHECK:         ret i32 poison
+=======
+; CHECK:         ret i32 undef
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ;
   %b = ashr i32 0, undef
   ret i32 %b
@@ -259,7 +283,11 @@ define i32 @test26() {
 
 define i32 @test27() {
 ; CHECK-LABEL: @test27(
+<<<<<<< HEAD
 ; CHECK:         ret i32 poison
+=======
+; CHECK:         ret i32 undef
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ;
   %b = shl i32 0, undef
   ret i32 %b
@@ -339,7 +367,11 @@ define i32 @test36(i32 %V) {
 
 define i32 @test37() {
 ; CHECK-LABEL: @test37(
+<<<<<<< HEAD
 ; CHECK:         ret i32 poison
+=======
+; CHECK:         ret i32 undef
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ;
   %b = udiv i32 undef, undef
   ret i32 %b
@@ -355,7 +387,11 @@ define i32 @test38(i32 %a) {
 
 define i32 @test39() {
 ; CHECK-LABEL: @test39(
+<<<<<<< HEAD
 ; CHECK:         ret i32 poison
+=======
+; CHECK:         ret i32 undef
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ;
   %b = udiv i32 0, undef
   ret i32 %b

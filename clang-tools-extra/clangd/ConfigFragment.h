@@ -244,6 +244,7 @@ struct Fragment {
     std::vector<Located<std::string>> FullyQualifiedNamespaces;
   };
   StyleBlock Style;
+<<<<<<< HEAD
 
   /// Describes code completion preferences.
   struct CompletionBlock {
@@ -252,6 +253,8 @@ struct Fragment {
     llvm::Optional<Located<bool>> AllScopes;
   };
   CompletionBlock Completion;
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 };
 
 } // namespace config

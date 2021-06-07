@@ -30,10 +30,13 @@ cl::opt<bool> ShowSourceLocations("show-source-locations", cl::ReallyHidden,
                                   cl::init(false), cl::ZeroOrMore,
                                   cl::desc("Print source locations."));
 
+<<<<<<< HEAD
 cl::opt<bool> ShowCanonicalFnName("show-canonical-fname", cl::ReallyHidden,
                                   cl::init(false), cl::ZeroOrMore,
                                   cl::desc("Print canonical function name."));
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 cl::opt<bool> ShowPseudoProbe(
     "show-pseudo-probe", cl::ReallyHidden, cl::init(false), cl::ZeroOrMore,
     cl::desc("Print pseudo probe section and disassembled info."));
@@ -131,9 +134,14 @@ bool ProfiledBinary::inlineContextEqual(uint64_t Address1,
                     Context2.begin(), Context2.begin() + Context2.size() - 1);
 }
 
+<<<<<<< HEAD
 std::string
 ProfiledBinary::getExpandedContextStr(const SmallVectorImpl<uint64_t> &Stack,
                                       bool &WasLeafInlined) const {
+=======
+std::string ProfiledBinary::getExpandedContextStr(
+    const SmallVectorImpl<uint64_t> &Stack) const {
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   std::string ContextStr;
   SmallVector<std::string, 16> ContextVec;
   // Process from frame root to leaf
@@ -144,9 +152,12 @@ ProfiledBinary::getExpandedContextStr(const SmallVectorImpl<uint64_t> &Stack,
     // processing
     if (ExpandedContext.empty())
       return std::string();
+<<<<<<< HEAD
     // Set WasLeafInlined to the size of inlined frame count for the last
     // address which is leaf
     WasLeafInlined = (ExpandedContext.size() > 1);
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
     for (const auto &Loc : ExpandedContext) {
       ContextVec.push_back(getCallSite(Loc));
     }
@@ -221,10 +232,14 @@ bool ProfiledBinary::dissassembleSymbol(std::size_t SI, ArrayRef<uint8_t> Bytes,
   if (StartOffset >= EndOffset)
     return true;
 
+<<<<<<< HEAD
   StringRef SymbolName =
       ShowCanonicalFnName
           ? FunctionSamples::getCanonicalFnName(Symbols[SI].Name)
           : Symbols[SI].Name;
+=======
+  std::string &&SymbolName = Symbols[SI].Name.str();
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   if (ShowDisassemblyOnly)
     outs() << '<' << SymbolName << ">:\n";
 
@@ -269,6 +284,7 @@ bool ProfiledBinary::dissassembleSymbol(std::size_t SI, ArrayRef<uint8_t> Bytes,
       outs() << "\n";
     }
 
+<<<<<<< HEAD
     if (Disassembled) {
       const MCInstrDesc &MCDesc = MII->get(Inst.getOpcode());
       // Populate a vector of the symbolized callsite at this location
@@ -294,13 +310,35 @@ bool ProfiledBinary::dissassembleSymbol(std::size_t SI, ArrayRef<uint8_t> Bytes,
     } else {
       InvalidInstLength += Size;
     }
+=======
+    const MCInstrDesc &MCDesc = MII->get(Inst.getOpcode());
+
+    // Populate a vector of the symbolized callsite at this location
+    // We don't need symbolized info for probe-based profile, just use an empty
+    // stack as an entry to indicate a valid binary offset
+    FrameLocationStack SymbolizedCallStack;
+    if (!UsePseudoProbes) {
+      InstructionPointer IP(this, Offset);
+      SymbolizedCallStack = symbolize(IP, true);
+    }
+    Offset2LocStackMap[Offset] = SymbolizedCallStack;
+    // Populate address maps.
+    CodeAddrs.push_back(Offset);
+    if (MCDesc.isCall())
+      CallAddrs.insert(Offset);
+    else if (MCDesc.isReturn())
+      RetAddrs.insert(Offset);
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
     Offset += Size;
   }
 
+<<<<<<< HEAD
   if (InvalidInstLength)
     WarnInvalidInsts(Offset - InvalidInstLength, Offset - 1);
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   if (ShowDisassemblyOnly)
     outs() << "\n";
 

@@ -157,10 +157,15 @@ set(bc_flags -S -x c++ -O1 -std=c++14
              -Xclang -emit-llvm-bc
              -Xclang -aux-triple -Xclang ${aux_triple}
              -fopenmp -fopenmp-cuda-mode -Xclang -fopenmp-is-device
+<<<<<<< HEAD
              -Xclang -target-feature -Xclang +ptx61
              -D__CUDACC__
              -I${devicertl_base_directory}
              -I${devicertl_common_directory}/include
+=======
+             -D__CUDACC__
+             -I${devicertl_base_directory}
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
              -I${devicertl_nvptx_directory}/src)
 
 if(${LIBOMPTARGET_NVPTX_DEBUG})
@@ -172,7 +177,21 @@ endif()
 # Create target to build all Bitcode libraries.
 add_custom_target(omptarget-nvptx-bc)
 
+<<<<<<< HEAD
 # Generate a Bitcode library for all the compute capabilities the user requested
+=======
+# This map is from clang/lib/Driver/ToolChains/Cuda.cpp.
+# The last element is the default case.
+set(cuda_version_list 112 111 110 102 101 100 92 91 90 80)
+set(ptx_feature_list 70 70 70 65 64 63 61 61 60 42)
+# The following two lines of ugly code is not needed when the minimal CMake
+# version requirement is 3.17+.
+list(LENGTH cuda_version_list num_version_supported)
+math(EXPR loop_range "${num_version_supported} - 1")
+
+# Generate a Bitcode library for all the compute capabilities the user
+# requested and all PTX version we know for now.
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 foreach(sm ${nvptx_sm_list})
   set(cuda_flags -Xclang -target-cpu -Xclang sm_${sm} "-D__CUDA_ARCH__=${sm}0")
   set(bc_files "")

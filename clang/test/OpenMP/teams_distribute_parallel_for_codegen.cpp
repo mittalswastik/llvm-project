@@ -24,7 +24,21 @@ int teams_argument_global(int n){
   int te = n / 128;
   int th = 128;
   // discard n_addr
+<<<<<<< HEAD
 
+=======
+  // CK1: alloca i32,
+  // CK1: [[TE:%.+]] = alloca i32,
+  // CK1: [[TH:%.+]] = alloca i32,
+  // CK1: [[TE_CAST:%.+]] = alloca i{{32|64}},
+  // CK1: [[TH_CAST:%.+]] = alloca i{{32|64}},
+  // CK1: [[TE_PAR:%.+]] = load{{.+}}, {{.+}} [[TE_CAST]],
+  // CK1: [[TH_PAR:%.+]] = load{{.+}}, {{.+}} [[TH_CAST]],
+  // CK1: call void @__kmpc_push_target_tripcount_mapper(%struct.ident_t* @{{.+}}, i64 -1, i64 %{{.+}})
+  // CK1: call i32 @__tgt_target_teams_mapper(%struct.ident_t* @{{.+}}, i64 -1, i8* @{{[^,]+}}, i32 4, i8** %{{[^,]+}}, i8** %{{[^,]+}}, i{{64|32}}* {{.+}}@{{[^,]+}}, i32 0, i32 0), i64* {{.+}}@{{[^,]+}}, i32 0, i32 0), i8** null, i8** null, i32 {{.+}}, i32 {{.+}})
+
+  // CK1: call void @[[OFFL1:.+]](i{{32|64}} [[TE_PAR]], i{{32|64}} [[TH_PAR]],
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   #pragma omp target
   #pragma omp teams distribute parallel for num_teams(te), thread_limit(th)
   for(int i = 0; i < n; i++) {

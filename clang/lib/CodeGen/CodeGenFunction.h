@@ -524,6 +524,7 @@ public:
   // applies to.  nullptr if there is no 'musttail' on the current statement.
   const CallExpr *MustTailCall = nullptr;
 
+<<<<<<< HEAD
   /// Returns true if a function must make progress, which means the
   /// mustprogress attribute can be added.
   bool checkIfFunctionMustProgress() {
@@ -540,6 +541,28 @@ public:
     //
     // Hence each function is 'mustprogress' in C++11 or later.
     return getLangOpts().CPlusPlus11;
+=======
+  /// True if the C++ Standard Requires Progress.
+  bool CPlusPlusWithProgress() {
+    if (CGM.getCodeGenOpts().getFiniteLoops() ==
+        CodeGenOptions::FiniteLoopsKind::Never)
+      return false;
+
+    return getLangOpts().CPlusPlus11 || getLangOpts().CPlusPlus14 ||
+           getLangOpts().CPlusPlus17 || getLangOpts().CPlusPlus20;
+  }
+
+  /// True if the C Standard Requires Progress.
+  bool CWithProgress() {
+    if (CGM.getCodeGenOpts().getFiniteLoops() ==
+        CodeGenOptions::FiniteLoopsKind::Always)
+      return true;
+    if (CGM.getCodeGenOpts().getFiniteLoops() ==
+        CodeGenOptions::FiniteLoopsKind::Never)
+      return false;
+
+    return getLangOpts().C11 || getLangOpts().C17 || getLangOpts().C2x;
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   }
 
   /// Returns true if a loop must make progress, which means the mustprogress

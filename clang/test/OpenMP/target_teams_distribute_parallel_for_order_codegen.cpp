@@ -13,6 +13,13 @@
 #define HEADER
 
 void gtid_test() {
+<<<<<<< HEAD
+=======
+// CHECK: call void @__kmpc_push_target_tripcount_mapper(%struct.ident_t* @{{.+}}, i64 -1, i64 100)
+// CHECK: %0 = call i32 @__tgt_target_teams_mapper(%struct.ident_t* @{{.+}}, i64 -1, i8* @{{.+}}, i32 0, i8** null, i8** null, i64* null, i64* null, i8** null, i8** null, i32 0, i32 0)
+// CHECK: call void [[TARGET_OUTLINE:@.+]]()
+// CHECK: ret void
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 #pragma omp target teams distribute parallel for order(concurrent)
   for(int i = 0 ; i < 100; i++) {}
 }

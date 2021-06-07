@@ -1939,7 +1939,11 @@ Sema::SemaDiagnosticBuilder Sema::diagIfOpenMPHostCode(SourceLocation Loc,
                                                        FunctionDecl *FD) {
   assert(LangOpts.OpenMP && !LangOpts.OpenMPIsDevice &&
          "Expected OpenMP host compilation.");
+<<<<<<< HEAD
 
+=======
+  FunctionEmissionStatus FES = getEmissionStatus(FD);
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   SemaDiagnosticBuilder::Kind Kind = SemaDiagnosticBuilder::K_Nop;
   if (FD) {
     FunctionEmissionStatus FES = getEmissionStatus(FD);

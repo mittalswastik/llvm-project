@@ -5196,6 +5196,7 @@ private:
   llvm::DenseMap<const IdentifierInfo *, Member> Results;
 };
 
+<<<<<<< HEAD
 // Returns a type for E that yields acceptable member completions.
 // In particular, when E->getType() is DependentTy, try to guess a likely type.
 // We accept some lossiness (like dropping parameters).
@@ -5264,6 +5265,8 @@ QualType getApproximateType(const Expr *E) {
   return Unresolved;
 }
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 // If \p Base is ParenListExpr, assume a chain of comma operators and pick the
 // last expr. We expect other ParenListExprs to be resolved to e.g. constructor
 // calls before here. (So the ParenListExpr should be nonempty, but check just

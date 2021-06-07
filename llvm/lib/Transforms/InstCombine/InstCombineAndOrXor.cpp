@@ -3357,6 +3357,7 @@ Instruction *InstCombinerImpl::visitXor(BinaryOperator &I) {
       }
     }
 
+<<<<<<< HEAD
     // ~((-X) | Y) --> (X - 1) & (~Y)
     if (match(NotVal,
               m_OneUse(m_c_Or(m_OneUse(m_Neg(m_Value(X))), m_Value(Y))))) {
@@ -3365,6 +3366,8 @@ Instruction *InstCombinerImpl::visitXor(BinaryOperator &I) {
       return BinaryOperator::CreateAnd(DecX, NotY);
     }
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
     // ~(~X >>s Y) --> (X >>s Y)
     if (match(NotVal, m_AShr(m_Not(m_Value(X)), m_Value(Y))))
       return BinaryOperator::CreateAShr(X, Y);

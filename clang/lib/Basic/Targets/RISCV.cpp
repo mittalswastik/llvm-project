@@ -224,6 +224,7 @@ void RISCVTargetInfo::getTargetDefines(const LangOptions &Opts,
 
   if (HasZvlsseg)
     Builder.defineMacro("__riscv_zvlsseg", "10000");
+<<<<<<< HEAD
 }
 
 const Builtin::Info RISCVTargetInfo::BuiltinInfo[] = {
@@ -247,6 +248,8 @@ bool RISCVTargetInfo::initFeatureMap(
     Features["64bit"] = true;
 
   return TargetInfo::initFeatureMap(Features, Diags, CPU, FeaturesVec);
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 }
 
 /// Return true if has this feature, need to sync with handleTargetFeatures.

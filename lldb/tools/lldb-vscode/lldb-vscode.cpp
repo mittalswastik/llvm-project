@@ -8,12 +8,21 @@
 
 #include "VSCode.h"
 
+<<<<<<< HEAD
 #include <cassert>
 #include <climits>
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+=======
+#include <assert.h>
+#include <limits.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 #include <sys/stat.h>
 #include <sys/types.h>
 #if defined(_WIN32)
@@ -58,7 +67,10 @@
 
 #include "JSONUtils.h"
 #include "LLDBUtils.h"
+<<<<<<< HEAD
 #include "OutputRedirector.h"
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 #if defined(_WIN32)
 #ifndef PATH_MAX

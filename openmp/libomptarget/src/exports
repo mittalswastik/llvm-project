@@ -36,10 +36,13 @@ VERS1.0 {
     omp_target_memcpy_rect;
     omp_target_associate_ptr;
     omp_target_disassociate_ptr;
+<<<<<<< HEAD
     llvm_omp_target_alloc_host;
     llvm_omp_target_alloc_shared;
     llvm_omp_target_alloc_device;
     __tgt_set_info_flag;
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   local:
     *;
 };

@@ -1562,12 +1562,15 @@ PassBuilder::buildThinLTOPreLinkDefaultPipeline(OptimizationLevel Level) {
   if (PGOOpt && PGOOpt->PseudoProbeForProfiling)
     MPM.addPass(PseudoProbeUpdatePass());
 
+<<<<<<< HEAD
   // Handle OptimizerLastEPCallbacks added by clang on PreLink. Actual
   // optimization is going to be done in PostLink stage, but clang can't
   // add callbacks there in case of in-process ThinLTO called by linker.
   for (auto &C : OptimizerLastEPCallbacks)
     C(MPM, Level);
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   // Emit annotation remarks.
   addAnnotationRemarksPass(MPM);
 

@@ -129,7 +129,11 @@
 // REPORT-NEXT: main                              1       0 100.00%        16       0 100.00%         0       0   0.00%
 // REPORT-NEXT: c-general.c:static_func           4       0 100.00%         4       0 100.00%         2       0 100.00%
 // REPORT-NEXT: ---
+<<<<<<< HEAD
 // REPORT-NEXT: TOTAL                           197      24  87.82%       234       8  96.58%       174      38  78.16%
+=======
+// REPORT-NEXT: TOTAL                           197      24  87.82%       234       8 96.58%       174      38  78.16%
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 // Test file-level report.
 // RUN: llvm-profdata merge %S/Inputs/branch-c-general.proftext -o %t.profdata

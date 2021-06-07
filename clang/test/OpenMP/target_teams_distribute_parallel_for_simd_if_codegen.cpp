@@ -41,6 +41,15 @@ void fn6();
 int Arg;
 
 void gtid_test() {
+<<<<<<< HEAD
+=======
+// CHECK: call void @__kmpc_push_target_tripcount_mapper(%struct.ident_t* @{{.+}}, i64 -1, i64 100)
+// CHECK: call i{{[0-9]+}} @__tgt_target_teams_mapper(%struct.ident_t* @{{.+}},
+// CHECK: call void [[OFFLOADING_FUN_0:@.+]](
+// CHECK: call void @__kmpc_push_target_tripcount_mapper(%struct.ident_t* @{{.+}}, i64 -1, i64 100)
+// CHECK: call i{{[0-9]+}} @__tgt_target_teams_mapper(%struct.ident_t* @{{.+}},
+// CHECK: call void [[OFFLOADING_FUN_1:@.+]](
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 #ifdef OMP5
 #pragma omp target teams distribute parallel for simd if(simd: true) nontemporal(Arg)
 #else
@@ -75,6 +84,18 @@ int tmain(T Arg) {
 }
 
 int main() {
+<<<<<<< HEAD
+=======
+// CHECK: call void @__kmpc_push_target_tripcount_mapper(%struct.ident_t* @{{.+}}, i64 -1, i64 100)
+// CHECK: call i{{[0-9]+}} @__tgt_target_teams_mapper(%struct.ident_t* @{{.+}},
+// CHECK: call void [[OFFLOADING_FUN_0:@.+]](
+// CHECK-NOT: call void @__kmpc_push_target_tripcount_mapper(%struct.ident_t* @{{.+}}, i64 -1, i64 100)
+// CHECK: call void [[OFFLOADING_FUN_1:@.+]](
+// CHECK: call void @__kmpc_push_target_tripcount_mapper(%struct.ident_t* @{{.+}}, i64 -1, i64 100)
+// CHECK: call i{{[0-9]+}} @__tgt_target_teams_mapper(%struct.ident_t* @{{.+}},
+// CHECK: call void [[OFFLOADING_FUN_2:@.+]](
+// CHECK: = call {{.*}}i{{.+}} @{{.+}}tmain
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 #pragma omp target teams distribute parallel for simd if (true)
   for(int i = 0 ; i < 100; i++) {
 

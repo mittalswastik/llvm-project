@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 ; RUN: opt < %s -mtriple=x86_64-- -inferattrs -S | FileCheck --check-prefixes=CHECK,CHECK-NOLINUX,CHECK-UNKNOWN %s
 ; RUN: opt < %s -mtriple=x86_64-- -passes=inferattrs -S | FileCheck --check-prefixes=CHECK,CHECK-NOLINUX,CHECK-UNKNOWN %s
 ; RUN: opt < %s -mtriple=x86_64-apple-macosx10.8.0 -inferattrs -S | FileCheck --check-prefixes=CHECK,CHECK-KNOWN,CHECK-NOLINUX,CHECK-DARWIN %s
 ; RUN: opt < %s -mtriple=x86_64-unknown-linux-gnu -inferattrs -S | FileCheck --check-prefixes=CHECK,CHECK-KNOWN,CHECK-LINUX %s
 ; RUN: opt < %s -mtriple=nvptx -inferattrs -S | FileCheck --check-prefixes=CHECK-NOLINUX,CHECK-NVPTX %s
+=======
+; RUN: opt < %s -mtriple=x86_64-- -inferattrs -S | FileCheck -check-prefix=CHECK-UNKNOWN %s
+; RUN: opt < %s -mtriple=x86_64-- -passes=inferattrs -S | FileCheck -check-prefix=CHECK-UNKNOWN %s
+; RUN: opt < %s -mtriple=x86_64-apple-macosx10.8.0 -inferattrs -S | FileCheck -check-prefix=CHECK -check-prefix=CHECK-DARWIN %s
+; RUN: opt < %s -mtriple=x86_64-unknown-linux-gnu -inferattrs -S | FileCheck -check-prefix=CHECK -check-prefix=CHECK-LINUX %s
+; RUN: opt < %s -mtriple=nvptx -inferattrs -S | FileCheck -check-prefix=CHECK-NVPTX %s
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 declare i32 @__nvvm_reflect(i8*)
 ; CHECK-NVPTX: declare noundef i32 @__nvvm_reflect(i8* noundef) [[NOFREE_NOUNWIND_READNONE:#[0-9]+]]
@@ -247,7 +255,11 @@ declare void @bcopy(i8*, i8*, i64)
 ; CHECK: declare void @bzero(i8* nocapture writeonly, i64)  [[ARGMEMONLY_NOFREE_NOUNWIND_WILLRETURN]]
 declare void @bzero(i8*, i64)
 
+<<<<<<< HEAD
 ; CHECK: declare noalias noundef i8* @calloc(i64 noundef, i64 noundef) [[NOFREE_NOUNWIND_WILLRETURN]]
+=======
+; CHECK: declare noalias noundef i8* @calloc(i64, i64) [[INACCESSIBLEMEMONLY_NOFREE_NOUNWIND_WILLRETURN:#[0-9]+]]
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 declare i8* @calloc(i64, i64)
 
 ; CHECK: declare double @cbrt(double) [[NOFREE_NOUNWIND_WILLRETURN]]
@@ -449,7 +461,11 @@ declare i32 @fputs(i8*, %opaque*)
 ; CHECK: declare noundef i64 @fread(i8* nocapture noundef, i64 noundef, i64 noundef, %opaque* nocapture noundef) [[NOFREE_NOUNWIND]]
 declare i64 @fread(i8*, i64, i64, %opaque*)
 
+<<<<<<< HEAD
 ; CHECK: declare void @free(i8* nocapture noundef) [[INACCESSIBLEMEMORARGMEMONLY_NOUNWIND_WILLRETURN:#[0-9]+]]
+=======
+; CHECK: declare void @free(i8* nocapture noundef) [[NOUNWIND:#[0-9]+]]
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 declare void @free(i8*)
 
 ; CHECK: declare double @frexp(double, i32* nocapture) [[NOFREE_NOUNWIND_WILLRETURN]]
@@ -731,7 +747,11 @@ declare i64 @read(i32, i8*, i64)
 ; CHECK: declare noundef i64 @readlink(i8* nocapture noundef readonly, i8* nocapture noundef, i64 noundef) [[NOFREE_NOUNWIND]]
 declare i64 @readlink(i8*, i8*, i64)
 
+<<<<<<< HEAD
 ; CHECK: declare noalias noundef i8* @realloc(i8* nocapture, i64 noundef) [[INACCESSIBLEMEMORARGMEMONLY_NOUNWIND_WILLRETURN]]
+=======
+; CHECK: declare noalias noundef i8* @realloc(i8* nocapture, i64) [[NOUNWIND]]
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 declare i8* @realloc(i8*, i64)
 
 ; CHECK: declare noundef i8* @reallocf(i8*, i64 noundef) [[WILLRETURN:#[0-9]+]]
@@ -1015,6 +1035,7 @@ declare i64 @write(i32, i8*, i64)
 ; CHECK-DARWIN: declare void @memset_pattern16(i8* nocapture writeonly, i8* nocapture readonly, i64) [[ARGMEMONLY_NOFREE:#[0-9]+]]
 declare void @memset_pattern16(i8*, i8*, i64)
 
+<<<<<<< HEAD
 
 ; CHECK-DAG: attributes [[NOFREE_NOUNWIND_WILLRETURN]] = { nofree nounwind willreturn mustprogress }
 ; CHECK-DAG: attributes [[NOFREE_NOUNWIND]] = { nofree nounwind }
@@ -1031,3 +1052,33 @@ declare void @memset_pattern16(i8*, i8*, i64)
 
 ; CHECK-DARWIN-DAG: attributes [[ARGMEMONLY_NOFREE]] = { argmemonly nofree }
 ; CHECK-NVPTX-DAG: attributes [[NOFREE_NOUNWIND_READNONE]] = { nofree nosync nounwind readnone }
+=======
+; CHECK-DAG-UNKNOWN: attributes [[INACCESSIBLEMEMONLY_NOFREE_WILLRETURN]] = { inaccessiblememonly nofree willreturn }
+; CHECK-DAG-UNKNOWN: attributes [[NOFREE_NOUNWIND_WILLRETURN]] = { nofree nounwind willreturn }
+; CHECK-DAG-UNKNOWN: attributes [[NOFREE_NOUNWIND]] = { nofree nounwind }
+; CHECK-DAG-UNKNOWN: attributes [[INACCESSIBLEMEMONLY_NOFREE_NOUNWIND_WILLRETURN]] = { inaccessiblememonly nofree nounwind willreturn }
+; CHECK-DAG-UNKNOWN: attributes [[NOFREE_NOUNWIND_READONLY_WILLRETURN]]  = { nofree nounwind readonly willreturn }
+; CHECK-DAG-UNKNOWN: attributes [[NOFREE_NOUNWIND_READONLY_WILLRETURN]] = { argmemonly nofree nounwind willreturn }
+; CHECK-DAG-UNKNOWN: attributes [[NOFREE_NOUNWIND_READONLY]] = { nofree nounwind readonly }
+; CHECK-DAG-UNKNOWN: attributes [[INACCESSIBLEMEMORARGONLY_NOUNWIND_WILLRETURN]]  = { inaccessiblemem_or_argmemonly nounwind willreturn }
+; CHECK-DAG-UNKNOWN: attributes [[NOFREE_WILLRETURN]] = { nofree willreturn }
+; CHECK-DAG-UNKNOWN: attributes [[ARGMEMONLY_NOFREE_NOUNWIND_READONLY_WILLRETURN]] = { argmemonly nofree nounwind readonly willreturn }
+; CHECK-DAG-UNKNOWN: attributes [[NOFREE]] = { nofree }
+; CHECK-DAG-UNKNOWN: attributes [[WILLRETURN]]= { willreturn }
+; CHECK-DAG-UNKNOWN: attributes [[INACCESSIBLEMEMORARGONLY_NOFREE_NOUNWIND_WILLRETURN]]  = { inaccessiblemem_or_argmemonly nofree nounwind willreturn }
+
+; CHECK-DAG-LINUX: attributes [[INACCESSIBLEMEMONLY_NOFREE_WILLRETURN]] = { inaccessiblememonly nofree willreturn }
+; CHECK-DAG-LINUX: attributes [[NOFREE]] = { nofree }
+; CHECK-DAG-LINUX: attributes [[NOFREE_NOUNWIND_WILLRETURN]] = { nofree nounwind willreturn }
+; CHECK-DAG-LINUX: attributes [[NOFREE_NOUNWIND]] = { nofree nounwind }
+; CHECK-DAG-LINUX: attributes [[INACCESSIBLEMEMONLY_NOFREE_NOUNWIND_WILLRETURN]] = { inaccessiblememonly nofree nounwind willreturn }
+; CHECK-DAG-LINUX: attributes [[NOFREE_NOUNWIND_READONLY_WILLRETURN]]  = { nofree nounwind readonly willreturn }
+; CHECK-DAG-LINUX: attributes [[ARGMEMONLY_NOFREE_NOUNWIND_READONLY_WILLRETURN]] = { argmemonly nofree nounwind readonly willreturn }
+; CHECK-DAG-LINUX: attributes [[NOFREE_NOUNWIND_READONLY_WILLRETURN]] = { argmemonly nofree nounwind willreturn }
+; CHECK-DAG-LINUX: attributes [[NOFREE_NOUNWIND_READONLY]] = { nofree nounwind readonly }
+; CHECK-DAG-LINUX: attributes [[INACCESSIBLEMEMORARGONLY_NOUNWIND_WILLRETURN]]  = { inaccessiblemem_or_argmemonly nounwind willreturn }
+; CHECK-DAG-LINUX: attributes [[NOFREE_WILLRETURN]] = { nofree willreturn }
+; CHECK-DAG-LINUX: attributes [[WILLRETURN]]= { willreturn }
+; CHECK-DAG-LINUX: attributes [[INACCESSIBLEMEMORARGONLY_NOFREE_NOUNWIND_WILLRETURN]]  = { inaccessiblemem_or_argmemonly nofree nounwind willreturn }
+; CHECK-DAG-LINUX: attributes [[ARGMEMONLY_NOFREE_NOUNWIND]] = { inaccessiblememonly nofree nounwind }
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d

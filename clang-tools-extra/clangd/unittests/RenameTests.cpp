@@ -1115,6 +1115,7 @@ TEST(RenameTest, IndexMergeMainFile) {
   auto AST = TU.build();
 
   auto Main = testPath("main.cc");
+<<<<<<< HEAD
   auto InMemFS = llvm::makeIntrusiveRefCnt<llvm::vfs::InMemoryFileSystem>();
   InMemFS->addFile(testPath("main.cc"), 0,
                    llvm::MemoryBuffer::getMemBuffer(Code.code()));
@@ -1130,6 +1131,17 @@ TEST(RenameTest, IndexMergeMainFile) {
                             : nullptr,
                         Idx,
                         RenameOptions()};
+=======
+
+  auto Rename = [&](const SymbolIndex *Idx) {
+    auto GetDirtyBuffer = [&](PathRef Path) -> llvm::Optional<std::string> {
+      return Code.code().str(); // Every file has the same content.
+    };
+    RenameOptions Opts;
+    Opts.AllowCrossFile = true;
+    RenameInputs Inputs{Code.point(), "xPrime", AST,           Main,
+                        Idx,          Opts,     GetDirtyBuffer};
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
     auto Results = rename(Inputs);
     EXPECT_TRUE(bool(Results)) << llvm::toString(Results.takeError());
     return std::move(*Results);

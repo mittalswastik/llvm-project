@@ -714,7 +714,10 @@ std::error_code SampleProfileReaderExtBinaryBase::readFuncProfiles() {
     }
     assert(Data == End && "More data is read than expected");
   } else {
+<<<<<<< HEAD
     // Load function profiles on demand.
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
     if (Remapper) {
       for (auto Name : FuncsToUse) {
         Remapper->insert(Name);
@@ -732,6 +735,7 @@ std::error_code SampleProfileReaderExtBinaryBase::readFuncProfiles() {
         if (std::error_code EC = readFuncProfile(FuncProfileAddr))
           return EC;
       }
+<<<<<<< HEAD
     } else if (FunctionSamples::ProfileIsCS) {
       // Compute the ordered set of names, so we can
       // get all context profiles under a subtree by
@@ -772,6 +776,8 @@ std::error_code SampleProfileReaderExtBinaryBase::readFuncProfiles() {
           It = OrderedNames.erase(It);
         }
       }
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
     } else {
       for (auto NameOffset : FuncOffsetTable) {
         SampleContext FContext(NameOffset.first);
@@ -787,10 +793,18 @@ std::error_code SampleProfileReaderExtBinaryBase::readFuncProfiles() {
     }
     Data = End;
   }
+<<<<<<< HEAD
   assert((CSProfileCount == 0 || CSProfileCount == Profiles.size()) &&
          "Cannot have both context-sensitive and regular profile");
   assert(ProfileIsCS == (CSProfileCount > 0) &&
          "Section flag should be consistent with actual profile");
+=======
+
+  assert((CSProfileCount == 0 || CSProfileCount == Profiles.size()) &&
+         "Cannot have both context-sensitive and regular profile");
+  ProfileIsCS = (CSProfileCount > 0);
+  FunctionSamples::ProfileIsCS = ProfileIsCS;
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   return sampleprof_error::success;
 }
 
@@ -983,8 +997,14 @@ std::error_code SampleProfileReaderExtBinaryBase::readNameTableSec(bool IsMD5) {
   return SampleProfileReaderBinary::readNameTable();
 }
 
+<<<<<<< HEAD
 std::error_code
 SampleProfileReaderExtBinaryBase::readFuncMetadata(bool ProfileHasAttribute) {
+=======
+std::error_code SampleProfileReaderExtBinaryBase::readFuncMetadata() {
+  if (!ProfileIsProbeBased)
+    return sampleprof_error::success;
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   while (Data < End) {
     auto FName(readStringFromTable());
     if (std::error_code EC = FName.getError())
@@ -1001,6 +1021,7 @@ SampleProfileReaderExtBinaryBase::readFuncMetadata(bool ProfileHasAttribute) {
         Profiles[FContext].setFunctionHash(*Checksum);
     }
 
+<<<<<<< HEAD
     if (ProfileHasAttribute) {
       auto Attributes = readNumber<uint32_t>();
       if (std::error_code EC = Attributes.getError())
@@ -1008,6 +1029,13 @@ SampleProfileReaderExtBinaryBase::readFuncMetadata(bool ProfileHasAttribute) {
       if (ProfileInMap)
         Profiles[FContext].getContext().setAllAttributes(*Attributes);
     }
+=======
+    SampleContext FContext(*FName);
+    // No need to load metadata for profiles that are not loaded in the current
+    // module.
+    if (Profiles.count(FContext))
+      Profiles[FContext].setFunctionHash(*Checksum);
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   }
 
   assert(Data == End && "More data is read than expected");

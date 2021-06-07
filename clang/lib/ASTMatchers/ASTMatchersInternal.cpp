@@ -733,7 +733,10 @@ const internal::VariadicDynCastAllOfMatcher<Decl, TypeAliasTemplateDecl>
     typeAliasTemplateDecl;
 const internal::VariadicAllOfMatcher<Decl> decl;
 const internal::VariadicDynCastAllOfMatcher<Decl, DecompositionDecl> decompositionDecl;
+<<<<<<< HEAD
 const internal::VariadicDynCastAllOfMatcher<Decl, BindingDecl> bindingDecl;
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 const internal::VariadicDynCastAllOfMatcher<Decl, LinkageSpecDecl>
     linkageSpecDecl;
 const internal::VariadicDynCastAllOfMatcher<Decl, NamedDecl> namedDecl;

@@ -194,7 +194,10 @@ struct FragmentCompiler {
     compile(std::move(F.CompileFlags));
     compile(std::move(F.Index));
     compile(std::move(F.Diagnostics));
+<<<<<<< HEAD
     compile(std::move(F.Completion));
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   }
 
   void compile(Fragment::IfBlock &&F) {
@@ -375,10 +378,13 @@ struct FragmentCompiler {
       Spec.MountPoint = std::move(*AbsPath);
     }
     Out.Apply.push_back([Spec(std::move(Spec))](const Params &P, Config &C) {
+<<<<<<< HEAD
       if (Spec.Kind == Config::ExternalIndexSpec::None) {
         C.Index.External = Spec;
         return;
       }
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
       if (P.Path.empty() || !pathStartsWith(Spec.MountPoint, P.Path,
                                             llvm::sys::path::Style::posix))
         return;
@@ -403,6 +409,7 @@ struct FragmentCompiler {
       Normalized.push_back(normalizeSuppressedCode(*Suppressed).str());
     }
     if (!Normalized.empty())
+<<<<<<< HEAD
       Out.Apply.push_back(
           [Normalized(std::move(Normalized))](const Params &, Config &C) {
             if (C.Diagnostics.SuppressAll)
@@ -410,6 +417,14 @@ struct FragmentCompiler {
             for (llvm::StringRef N : Normalized)
               C.Diagnostics.Suppress.insert(N);
           });
+=======
+      Out.Apply.push_back([Normalized](const Params &, Config &C) {
+        if (C.Diagnostics.SuppressAll)
+          return;
+        for (llvm::StringRef N : Normalized)
+          C.Diagnostics.Suppress.insert(N);
+      });
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
     compile(std::move(F.ClangTidy));
   }
@@ -481,6 +496,7 @@ struct FragmentCompiler {
             for (auto &StringPair : CheckOptions)
               C.Diagnostics.ClangTidy.CheckOptions.insert_or_assign(
                   StringPair.first, StringPair.second);
+<<<<<<< HEAD
           });
     }
   }
@@ -490,6 +506,8 @@ struct FragmentCompiler {
       Out.Apply.push_back(
           [AllScopes(**F.AllScopes)](const Params &, Config &C) {
             C.Completion.AllScopes = AllScopes;
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
           });
     }
   }

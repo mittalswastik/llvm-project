@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 ; RUN: opt -passes=instcombine -available-load-scan-limit=2 -S < %s | FileCheck %s
+=======
+; RUN: opt -passes=instcombine -S < %s | FileCheck %s
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 %struct.nonbonded = type { [2 x %struct.CompAtom*], [2 x %struct.CompAtomExt*], [2 x %struct.CompAtom*], [2 x %class.Vector*], [2 x %class.Vector*], [2 x i32], %class.Vector, double*, double*, %class.ComputeNonbondedWorkArrays*, %class.Pairlists*, i32, i32, double, double, i32, i32, i32, i32 }
 %struct.CompAtomExt = type { i32 }
@@ -13,11 +17,19 @@
 %class.ResizeArrayRaw.3 = type <{ %class.Vector*, i8*, i32, i32, i32, float, i32, [4 x i8] }>
 %class.Pairlists = type { i16*, i32, i32 }
 
+<<<<<<< HEAD
 define dso_local void @merge(%struct.nonbonded* nocapture readonly %params) local_unnamed_addr align 2 {
 ;; Check the minPart4 and minPart assignments are merged.
 ; CHECK-LABEL: @merge(
 ; CHECK-COUNT-1: getelementptr inbounds %struct.nonbonded, %struct.nonbonded* %params, i64 0, i32 16
 ; CHECK-NOT: getelementptr inbounds %struct.nonbonded, %struct.nonbonded* %params, i64 0, i32 16
+=======
+;; Check the minPart4 and minPart assignments are merged.
+; CHECK-COUNT-1: getelementptr inbounds %struct.nonbonded, %struct.nonbonded* %params, i64 0, i32 16
+; CHECK-NOT: getelementptr inbounds %struct.nonbonded, %struct.nonbonded* %params, i64 0, i32 16
+
+define dso_local void @_ZN20ComputeNonbondedUtil9calc_pairEP9nonbonded(%struct.nonbonded* nocapture readonly %params) local_unnamed_addr align 2 {
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 entry:
   %savePairlists3 = getelementptr inbounds %struct.nonbonded, %struct.nonbonded* %params, i64 0, i32 11
   %0 = load i32, i32* %savePairlists3, align 8
@@ -58,6 +70,7 @@ if.else147:                                       ; preds = %if.then138
   ret void
 }
 
+<<<<<<< HEAD
 define i32 @load(i32* nocapture %a, i32* nocapture %b) {
 ;; Check the last store is deleted.
 ; CHECK-LABEL: @load(
@@ -88,6 +101,9 @@ define void @dse(i32* %p) {
   store i32 0, i32* %p
   ret void
 }
+=======
+declare dso_local void @_ZN9Pairlists8addIndexEv() align 2
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 ; Function Attrs: inaccessiblememonly nounwind willreturn
 declare void @llvm.pseudoprobe(i64, i64, i32, i64) #0

@@ -14072,14 +14072,22 @@ Value *CodeGenFunction::EmitX86BuiltinExpr(unsigned BuiltinID,
   case X86::BI__builtin_ia32_reduce_fadd_ps512: {
     Function *F =
         CGM.getIntrinsic(Intrinsic::vector_reduce_fadd, Ops[1]->getType());
+<<<<<<< HEAD
     Builder.getFastMathFlags().setAllowReassoc();
+=======
+    Builder.getFastMathFlags().setAllowReassoc(true);
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
     return Builder.CreateCall(F, {Ops[0], Ops[1]});
   }
   case X86::BI__builtin_ia32_reduce_fmul_pd512:
   case X86::BI__builtin_ia32_reduce_fmul_ps512: {
     Function *F =
         CGM.getIntrinsic(Intrinsic::vector_reduce_fmul, Ops[1]->getType());
+<<<<<<< HEAD
     Builder.getFastMathFlags().setAllowReassoc();
+=======
+    Builder.getFastMathFlags().setAllowReassoc(true);
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
     return Builder.CreateCall(F, {Ops[0], Ops[1]});
   }
   case X86::BI__builtin_ia32_reduce_fmax_pd512:

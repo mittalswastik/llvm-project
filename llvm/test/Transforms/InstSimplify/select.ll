@@ -965,6 +965,7 @@ define <vscale x 2 x i1> @ignore_scalable_undef(<vscale x 2 x i1> %cond) {
   ret <vscale x 2 x i1> %s
 }
 
+<<<<<<< HEAD
 define i32 @select_neutral_add_rhs(i32 %x, i32 %y) {
 ; CHECK-LABEL: @select_neutral_add_rhs(
 ; CHECK-NEXT:    [[ADD:%.*]] = add i32 [[X:%.*]], [[Y:%.*]]
@@ -1023,6 +1024,8 @@ define i32 @select_ctpop_zero(i32 %x) {
 }
 declare i32 @llvm.ctpop.i32(i32)
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 define <2 x i32> @vec_select_no_equivalence(<2 x i32> %x, <2 x i32> %y) {
 ; CHECK-LABEL: @vec_select_no_equivalence(
 ; CHECK-NEXT:    [[X10:%.*]] = shufflevector <2 x i32> [[X:%.*]], <2 x i32> undef, <2 x i32> <i32 1, i32 0>

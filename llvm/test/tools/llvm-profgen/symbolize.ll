@@ -1,7 +1,10 @@
 ; REQUIRES: x86-registered-target
 ; RUN: llc -filetype=obj %s -o %t
 ; RUN: llvm-profgen --binary=%t --perfscript=%s --output=%t1 --show-disassembly-only -x86-asm-syntax=intel --show-source-locations | FileCheck %s --match-full-lines
+<<<<<<< HEAD
 ; RUN: llvm-profgen --binary=%t --perfscript=%s --output=%t2 --show-disassembly-only -x86-asm-syntax=intel --show-source-locations --show-canonical-fname | FileCheck %s --match-full-lines  --check-prefix=CHECK-CANO
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 ; CHECK: Disassembly of section .text [0x0, 0x4a]:
 ; CHECK: <funcA.llvm.1000>:

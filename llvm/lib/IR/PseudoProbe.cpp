@@ -97,6 +97,7 @@ void setProbeDistributionFactor(Instruction &Inst, float Factor) {
     }
   }
 }
+<<<<<<< HEAD
 
 void addPseudoProbeAttribute(PseudoProbeInst &Inst,
                              PseudoProbeAttributes Attr) {
@@ -167,4 +168,6 @@ bool removeRedundantPseudoProbes(BasicBlock *Block) {
     I->eraseFromParent();
   return !ToBeRemoved.empty();
 }
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 } // namespace llvm

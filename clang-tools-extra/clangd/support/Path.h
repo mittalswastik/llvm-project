@@ -40,10 +40,13 @@ bool pathEqual(PathRef, PathRef);
 bool pathStartsWith(
     PathRef Ancestor, PathRef Path,
     llvm::sys::path::Style Style = llvm::sys::path::Style::native);
+<<<<<<< HEAD
 
 /// Variant of parent_path that operates only on absolute paths.
 /// Unlike parent_path doesn't consider C: a parent of C:\.
 PathRef absoluteParent(PathRef Path);
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 } // namespace clangd
 } // namespace clang
 

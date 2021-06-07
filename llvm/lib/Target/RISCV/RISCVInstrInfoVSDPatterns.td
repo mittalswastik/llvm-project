@@ -467,10 +467,17 @@ defm : VPatBinarySDNode_VV_VX<mulhs, "PseudoVMULH">;
 defm : VPatBinarySDNode_VV_VX<mulhu, "PseudoVMULHU">;
 
 // 12.11. Vector Integer Divide Instructions
+<<<<<<< HEAD
 defm : VPatBinarySDNode_VV_VX<udiv, "PseudoVDIVU">;
 defm : VPatBinarySDNode_VV_VX<sdiv, "PseudoVDIV">;
 defm : VPatBinarySDNode_VV_VX<urem, "PseudoVREMU">;
 defm : VPatBinarySDNode_VV_VX<srem, "PseudoVREM">;
+=======
+defm "" : VPatBinarySDNode_VV_VX<udiv, "PseudoVDIVU">;
+defm "" : VPatBinarySDNode_VV_VX<sdiv, "PseudoVDIV">;
+defm "" : VPatBinarySDNode_VV_VX<urem, "PseudoVREMU">;
+defm "" : VPatBinarySDNode_VV_VX<srem, "PseudoVREM">;
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 // 12.15. Vector Integer Merge Instructions
 foreach vti = AllIntegerVectors in {

@@ -106,8 +106,22 @@ public:
     llvm::SmallVector<DotClangTidyCache *> Caches;
     {
       std::lock_guard<std::mutex> Lock(Mu);
+<<<<<<< HEAD
       for (auto Ancestor = absoluteParent(AbsPath); !Ancestor.empty();
            Ancestor = absoluteParent(Ancestor)) {
+=======
+      for (auto I = path::rbegin(Parent), E = path::rend(Parent); I != E; ++I) {
+        assert(I->end() >= Parent.begin() && I->end() <= Parent.end() &&
+               "Canonical path components should be substrings");
+        llvm::StringRef Ancestor(Parent.begin(), I->end() - Parent.begin());
+#ifdef _WIN32
+        // C:\ is an ancestor, but skip its (relative!) parent C:.
+        if (Ancestor.size() == 2 && Ancestor.back() == ':')
+          continue;
+#endif
+        assert(path::is_absolute(Ancestor));
+
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
         auto It = Cache.find(Ancestor);
         // Assemble the actual config file path only if needed.
         if (It == Cache.end()) {

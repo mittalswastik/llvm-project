@@ -734,7 +734,11 @@ mergeSampleProfile(const WeightedFileVector &Inputs, SymbolRemapper *Remapper,
           Remapper ? remapSamples(I->second, *Remapper, Result)
                    : FunctionSamples();
       FunctionSamples &Samples = Remapper ? Remapped : I->second;
+<<<<<<< HEAD
       StringRef FName = Samples.getNameWithContext();
+=======
+      StringRef FName = Samples.getNameWithContext(true);
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
       MergeResult(Result, ProfileMap[FName].merge(Samples, Input.Weight));
       if (Result != sampleprof_error::success) {
         std::error_code EC = make_error_code(Result);

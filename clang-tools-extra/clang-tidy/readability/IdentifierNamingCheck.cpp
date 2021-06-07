@@ -352,7 +352,11 @@ static bool isParamInMainLikeFunction(const ParmVarDecl &ParmDecl,
     return false;
   if (FDecl->getAccess() != AS_public && FDecl->getAccess() != AS_none)
     return false;
+<<<<<<< HEAD
   // If the function doesn't have a name that's an identifier, can occur if the
+=======
+  // If the function doesn't have a name thats an identifier, can occur of the
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   // function is an operator overload, bail out early.
   if (!FDecl->getDeclName().isIdentifier())
     return false;

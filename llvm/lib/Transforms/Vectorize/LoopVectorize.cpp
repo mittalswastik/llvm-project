@@ -5372,7 +5372,11 @@ bool LoopVectorizationCostModel::interleavedAccessCanBeWidened(
   // If the instruction's allocated size doesn't equal it's type size, it
   // requires padding and will be scalarized.
   auto &DL = I->getModule()->getDataLayout();
+<<<<<<< HEAD
   auto *ScalarTy = getLoadStoreType(I);
+=======
+  auto *ScalarTy = getMemInstValueType(I);
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   if (hasIrregularType(ScalarTy, DL))
     return false;
 
@@ -5854,6 +5858,7 @@ LoopVectorizationCostModel::computeMaxVF(ElementCount UserVF, unsigned UserIC) {
     InterleaveInfo.invalidateGroupsRequiringScalarEpilogue();
   }
 
+<<<<<<< HEAD
   FixedScalableVFPair MaxFactors = computeFeasibleMaxVF(TC, UserVF);
   // Avoid tail folding if the trip count is known to be a multiple of any VF
   // we chose.
@@ -5877,6 +5882,27 @@ LoopVectorizationCostModel::computeMaxVF(ElementCount UserVF, unsigned UserIC) {
       LLVM_DEBUG(dbgs() << "LV: No tail will remain for any chosen VF.\n");
       return MaxFactors;
     }
+=======
+  ElementCount MaxVF = computeFeasibleMaxVF(TC, UserVF);
+  assert(!MaxVF.isScalable() &&
+         "Scalable vectors do not yet support tail folding");
+  assert((UserVF.isNonZero() || isPowerOf2_32(MaxVF.getFixedValue())) &&
+         "MaxVF must be a power of 2");
+  unsigned MaxVFtimesIC =
+      UserIC ? MaxVF.getFixedValue() * UserIC : MaxVF.getFixedValue();
+  // Avoid tail folding if the trip count is known to be a multiple of any VF we
+  // chose.
+  ScalarEvolution *SE = PSE.getSE();
+  const SCEV *BackedgeTakenCount = PSE.getBackedgeTakenCount();
+  const SCEV *ExitCount = SE->getAddExpr(
+      BackedgeTakenCount, SE->getOne(BackedgeTakenCount->getType()));
+  const SCEV *Rem = SE->getURemExpr(
+      ExitCount, SE->getConstant(BackedgeTakenCount->getType(), MaxVFtimesIC));
+  if (Rem->isZero()) {
+    // Accept MaxVF if we do not have a tail.
+    LLVM_DEBUG(dbgs() << "LV: No tail will remain for any chosen VF.\n");
+    return MaxVF;
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   }
 
   // If we don't know the precise trip count, or if the trip count that we

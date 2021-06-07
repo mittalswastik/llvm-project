@@ -59,6 +59,7 @@
 ; INLINE-HOT-NEXT:   Callee context found: main:3.1 @ _Z5funcBi
 ; INLINE-HOT-NEXT: Getting callee context for instr:   %call1 = tail call i32 @_Z5funcAi
 ; INLINE-HOT-NEXT:   Callee context found: main:3 @ _Z5funcAi
+<<<<<<< HEAD
 ; INLINE-HOT-DAG: Getting base profile for function: _Z5funcAi
 ; INLINE-HOT-DAG-NEXT:   Merging context profile into base profile: _Z5funcAi
 ; INLINE-HOT-DAG-NEXT:   Found context tree root to promote: main:3 @ _Z5funcAi
@@ -84,6 +85,33 @@
 ; INLINE-HOT-DAG-NEXT:   Getting callee context for instr:   %call.i = tail call i32 @_Z3fibi
 ; INLINE-HOT-DAG-NEXT:   Getting callee context for instr:   %call5.i = tail call i32 @_Z3fibi
 ; INLINE-HOT:      Getting base profile for function: _Z8funcLeafi
+=======
+; INLINE-HOT-NEXT: Getting base profile for function: _Z5funcAi
+; INLINE-HOT-NEXT:   Merging context profile into base profile: _Z5funcAi
+; INLINE-HOT-NEXT:   Found context tree root to promote: main:3 @ _Z5funcAi
+; INLINE-HOT-NEXT:   Context promoted to: _Z5funcAi
+; INLINE-HOT-NEXT:   Context promoted to: _Z5funcAi:1 @ _Z8funcLeafi
+; INLINE-HOT-NEXT:   Getting callee context for instr:   %call = tail call i32 @_Z8funcLeafi(i32 %add), !dbg !50
+; INLINE-HOT-NEXT:   Callee context found: _Z5funcAi:1 @ _Z8funcLeafi
+; INLINE-HOT-NEXT: Marking context profile as inlined: _Z5funcAi:1 @ _Z8funcLeafi
+; INLINE-HOT-NEXT: Getting callee context for instr:   %call.i = tail call i32 @_Z3fibi(i32 %tmp.i) #2, !dbg !62
+; INLINE-HOT-NEXT: Getting callee context for instr:   %call5.i = tail call i32 @_Z3fibi(i32 %tmp1.i) #2, !dbg !69
+; INLINE-HOT-NEXT: Getting base profile for function: _Z5funcBi
+; INLINE-HOT-NEXT:   Merging context profile into base profile: _Z5funcBi
+; INLINE-HOT-NEXT:   Found context tree root to promote: external:10 @ _Z5funcBi
+; INLINE-HOT-NEXT:   Context promoted to: _Z5funcBi
+; INLINE-HOT-NEXT:   Found context tree root to promote: main:3.1 @ _Z5funcBi
+; INLINE-HOT-NEXT:   Context promoted and merged to: _Z5funcBi
+; INLINE-HOT-NEXT:   Context promoted to: _Z5funcBi:1 @ _Z8funcLeafi
+; INLINE-HOT-NEXT:   Found context tree root to promote: externalA:17 @ _Z5funcBi
+; INLINE-HOT-NEXT:   Context promoted and merged to: _Z5funcBi
+; INLINE-HOT-NEXT: Getting callee context for instr:   %call = tail call i32 @_Z8funcLeafi
+; INLINE-HOT-NEXT:   Callee context found: _Z5funcBi:1 @ _Z8funcLeafi
+; INLINE-HOT-NEXT: Marking context profile as inlined: _Z5funcBi:1 @ _Z8funcLeafi
+; INLINE-HOT-NEXT: Getting callee context for instr:   %call.i = tail call i32 @_Z3fibi
+; INLINE-HOT-NEXT: Getting callee context for instr:   %call5.i = tail call i32 @_Z3fibi
+; INLINE-HOT-NEXT: Getting base profile for function: _Z8funcLeafi
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ; INLINE-HOT-NEXT:   Merging context profile into base profile: _Z8funcLeafi
 
 

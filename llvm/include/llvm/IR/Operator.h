@@ -576,12 +576,15 @@ public:
       Type *SourceType, ArrayRef<const Value *> Index, const DataLayout &DL,
       APInt &Offset,
       function_ref<bool(Value &, APInt &)> ExternalAnalysis = nullptr);
+<<<<<<< HEAD
 
   /// Collect the offset of this GEP as a map of Values to their associated
   /// APInt multipliers, as well as a total Constant Offset.
   bool collectOffset(const DataLayout &DL, unsigned BitWidth,
                      SmallDenseMap<Value *, APInt, 8> &VariableOffsets,
                      APInt &ConstantOffset) const;
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 };
 
 class PtrToIntOperator

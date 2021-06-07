@@ -526,9 +526,12 @@ protected:
   /// Number of context-sensitive profiles.
   uint32_t CSProfileCount = 0;
 
+<<<<<<< HEAD
   /// Whether the function profiles use FS discriminators.
   bool ProfileIsFS = false;
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   /// \brief The format of sample.
   SampleProfileFormat Format = SPF_None;
 

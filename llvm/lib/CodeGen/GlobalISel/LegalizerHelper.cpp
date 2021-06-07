@@ -5016,7 +5016,11 @@ LegalizerHelper::narrowScalarFPTOI(MachineInstr &MI, unsigned TypeIdx,
   // out the result type. This is practically only useful for conversions from
   // half to at least 16-bits, so just handle the one case.
   if (SrcTy.getScalarType() != LLT::scalar(16) ||
+<<<<<<< HEAD
       NarrowTy.getScalarSizeInBits() < (IsSigned ? 17u : 16u))
+=======
+      NarrowTy.getScalarSizeInBits() < (IsSigned ? 17 : 16))
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
     return UnableToLegalize;
 
   Observer.changingInstr(MI);

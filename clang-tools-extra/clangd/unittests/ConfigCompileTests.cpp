@@ -341,13 +341,19 @@ TEST_F(ConfigCompileTests, ExternalBlockWarnOnMultipleSource) {
 #ifdef CLANGD_ENABLE_REMOTE
   EXPECT_THAT(
       Diags.Diagnostics,
+<<<<<<< HEAD
       Contains(
           AllOf(DiagMessage("Exactly one of File, Server or None must be set."),
                 DiagKind(llvm::SourceMgr::DK_Error))));
+=======
+      Contains(AllOf(DiagMessage("Exactly one of File or Server must be set."),
+                     DiagKind(llvm::SourceMgr::DK_Error))));
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 #else
   ASSERT_TRUE(Conf.Index.External.hasValue());
   EXPECT_EQ(Conf.Index.External->Kind, Config::ExternalIndexSpec::File);
 #endif
+<<<<<<< HEAD
 }
 
 TEST_F(ConfigCompileTests, ExternalBlockDisableWithNone) {
@@ -359,6 +365,8 @@ TEST_F(ConfigCompileTests, ExternalBlockDisableWithNone) {
   Frag.Index.External = std::move(External);
   compileAndApply();
   EXPECT_EQ(Conf.Index.External.Kind, Config::ExternalIndexSpec::None);
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 }
 
 TEST_F(ConfigCompileTests, ExternalBlockErrOnNoSource) {
@@ -450,8 +458,13 @@ TEST_F(ConfigCompileTests, ExternalBlockMountPoint) {
   Frag = GetFrag("", FooPath.c_str());
   compileAndApply();
   ASSERT_THAT(Diags.Diagnostics, IsEmpty());
+<<<<<<< HEAD
   ASSERT_EQ(Conf.Index.External.Kind, Config::ExternalIndexSpec::File);
   EXPECT_THAT(Conf.Index.External.MountPoint, FooPath);
+=======
+  ASSERT_TRUE(Conf.Index.External);
+  EXPECT_THAT(Conf.Index.External->MountPoint, FooPath);
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
   // Only matches case-insensitively.
   BazPath = testPath("fOo/baz.h", llvm::sys::path::Style::posix);
@@ -464,6 +477,7 @@ TEST_F(ConfigCompileTests, ExternalBlockMountPoint) {
   compileAndApply();
   ASSERT_THAT(Diags.Diagnostics, IsEmpty());
 #ifdef CLANGD_PATH_CASE_INSENSITIVE
+<<<<<<< HEAD
   ASSERT_EQ(Conf.Index.External.Kind, Config::ExternalIndexSpec::File);
   EXPECT_THAT(Conf.Index.External.MountPoint, FooPath);
 #else
@@ -485,6 +499,13 @@ TEST_F(ConfigCompileTests, AllScopes) {
   Frag.Completion.AllScopes = true;
   EXPECT_TRUE(compileAndApply());
   EXPECT_TRUE(Conf.Completion.AllScopes);
+=======
+  ASSERT_TRUE(Conf.Index.External);
+  EXPECT_THAT(Conf.Index.External->MountPoint, FooPath);
+#else
+  ASSERT_FALSE(Conf.Index.External);
+#endif
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 }
 } // namespace
 } // namespace config

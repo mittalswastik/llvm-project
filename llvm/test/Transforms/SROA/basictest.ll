@@ -288,6 +288,34 @@ entry:
 
   %b = getelementptr [300 x i8], [300 x i8]* %a, i64 0, i64 0
   call void @llvm.memcpy.p0i8.p0i8.i32(i8* %b, i8* align 8 %src, i32 300, i1 false), !tbaa !0
+<<<<<<< HEAD
+=======
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds [42 x i8], [42 x i8]* %[[test3_a1]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 8 %src, i32 42, {{.*}}), !tbaa [[TAG_0:!.*]]
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds i8, i8* %src, i64 42
+; CHECK-NEXT: %[[test3_r1:.*]] = load i8, i8* %[[gep]], {{.*}}, !tbaa [[TAG_0_M42:!.*]]
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds i8, i8* %src, i64 43
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds [99 x i8], [99 x i8]* %[[test3_a2]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 99, {{.*}}), !tbaa [[TAG_0_M43:!.*]]
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds i8, i8* %src, i64 142
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds [16 x i8], [16 x i8]* %[[test3_a3]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 2 %[[gep_src]], i32 16, {{.*}}), !tbaa [[TAG_0_M142:!.*]]
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds i8, i8* %src, i64 158
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds [42 x i8], [42 x i8]* %[[test3_a4]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 2 %[[gep_src]], i32 42, {{.*}}), !tbaa [[TAG_0_M158:!.*]]
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds i8, i8* %src, i64 200
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds [7 x i8], [7 x i8]* %[[test3_a5]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 8 %[[gep_src]], i32 7, {{.*}})
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds i8, i8* %src, i64 207
+; CHECK-NOT:  %[[bad_test3_r2:.*]] = load i8, i8* %[[gep]], {{.*}}, !tbaa
+; CHECK-NEXT: %[[test3_r2:.*]] = load i8, i8* %[[gep]], {{.*}}
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds i8, i8* %src, i64 208
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds [7 x i8], [7 x i8]* %[[test3_a6]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 8 %[[gep_src]], i32 7, {{.*}})
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds i8, i8* %src, i64 215
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds [85 x i8], [85 x i8]* %[[test3_a7]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 85, {{.*}})
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
   ; Clobber a single element of the array, this should be promotable, and be deleted.
   %c = getelementptr [300 x i8], [300 x i8]* %a, i64 0, i64 42
@@ -365,18 +393,65 @@ entry:
 
   %overlap2.prefix = getelementptr i8, i8* %overlap2.1.1.i8, i64 -4
   call void @llvm.memcpy.p0i8.p0i8.i32(i8* %overlap2.prefix, i8* %src, i32 8, i1 false), !tbaa !51
+<<<<<<< HEAD
+=======
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds [42 x i8], [42 x i8]* %[[test3_a4]], i64 0, i64 39
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %src, i32 3, {{.*}}), !tbaa [[TAG_51:!.*]]
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds i8, i8* %src, i64 3
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds [7 x i8], [7 x i8]* %[[test3_a5]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 5, {{.*}})
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
   ; Bridge between the overlapping areas
   call void @llvm.memset.p0i8.i32(i8* %overlap2.1.2.i8, i8 42, i32 8, i1 false), !tbaa !53
 ; ...promoted i8 store...
+<<<<<<< HEAD
+=======
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds [7 x i8], [7 x i8]* %[[test3_a6]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memset.p0i8.i32(i8* align 1 %[[gep]], i8 42, i32 2, {{.*}})
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
   ; Entirely within the second overlap.
   call void @llvm.memcpy.p0i8.p0i8.i32(i8* %overlap2.2.1.i8, i8* %src, i32 5, i1 false), !tbaa !55
 
   ; Trailing past the second overlap.
   call void @llvm.memcpy.p0i8.p0i8.i32(i8* %overlap2.2.2.i8, i8* %src, i32 8, i1 false), !tbaa !57
+<<<<<<< HEAD
 
   call void @llvm.memcpy.p0i8.p0i8.i32(i8* %dst, i8* %b, i32 300, i1 false), !tbaa !59
+=======
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds [7 x i8], [7 x i8]* %[[test3_a6]], i64 0, i64 2
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep]], i8* align 1 %src, i32 5, {{.*}}), !tbaa [[TAG_57:!.*]]
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds i8, i8* %src, i64 5
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds [85 x i8], [85 x i8]* %[[test3_a7]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 3, {{.*}})
+
+  call void @llvm.memcpy.p0i8.p0i8.i32(i8* %dst, i8* %b, i32 300, i1 false), !tbaa !59
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds [42 x i8], [42 x i8]* %[[test3_a1]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %dst, i8* align 1 %[[gep]], i32 42, {{.*}}), !tbaa [[TAG_59:!.*]]
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds i8, i8* %dst, i64 42
+; CHECK-NEXT: store i8 0, i8* %[[gep]], {{.*}}
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds i8, i8* %dst, i64 43
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds [99 x i8], [99 x i8]* %[[test3_a2]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 99, {{.*}})
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds i8, i8* %dst, i64 142
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds [16 x i8], [16 x i8]* %[[test3_a3]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 16, {{.*}})
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds i8, i8* %dst, i64 158
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds [42 x i8], [42 x i8]* %[[test3_a4]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 42, {{.*}})
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds i8, i8* %dst, i64 200
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds [7 x i8], [7 x i8]* %[[test3_a5]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 7, {{.*}})
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds i8, i8* %dst, i64 207
+; CHECK-NEXT: store i8 42, i8* %[[gep]], {{.*}}
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds i8, i8* %dst, i64 208
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds [7 x i8], [7 x i8]* %[[test3_a6]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 7, {{.*}})
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds i8, i8* %dst, i64 215
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds [85 x i8], [85 x i8]* %[[test3_a7]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 85, {{.*}})
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
   ret void
 }
@@ -468,10 +543,51 @@ entry:
 
   %b = getelementptr [100 x i8], [100 x i8]* %a, i64 0, i64 0
   call void @llvm.memcpy.p0i8.p0i8.i32(i8* %b, i8* %src, i32 100, i1 false), !tbaa !0
+<<<<<<< HEAD
+=======
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds [20 x i8], [20 x i8]* %[[test4_a1]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep]], i8* align 1 %src, i32 20, {{.*}}), !tbaa [[TAG_0]]
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds i8, i8* %src, i64 20
+; CHECK-NEXT: %[[bitcast:.*]] = bitcast i8* %[[gep]] to i16*
+; CHECK-NEXT: %[[test4_r1:.*]] = load i16, i16* %[[bitcast]], {{.*}}, !tbaa [[TAG_0_M20:!.*]]
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds i8, i8* %src, i64 22
+; CHECK-NEXT: %[[test4_r2:.*]] = load i8, i8* %[[gep]], {{.*}}, !tbaa [[TAG_0_M22:!.*]]
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds i8, i8* %src, i64 23
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds [7 x i8], [7 x i8]* %[[test4_a2]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 7, {{.*}}), !tbaa [[TAG_0_M23:!.*]]
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds i8, i8* %src, i64 30
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds [10 x i8], [10 x i8]* %[[test4_a3]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 10, {{.*}}), !tbaa [[TAG_0_M30:!.*]]
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds i8, i8* %src, i64 40
+; CHECK-NEXT: %[[bitcast:.*]] = bitcast i8* %[[gep]] to i16*
+; CHECK-NEXT: %[[test4_r3:.*]] = load i16, i16* %[[bitcast]], {{.*}}, !tbaa [[TAG_0_M40:!.*]]
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds i8, i8* %src, i64 42
+; CHECK-NEXT: %[[test4_r4:.*]] = load i8, i8* %[[gep]], {{.*}}, !tbaa [[TAG_0_M42]]
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds i8, i8* %src, i64 43
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds [7 x i8], [7 x i8]* %[[test4_a4]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 7, {{.*}}), !tbaa [[TAG_0_M43]]
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds i8, i8* %src, i64 50
+; CHECK-NEXT: %[[bitcast:.*]] = bitcast i8* %[[gep]] to i16*
+; CHECK-NEXT: %[[test4_r5:.*]] = load i16, i16* %[[bitcast]], {{.*}}, !tbaa [[TAG_0_M50:!.*]]
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds i8, i8* %src, i64 52
+; CHECK-NEXT: %[[test4_r6:.*]] = load i8, i8* %[[gep]], {{.*}}, !tbaa [[TAG_0_M52:!.*]]
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds i8, i8* %src, i64 53
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds [7 x i8], [7 x i8]* %[[test4_a5]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 7, {{.*}}), !tbaa [[TAG_0_M53:!.+]]
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds i8, i8* %src, i64 60
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds [40 x i8], [40 x i8]* %[[test4_a6]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 40, {{.*}}), !tbaa [[TAG_0_M60:!.+]]
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
   %a.src.1 = getelementptr [100 x i8], [100 x i8]* %a, i64 0, i64 20
   %a.dst.1 = getelementptr [100 x i8], [100 x i8]* %a, i64 0, i64 40
   call void @llvm.memcpy.p0i8.p0i8.i32(i8* %a.dst.1, i8* %a.src.1, i32 10, i1 false), !tbaa !3
+<<<<<<< HEAD
+=======
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds [7 x i8], [7 x i8]* %[[test4_a4]], i64 0, i64 0
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds [7 x i8], [7 x i8]* %[[test4_a2]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 7, {{.*}})
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
   ; Clobber a single element of the array, this should be promotable, and be deleted.
   %c = getelementptr [100 x i8], [100 x i8]* %a, i64 0, i64 42
@@ -479,8 +595,48 @@ entry:
 
   %a.src.2 = getelementptr [100 x i8], [100 x i8]* %a, i64 0, i64 50
   call void @llvm.memmove.p0i8.p0i8.i32(i8* %a.dst.1, i8* %a.src.2, i32 10, i1 false), !tbaa !5
+<<<<<<< HEAD
 
   call void @llvm.memcpy.p0i8.p0i8.i32(i8* %dst, i8* %b, i32 100, i1 false), !tbaa !7
+=======
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds [7 x i8], [7 x i8]* %[[test4_a4]], i64 0, i64 0
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds [7 x i8], [7 x i8]* %[[test4_a5]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 7, {{.*}})
+
+  call void @llvm.memcpy.p0i8.p0i8.i32(i8* %dst, i8* %b, i32 100, i1 false), !tbaa !7
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds [20 x i8], [20 x i8]* %[[test4_a1]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %dst, i8* align 1 %[[gep]], i32 20, {{.*}}), !tbaa [[TAG_7]]
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds i8, i8* %dst, i64 20
+; CHECK-NEXT: %[[bitcast:.*]] = bitcast i8* %[[gep]] to i16*
+; CHECK-NEXT: store i16 %[[test4_r1]], i16* %[[bitcast]], {{.*}}
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds i8, i8* %dst, i64 22
+; CHECK-NEXT: store i8 %[[test4_r2]], i8* %[[gep]], {{.*}}
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds i8, i8* %dst, i64 23
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds [7 x i8], [7 x i8]* %[[test4_a2]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 7, {{.*}})
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds i8, i8* %dst, i64 30
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds [10 x i8], [10 x i8]* %[[test4_a3]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 10, {{.*}})
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds i8, i8* %dst, i64 40
+; CHECK-NEXT: %[[bitcast:.*]] = bitcast i8* %[[gep]] to i16*
+; CHECK-NEXT: store i16 %[[test4_r5]], i16* %[[bitcast]], {{.*}}
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds i8, i8* %dst, i64 42
+; CHECK-NEXT: store i8 %[[test4_r6]], i8* %[[gep]], {{.*}}
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds i8, i8* %dst, i64 43
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds [7 x i8], [7 x i8]* %[[test4_a4]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 7, {{.*}})
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds i8, i8* %dst, i64 50
+; CHECK-NEXT: %[[bitcast:.*]] = bitcast i8* %[[gep]] to i16*
+; CHECK-NEXT: store i16 %[[test4_r5]], i16* %[[bitcast]], {{.*}}
+; CHECK-NEXT: %[[gep:.*]] = getelementptr inbounds i8, i8* %dst, i64 52
+; CHECK-NEXT: store i8 %[[test4_r6]], i8* %[[gep]], {{.*}}
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds i8, i8* %dst, i64 53
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds [7 x i8], [7 x i8]* %[[test4_a5]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 7, {{.*}})
+; CHECK-NEXT: %[[gep_dst:.*]] = getelementptr inbounds i8, i8* %dst, i64 60
+; CHECK-NEXT: %[[gep_src:.*]] = getelementptr inbounds [40 x i8], [40 x i8]* %[[test4_a6]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[gep_dst]], i8* align 1 %[[gep_src]], i32 40, {{.*}})
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
   ret void
 }
@@ -893,6 +1049,7 @@ define void @test18(i8* %src, i8* %dst, i32 %size) {
 ; fixed size operations. Further, continue to split and promote allocas preceding
 ; the variable sized intrinsic.
 ; CHECK-LABEL: @test18(
+<<<<<<< HEAD
 ; CHECK-NEXT:  entry:
 ; CHECK-NEXT:    [[A_SROA_33:%.*]] = alloca [34 x i8], align 1
 ; CHECK-NEXT:    [[A_SROA_0_0_SRC_SROA_CAST:%.*]] = bitcast i8* [[SRC:%.*]] to i32*
@@ -913,6 +1070,24 @@ define void @test18(i8* %src, i8* %dst, i32 %size) {
 ; CHECK-NEXT:    call void @llvm.memcpy.p0i8.p0i8.i32(i8* [[DST]], i8* align 1 [[A_SROA_33_0_PTR2_SROA_IDX7]], i32 [[SIZE]], i1 false), !tbaa [[TBAA11]]
 ; CHECK-NEXT:    ret void
 ;
+=======
+; CHECK:      %[[a:.*]] = alloca [34 x i8]
+; CHECK:      %[[srcgep1:.*]] = getelementptr inbounds i8, i8* %src, i64 4
+; CHECK-NEXT: %[[srccast1:.*]] = bitcast i8* %[[srcgep1]] to i32*
+; CHECK-NEXT: %[[srcload:.*]] = load i32, i32* %[[srccast1]], {{.*}}, !tbaa [[TAG_0_M4:!.*]]
+; CHECK-NEXT: %[[agep1:.*]] = getelementptr inbounds [34 x i8], [34 x i8]* %[[a]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* align 1 %[[agep1]], i8* %src, i32 %size, {{.*}}), !tbaa [[TAG_3]]
+; CHECK-NEXT: %[[agep2:.*]] = getelementptr inbounds [34 x i8], [34 x i8]* %[[a]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memset.p0i8.i32(i8* align 1 %[[agep2]], i8 42, i32 %size, {{.*}}), !tbaa [[TAG_5]]
+; CHECK-NEXT: %[[dstcast1:.*]] = bitcast i8* %dst to i32*
+; CHECK-NEXT: store i32 42, i32* %[[dstcast1]], {{.*}}, !tbaa [[TAG_9]]
+; CHECK-NEXT: %[[dstgep1:.*]] = getelementptr inbounds i8, i8* %dst, i64 4
+; CHECK-NEXT: %[[dstcast2:.*]] = bitcast i8* %[[dstgep1]] to i32*
+; CHECK-NEXT: store i32 %[[srcload]], i32* %[[dstcast2]], {{.*}}
+; CHECK-NEXT: %[[agep3:.*]] = getelementptr inbounds [34 x i8], [34 x i8]* %[[a]], i64 0, i64 0
+; CHECK-NEXT: call void @llvm.memcpy.p0i8.p0i8.i32(i8* %dst, i8* align 1 %[[agep3]], i32 %size, {{.*}}), !tbaa [[TAG_11]]
+; CHECK-NEXT: ret void
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 entry:
   %a = alloca [42 x i8]
@@ -2250,6 +2425,7 @@ bb7:
 !59 = !{!60, !60, i64 0, i64 1}
 !60 = !{!2, i64 1, !"type_59"}
 
+<<<<<<< HEAD
 
 
 
@@ -2259,3 +2435,88 @@ bb7:
 
 
 
+=======
+; CHECK-DAG: [[TAG_0]] = !{[[TYPE_0:!.*]], [[TYPE_0]], i64 0, i64 200}
+; CHECK-DAG: [[TYPE_0]] = !{{{.*}}, !"type_0"}
+
+; CHECK-DAG: [[TAG_0_M42]] = !{[[TYPE_0]], [[TYPE_0]], i64 0, i64 158}
+; CHECK-DAG: [[TAG_0_M43]] = !{[[TYPE_0]], [[TYPE_0]], i64 0, i64 157}
+; CHECK-DAG: [[TAG_0_M142]] = !{[[TYPE_0]], [[TYPE_0]], i64 0, i64 58}
+; CHECK-DAG: [[TAG_0_M158]] = !{[[TYPE_0]], [[TYPE_0]], i64 0, i64 42}
+
+; CHECK-DAG: [[TAG_59]] = !{[[TYPE_59:!.*]], [[TYPE_59]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_59]] = !{{{.*}}, !"type_59"}
+
+; CHECK-DAG: [[TAG_0_M20]] = !{[[TYPE_0]], [[TYPE_0]], i64 0, i64 180}
+; CHECK-DAG: [[TAG_0_M22]] = !{[[TYPE_0]], [[TYPE_0]], i64 0, i64 178}
+; CHECK-DAG: [[TAG_0_M23]] = !{[[TYPE_0]], [[TYPE_0]], i64 0, i64 177}
+; CHECK-DAG: [[TAG_0_M30]] = !{[[TYPE_0]], [[TYPE_0]], i64 0, i64 170}
+; CHECK-DAG: [[TAG_0_M40]] = !{[[TYPE_0]], [[TYPE_0]], i64 0, i64 160}
+; CHECK-DAG: [[TAG_0_M50]] = !{[[TYPE_0]], [[TYPE_0]], i64 0, i64 150}
+; CHECK-DAG: [[TAG_0_M52]] = !{[[TYPE_0]], [[TYPE_0]], i64 0, i64 148}
+; CHECK-DAG: [[TAG_0_M53]] = !{[[TYPE_0]], [[TYPE_0]], i64 0, i64 147}
+; CHECK-DAG: [[TAG_0_M60]] = !{[[TYPE_0]], [[TYPE_0]], i64 0, i64 140}
+
+; CHECK-DAG: [[TYPE_7:!.*]] = !{{{.*}}, !"type_7"}
+; CHECK-DAG: [[TAG_7]] = !{[[TYPE_7]], [[TYPE_7]], i64 0, i64 1}
+
+; CHECK-DAG: [[TYPE_3:!.*]] = !{{{.*}}, !"type_3"}
+; CHECK-DAG: [[TAG_3]] = !{[[TYPE_3]], [[TYPE_3]], i64 0, i64 1}
+
+; CHECK-DAG: [[TYPE_5:!.*]] = !{{{.*}}, !"type_5"}
+; CHECK-DAG: [[TAG_5]] = !{[[TYPE_5]], [[TYPE_5]], i64 0, i64 1}
+
+; CHECK-DAG: [[TAG_0_M4]] = !{[[TYPE_0]], [[TYPE_0]], i64 0, i64 196}
+
+
+; CHECK-DAG: [[TYPE_9:!.*]] = !{{{.*}}, !"type_9"}
+; CHECK-DAG: [[TAG_9]] = !{[[TYPE_9]], [[TYPE_9]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_11:!.*]] = !{{{.*}}, !"type_11"}
+; CHECK-DAG: [[TAG_11]] = !{[[TYPE_11]], [[TYPE_11]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_13:!.*]] = !{{{.*}}, !"type_13"}
+; CHECK-DAG: [[TAG_13]] = !{[[TYPE_13]], [[TYPE_13]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_15:!.*]] = !{{{.*}}, !"type_15"}
+; CHECK-DAG: [[TAG_15]] = !{[[TYPE_15]], [[TYPE_15]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_17:!.*]] = !{{{.*}}, !"type_17"}
+; CHECK-DAG: [[TAG_17]] = !{[[TYPE_17]], [[TYPE_17]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_19:!.*]] = !{{{.*}}, !"type_19"}
+; CHECK-DAG: [[TAG_19]] = !{[[TYPE_19]], [[TYPE_19]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_21:!.*]] = !{{{.*}}, !"type_21"}
+; CHECK-DAG: [[TAG_21]] = !{[[TYPE_21]], [[TYPE_21]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_23:!.*]] = !{{{.*}}, !"type_23"}
+; CHECK-DAG: [[TAG_23]] = !{[[TYPE_23]], [[TYPE_23]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_25:!.*]] = !{{{.*}}, !"type_25"}
+; CHECK-DAG: [[TAG_25]] = !{[[TYPE_25]], [[TYPE_25]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_27:!.*]] = !{{{.*}}, !"type_27"}
+; CHECK-DAG: [[TAG_27]] = !{[[TYPE_27]], [[TYPE_27]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_29:!.*]] = !{{{.*}}, !"type_29"}
+; CHECK-DAG: [[TAG_29]] = !{[[TYPE_29]], [[TYPE_29]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_31:!.*]] = !{{{.*}}, !"type_31"}
+; CHECK-DAG: [[TAG_31]] = !{[[TYPE_31]], [[TYPE_31]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_33:!.*]] = !{{{.*}}, !"type_33"}
+; CHECK-DAG: [[TAG_33]] = !{[[TYPE_33]], [[TYPE_33]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_35:!.*]] = !{{{.*}}, !"type_35"}
+; CHECK-DAG: [[TAG_35]] = !{[[TYPE_35]], [[TYPE_35]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_37:!.*]] = !{{{.*}}, !"type_37"}
+; CHECK-DAG: [[TAG_37]] = !{[[TYPE_37]], [[TYPE_37]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_39:!.*]] = !{{{.*}}, !"type_39"}
+; CHECK-DAG: [[TAG_39]] = !{[[TYPE_39]], [[TYPE_39]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_41:!.*]] = !{{{.*}}, !"type_41"}
+; CHECK-DAG: [[TAG_41]] = !{[[TYPE_41]], [[TYPE_41]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_43:!.*]] = !{{{.*}}, !"type_43"}
+; CHECK-DAG: [[TAG_43]] = !{[[TYPE_43]], [[TYPE_43]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_45:!.*]] = !{{{.*}}, !"type_45"}
+; CHECK-DAG: [[TAG_45]] = !{[[TYPE_45]], [[TYPE_45]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_47:!.*]] = !{{{.*}}, !"type_47"}
+; CHECK-DAG: [[TAG_47]] = !{[[TYPE_47]], [[TYPE_47]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_49:!.*]] = !{{{.*}}, !"type_49"}
+; CHECK-DAG: [[TAG_49]] = !{[[TYPE_49]], [[TYPE_49]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_51:!.*]] = !{{{.*}}, !"type_51"}
+; CHECK-DAG: [[TAG_51]] = !{[[TYPE_51]], [[TYPE_51]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_53:!.*]] = !{{{.*}}, !"type_53"}
+; CHECK-DAG: [[TAG_53]] = !{[[TYPE_53]], [[TYPE_53]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_55:!.*]] = !{{{.*}}, !"type_55"}
+; CHECK-DAG: [[TAG_55]] = !{[[TYPE_55]], [[TYPE_55]], i64 0, i64 1}
+; CHECK-DAG: [[TYPE_57:!.*]] = !{{{.*}}, !"type_57"}
+; CHECK-DAG: [[TAG_57]] = !{[[TYPE_57]], [[TYPE_57]], i64 0, i64 1}
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d

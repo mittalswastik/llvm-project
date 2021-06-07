@@ -19,6 +19,7 @@
 #include <cassert>
 #include <vector>
 
+<<<<<<< HEAD
 int AsyncInfoTy::synchronize() {
   int Result = OFFLOAD_SUCCESS;
   if (AsyncInfo.Queue) {
@@ -32,6 +33,11 @@ int AsyncInfoTy::synchronize() {
 }
 
 void *&AsyncInfoTy::getVoidPtrLocation() {
+=======
+/// Return a void* reference with a lifetime that is at least as long as this
+/// AsyncInfoTy object. The location can be used as intermediate buffer.
+void *&__tgt_async_info::getVoidPtrLocation() {
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   BufferLocations.push_back(nullptr);
   return BufferLocations.back();
 }
@@ -568,7 +574,11 @@ int targetDataBegin(ident_t *loc, DeviceTy &Device, int32_t arg_num,
       DP("Update pointer (" DPxMOD ") -> [" DPxMOD "]\n",
          DPxPTR(PointerTgtPtrBegin), DPxPTR(TgtPtrBegin));
       uint64_t Delta = (uint64_t)HstPtrBegin - (uint64_t)HstPtrBase;
+<<<<<<< HEAD
       void *&TgtPtrBase = AsyncInfo.getVoidPtrLocation();
+=======
+      void *&TgtPtrBase = async_info_ptr->getVoidPtrLocation();
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
       TgtPtrBase = (void *)((uint64_t)TgtPtrBegin - Delta);
       int rt = Device.submitData(PointerTgtPtrBegin, &TgtPtrBase,
                                  sizeof(void *), AsyncInfo);
@@ -605,6 +615,17 @@ struct DeallocTgtPtrInfo {
       : HstPtrBegin(HstPtr), DataSize(Size), ForceDelete(ForceDelete),
         HasCloseModifier(HasCloseModifier) {}
 };
+
+/// Synchronize device
+static int syncDevice(DeviceTy &Device, __tgt_async_info *AsyncInfo) {
+  assert(AsyncInfo && AsyncInfo->Queue && "Invalid AsyncInfo");
+  if (Device.synchronize(AsyncInfo) != OFFLOAD_SUCCESS) {
+    REPORT("Failed to synchronize device.\n");
+    return OFFLOAD_FAIL;
+  }
+
+  return OFFLOAD_SUCCESS;
+}
 } // namespace
 
 /// Internal function to undo the mapping and retrieve the data from the device.
@@ -806,9 +827,22 @@ int targetDataEnd(ident_t *loc, DeviceTy &Device, int32_t ArgNum,
   //       allocate/deallocate device APIs.
   //
   // We need to synchronize before deallocating data.
+<<<<<<< HEAD
   Ret = AsyncInfo.synchronize();
   if (Ret != OFFLOAD_SUCCESS)
     return OFFLOAD_FAIL;
+=======
+  // If AsyncInfo is nullptr, the previous data transfer (if has) will be
+  // synchronous, so we don't need to synchronize again. If AsyncInfo->Queue is
+  // nullptr, there is no data transfer happened because once there is,
+  // AsyncInfo->Queue will not be nullptr, so again, we don't need to
+  // synchronize.
+  if (AsyncInfo && AsyncInfo->Queue) {
+    Ret = syncDevice(Device, AsyncInfo);
+    if (Ret != OFFLOAD_SUCCESS)
+      return OFFLOAD_FAIL;
+  }
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
   // Deallocate target pointer
   for (DeallocTgtPtrInfo &Info : DeallocTgtPtrs) {
@@ -1289,7 +1323,11 @@ static int processDataBefore(ident_t *loc, int64_t DeviceId, void *HostPtr,
         DP("Parent lambda base " DPxMOD "\n", DPxPTR(TgtPtrBase));
         uint64_t Delta = (uint64_t)HstPtrBegin - (uint64_t)HstPtrBase;
         void *TgtPtrBegin = (void *)((uintptr_t)TgtPtrBase + Delta);
+<<<<<<< HEAD
         void *&PointerTgtPtrBegin = AsyncInfo.getVoidPtrLocation();
+=======
+        void *&PointerTgtPtrBegin = AsyncInfo->getVoidPtrLocation();
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
         PointerTgtPtrBegin = Device.getTgtPtrBegin(HstPtrVal, ArgSizes[I],
                                                    IsLast, false, IsHostPtr);
         if (!PointerTgtPtrBegin) {
@@ -1485,6 +1523,11 @@ int target(ident_t *loc, DeviceTy &Device, void *HostPtr, int32_t ArgNum,
       REPORT("Failed to process data after launching the kernel.\n");
       return OFFLOAD_FAIL;
     }
+  } else if (AsyncInfo.Queue) {
+    // If ArgNum is zero, but AsyncInfo.Queue is valid, then the kernel doesn't
+    // hava any argument, and the device supports async operations, so we need a
+    // sync at this point.
+    return syncDevice(Device, &AsyncInfo);
   }
 
   return OFFLOAD_SUCCESS;

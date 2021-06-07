@@ -609,11 +609,15 @@ llvm::json::Value toJSON(const Diagnostic &D) {
 bool fromJSON(const llvm::json::Value &Params, Diagnostic &R,
               llvm::json::Path P) {
   llvm::json::ObjectMapper O(Params, P);
+<<<<<<< HEAD
   if (!O)
     return false;
   if (auto *Data = Params.getAsObject()->getObject("data"))
     R.data = *Data;
   return O.map("range", R.range) && O.map("message", R.message) &&
+=======
+  return O && O.map("range", R.range) && O.map("message", R.message) &&
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
          mapOptOrNull(Params, "severity", R.severity, P) &&
          mapOptOrNull(Params, "category", R.category, P) &&
          mapOptOrNull(Params, "code", R.code, P) &&

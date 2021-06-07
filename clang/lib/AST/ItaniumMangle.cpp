@@ -129,6 +129,8 @@ class ItaniumMangleContextImpl : public ItaniumMangleContext {
 
   bool NeedsUniqueInternalLinkageNames = false;
 
+  bool IsDevCtx = false;
+
 public:
   explicit ItaniumMangleContextImpl(
       ASTContext &Context, DiagnosticsEngine &Diags,
@@ -144,10 +146,15 @@ public:
     return false;
   }
 
+<<<<<<< HEAD
   bool isUniqueInternalLinkageDecl(const NamedDecl *ND) override;
   void needsUniqueInternalLinkageNames() override {
     NeedsUniqueInternalLinkageNames = true;
   }
+=======
+  bool isDeviceMangleContext() const override { return IsDevCtx; }
+  void setDeviceMangleContext(bool IsDev) override { IsDevCtx = IsDev; }
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
   void mangleCXXName(GlobalDecl GD, raw_ostream &) override;
   void mangleThunk(const CXXMethodDecl *MD, const ThunkInfo &Thunk,
@@ -1958,11 +1965,17 @@ void CXXNameMangler::mangleLambda(const CXXRecordDecl *Lambda) {
   // if the host-side CXX ABI has different numbering for lambda. In such case,
   // if the mangle context is that device-side one, use the device-side lambda
   // mangling number for this lambda.
+<<<<<<< HEAD
   llvm::Optional<unsigned> DeviceNumber =
       Context.getDiscriminatorOverride()(Context.getASTContext(), Lambda);
   unsigned Number = DeviceNumber.hasValue() ? *DeviceNumber
                                             : Lambda->getLambdaManglingNumber();
 
+=======
+  unsigned Number = Context.isDeviceMangleContext()
+                        ? Lambda->getDeviceLambdaManglingNumber()
+                        : Lambda->getLambdaManglingNumber();
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   assert(Number > 0 && "Lambda should be mangled as an unnamed class");
   if (Number > 1)
     mangleNumber(Number - 2);

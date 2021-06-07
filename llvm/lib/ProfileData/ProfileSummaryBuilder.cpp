@@ -26,6 +26,7 @@ cl::opt<bool> UseContextLessSummary(
     "profile-summary-contextless", cl::Hidden, cl::init(false), cl::ZeroOrMore,
     cl::desc("Merge context profiles before calculating thresholds."));
 
+<<<<<<< HEAD
 // The following two parameters determine the threshold for a count to be
 // considered hot/cold. These two parameters are percentile values (multiplied
 // by 10000). If the counts are sorted in descending order, the minimum count to
@@ -69,6 +70,8 @@ cl::opt<int> ProfileSummaryColdCount(
     cl::desc("A fixed cold count that overrides the count derived from"
              " profile-summary-cutoff-cold"));
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 // A set of cutoff values. Each value, when divided by ProfileSummary::Scale
 // (which is 1000000) is a desired percentile of total counts.
 static const uint32_t DefaultCutoffsData[] = {

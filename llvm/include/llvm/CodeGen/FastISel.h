@@ -485,6 +485,15 @@ protected:
   /// - \c Add has a constant operand.
   bool canFoldAddIntoGEP(const User *GEP, const Value *Add);
 
+<<<<<<< HEAD
+=======
+  /// Test whether the register associated with this value has exactly one use,
+  /// in which case that single use is killing. Note that multiple IR values
+  /// may map onto the same register, in which case this is not the same as
+  /// checking that an IR value has one use.
+  bool hasTrivialKill(const Value *V);
+
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   /// Create a machine mem operand from the given instruction.
   MachineMemOperand *createMachineMemOperandFor(const Instruction *I) const;
 

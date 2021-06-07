@@ -1,9 +1,13 @@
+<<<<<<< HEAD
 // RUN: %clang_cc1 -std=c89 -triple=x86_64-unknown-linux-gnu -S -emit-llvm %s -o - | FileCheck --check-prefix=CHECK --check-prefix=C99 %s
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 // RUN: %clang_cc1 -std=c99 -triple=x86_64-unknown-linux-gnu -S -emit-llvm %s -o - | FileCheck --check-prefix=CHECK --check-prefix=C99 %s
 // RUN: %clang_cc1 -std=c11 -triple=x86_64-unknown-linux-gnu -S -emit-llvm %s -o - | FileCheck --check-prefix=CHECK --check-prefix=C11 %s
 // RUN: %clang_cc1 -std=c18 -triple=x86_64-unknown-linux-gnu -S -emit-llvm %s -o - | FileCheck --check-prefix=CHECK --check-prefix=C11 %s
 // RUN: %clang_cc1 -std=c2x -triple=x86_64-unknown-linux-gnu -S -emit-llvm %s -o - | FileCheck --check-prefix=CHECK --check-prefix=C11 %s
 //
+<<<<<<< HEAD
 // Check -ffinite-loops option in combination with various standard versions.
 // RUN: %clang_cc1 -std=c89 -ffinite-loops -triple=x86_64-unknown-linux-gnu -S -emit-llvm %s -o - | FileCheck --check-prefix=CHECK --check-prefix=FINITE %s
 // RUN: %clang_cc1 -std=c99 -ffinite-loops -triple=x86_64-unknown-linux-gnu -S -emit-llvm %s -o - | FileCheck --check-prefix=CHECK --check-prefix=FINITE %s
@@ -17,6 +21,10 @@
 // RUN: %clang_cc1 -std=c11 -fno-finite-loops -triple=x86_64-unknown-linux-gnu -S -emit-llvm %s -o - | FileCheck --check-prefix=CHECK --check-prefix=C99 %s
 // RUN: %clang_cc1 -std=c18 -fno-finite-loops -triple=x86_64-unknown-linux-gnu -S -emit-llvm %s -o - | FileCheck --check-prefix=CHECK --check-prefix=C99 %s
 // RUN: %clang_cc1 -std=c2x -fno-finite-loops -triple=x86_64-unknown-linux-gnu -S -emit-llvm %s -o - | FileCheck --check-prefix=CHECK --check-prefix=C99 %s
+=======
+// RUN: %clang_cc1 -std=c11 -ffinite-loops -triple=x86_64-unknown-linux-gnu -S -emit-llvm %s -o - | FileCheck --check-prefix=CHECK --check-prefix=FINITE %s
+// RUN: %clang_cc1 -std=c11 -fno-finite-loops -triple=x86_64-unknown-linux-gnu -S -emit-llvm %s -o - | FileCheck --check-prefix=CHECK --check-prefix=C99 %s
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 int a = 0;
 int b = 0;
@@ -28,9 +36,13 @@ int b = 0;
 // CHECK-NEXT:  entry:
 // CHECK-NEXT:    br label %for.cond
 // CHECK:       for.cond:
+<<<<<<< HEAD
 // C99-NOT:       br {{.*}}!llvm.loop
 // C11-NOT:       br {{.*}}!llvm.loop
 // FINITE-NEXT:   br {{.*}}!llvm.loop
+=======
+// CHECK-NOT:     br {{.*}}!llvm.loop
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 //
 void f0() {
   for (; ;) ;
@@ -43,9 +55,13 @@ void f0() {
 // CHECK:       for.cond:
 // CHECK-NEXT:    br i1 true, label %for.body, label %for.end
 // CHECK:       for.body:
+<<<<<<< HEAD
 // C99-NOT:       br {{.*}}, !llvm.loop
 // C11-NOT:       br {{.*}}, !llvm.loop
 // FINITE-NEXT:   br {{.*}}, !llvm.loop
+=======
+// CHECK-NOT:     br {{.*}}, !llvm.loop
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 // CHECK:       for.end:
 // CHECK-NEXT:    ret void
 //
@@ -82,9 +98,13 @@ void f2() {
 // CHECK:       for.cond:
 // CHECK-NEXT:    br i1 true, label %for.body, label %for.end
 // CHECK:       for.body:
+<<<<<<< HEAD
 // C99-NOT:       br {{.*}}, !llvm.loop
 // C11-NOT:       br {{.*}}, !llvm.loop
 // FINITE-NEXT:   br {{.*}}, !llvm.loop
+=======
+// CHECK-NOT:     br {{.*}}, !llvm.loop
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 // CHECK:       for.end:
 // CHECK-NEXT:    br label %for.cond1
 // CHECK:       for.cond1:
@@ -111,9 +131,13 @@ void F() {
 // CHECK-NEXT:  entry:
 // CHECK-NEXT:    br label %while.body
 // CHECK:       while.body:
+<<<<<<< HEAD
 // C99-NOT:       br {{.*}}, !llvm.loop
 // C11-NOT:       br {{.*}}, !llvm.loop
 // FINITE-NEXT:   br {{.*}}, !llvm.loop
+=======
+// CHECK-NOT:     br {{.*}}, !llvm.loop
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 //
 void w1() {
   while (1) {
@@ -152,6 +176,7 @@ void w2() {
 // CHECK-NEXT:    br i1 [[CMP]], label %while.body, label %while.end
 // CHECK:       while.body:
 // C99-NOT:       br {{.*}} !llvm.loop
+<<<<<<< HEAD
 // C11-NEXT:      br label %while.cond, !llvm.loop [[LOOP4:!.*]]
 // FINITE-NEXT:   br label %while.cond, !llvm.loop [[LOOP4:!.*]]
 // CHECK:       while.end:
@@ -160,6 +185,14 @@ void w2() {
 // C99-NOT:       br {{.*}} !llvm.loop
 // C11-NOT:       br {{.*}} !llvm.loop
 // FINITE-NEXT:   br {{.*}} !llvm.loop
+=======
+// C11:           br label %while.cond, !llvm.loop [[LOOP4:!.*]]
+// FINITE:        br label %while.cond, !llvm.loop [[LOOP4:!.*]]
+// CHECK:       while.end:
+// CHECK-NEXT:    br label %while.body2
+// CHECK:       while.body2:
+// CHECK-NOT:     br {{.*}} !llvm.loop
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 //
 void W() {
   while (a == b) {
@@ -175,9 +208,13 @@ void W() {
 // CHECK:       do.body:
 // CHECK-NEXT:    br label %do.cond
 // CHECK:       do.cond:
+<<<<<<< HEAD
 // C99-NOT:       br {{.*}}, !llvm.loop
 // C11-NOT:       br {{.*}}, !llvm.loop
 // FINITE-NEXT:   br {{.*}}, !llvm.loop
+=======
+// CHECK-NOT:     br {{.*}}, !llvm.loop
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 // CHECK:       do.end:
 // CHECK-NEXT:    ret void
 //

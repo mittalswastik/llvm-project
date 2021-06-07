@@ -1954,6 +1954,7 @@ bool CompilerInvocation::ParseCodeGenArgs(CodeGenOptions &Opts, ArgList &Args,
     Opts.FiniteLoops = CodeGenOptions::FiniteLoopsKind::Always;
   else if (Args.hasArg(options::OPT_fno_finite_loops))
     Opts.FiniteLoops = CodeGenOptions::FiniteLoopsKind::Never;
+<<<<<<< HEAD
 
   Opts.EmitIEEENaNCompliantInsts =
       Args.hasFlag(options::OPT_mamdgpu_ieee, options::OPT_mno_amdgpu_ieee);
@@ -2000,6 +2001,9 @@ GenerateDependencyOutputArgs(const DependencyOutputOptions &Opts,
       break;
     }
   }
+=======
+  return Success;
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 }
 
 static bool ParseDependencyOutputArgs(DependencyOutputOptions &Opts,

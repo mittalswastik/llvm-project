@@ -45,6 +45,21 @@ int target_teams_fun(int *g){
   int th = 128;
 // discard n_addr
 // discard capture expressions for te and th
+<<<<<<< HEAD
+=======
+// HCK1: = alloca i32,
+// HCK1: = alloca i32,
+// HCK1: [[I_CAST:%.+]] = alloca i{{32|64}},
+// HCK1: [[N_CAST:%.+]] = alloca i{{32|64}},
+// HCK1: [[TE_CAST:%.+]] = alloca i{{32|64}},
+// HCK1: [[TH_CAST:%.+]] = alloca i{{32|64}},
+// HCK1: [[I_PAR:%.+]] = load{{.+}}, {{.+}} [[I_CAST]],
+// HCK1: [[N_PAR:%.+]] = load{{.+}}, {{.+}} [[N_CAST]],
+// HCK1: [[TE_PAR:%.+]] = load{{.+}}, {{.+}} [[TE_CAST]],
+// HCK1: [[TH_PAR:%.+]] = load{{.+}}, {{.+}} [[TH_CAST]],
+// HCK1: call void @__kmpc_push_target_tripcount_mapper(%struct.ident_t* @{{.+}}, i64 -1, i64 %{{.+}})
+// HCK1: call i32 @__tgt_target_teams_mapper(%struct.ident_t* @{{.+}}, i64 -1, i8* @{{[^,]+}}, i32 5, i8** %{{[^,]+}}, i8** %{{[^,]+}},
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
   int i;
 #pragma omp target teams distribute parallel for simd num_teams(te), thread_limit(th) aligned(a : 8) safelen(16) simdlen(4) linear(i : n)

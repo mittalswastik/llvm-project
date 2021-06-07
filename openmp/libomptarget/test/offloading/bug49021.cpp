@@ -1,4 +1,12 @@
+<<<<<<< HEAD
 // RUN: %libomptarget-compilexx-generic -O3 && %libomptarget-run-generic
+=======
+// RUN: %libomptarget-compilexx-aarch64-unknown-linux-gnu -O3 && %libomptarget-run-aarch64-unknown-linux-gnu
+// RUN: %libomptarget-compilexx-powerpc64-ibm-linux-gnu -O3 && %libomptarget-run-powerpc64-ibm-linux-gnu
+// RUN: %libomptarget-compilexx-powerpc64le-ibm-linux-gnu -O3 && %libomptarget-run-powerpc64le-ibm-linux-gnu
+// RUN: %libomptarget-compilexx-x86_64-pc-linux-gnu -O3 && %libomptarget-run-x86_64-pc-linux-gnu
+// RUN: %libomptarget-compilexx-nvptx64-nvidia-cuda -O3 && %libomptarget-run-nvptx64-nvidia-cuda
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 #include <iostream>
 

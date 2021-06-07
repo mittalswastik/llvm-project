@@ -39,6 +39,10 @@
 
 #ifdef CK1
 
+<<<<<<< HEAD
+=======
+// HCK_NO_TGT-NOT: @__kmpc_push_target_tripcount_mapper
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 int target_teams_fun(int *g){
   int n = 1000;
@@ -47,6 +51,19 @@ int target_teams_fun(int *g){
   int th = 128;
   // discard n_addr
   // discard capture expressions for te and th
+<<<<<<< HEAD
+=======
+  // HCK1: = alloca i32,
+  // HCK1: = alloca i32,
+  // HCK1: [[N_CAST:%.+]] = alloca i{{32|64}},
+  // HCK1: [[TE_CAST:%.+]] = alloca i{{32|64}},
+  // HCK1: [[TH_CAST:%.+]] = alloca i{{32|64}},
+  // HCK1: [[N_PAR:%.+]] = load{{.+}}, {{.+}} [[N_CAST]],
+  // HCK1: [[TE_PAR:%.+]] = load{{.+}}, {{.+}} [[TE_CAST]],
+  // HCK1: [[TH_PAR:%.+]] = load{{.+}}, {{.+}} [[TH_CAST]],
+  // HCK1: call void @__kmpc_push_target_tripcount_mapper(%struct.ident_t* @{{.+}}, i64 -1, i64 %{{.+}})
+  // HCK1: call i32 @__tgt_target_teams_mapper(%struct.ident_t* @{{.+}}, i64 -1, i8* @{{[^,]+}}, i32 4, i8** %{{[^,]+}}, i8** %{{[^,]+}},
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
   #pragma omp target teams distribute parallel for num_teams(te), thread_limit(th)
   for(int i = 0; i < n; i++) {

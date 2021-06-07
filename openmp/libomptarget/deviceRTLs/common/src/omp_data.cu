@@ -26,16 +26,26 @@ omptarget_device_environmentTy omptarget_device_environment;
 ////////////////////////////////////////////////////////////////////////////////
 
 // OpenMP will try to call its ctor if we don't add the attribute explicitly
+<<<<<<< HEAD
 [[clang::loader_uninitialized]] omptarget_nvptx_Queue<
     omptarget_nvptx_ThreadPrivateContext, OMP_STATE_COUNT>
     omptarget_nvptx_device_State[MAX_SM];
+=======
+[[clang::loader_uninitialized]] DEVICE
+    omptarget_nvptx_Queue<omptarget_nvptx_ThreadPrivateContext, OMP_STATE_COUNT>
+        omptarget_nvptx_device_State[MAX_SM];
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 omptarget_nvptx_SimpleMemoryManager omptarget_nvptx_simpleMemoryManager;
 uint32_t SHARED(usedMemIdx);
 uint32_t SHARED(usedSlotIdx);
 
 // SHARED doesn't work with array so we add the attribute explicitly.
+<<<<<<< HEAD
 [[clang::loader_uninitialized]] uint8_t
+=======
+[[clang::loader_uninitialized]] DEVICE uint8_t
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
     parallelLevel[MAX_THREADS_PER_TEAM / WARPSIZE];
 #pragma omp allocate(parallelLevel) allocator(omp_pteam_mem_alloc)
 uint16_t SHARED(threadLimit);

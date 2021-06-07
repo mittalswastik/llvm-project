@@ -50,6 +50,7 @@ static cl::opt<bool>
     UpdatePseudoProbe("update-pseudo-probe", cl::init(true), cl::Hidden,
                       cl::desc("Update pseudo probe distribution factor"));
 
+<<<<<<< HEAD
 static uint64_t getCallStackHash(const DILocation *DIL) {
   uint64_t Hash = 0;
   const DILocation *InlinedAt = DIL ? DIL->getInlinedAt() : nullptr;
@@ -71,6 +72,8 @@ static uint64_t computeCallStackHash(const Instruction &Inst) {
   return getCallStackHash(Inst.getDebugLoc());
 }
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 bool PseudoProbeVerifier::shouldVerifyFunction(const Function *F) {
   // Skip function declaration.
   if (F->isDeclaration())
@@ -138,10 +141,15 @@ void PseudoProbeVerifier::runAfterPass(const Loop *L) {
 void PseudoProbeVerifier::collectProbeFactors(const BasicBlock *Block,
                                               ProbeFactorMap &ProbeFactors) {
   for (const auto &I : *Block) {
+<<<<<<< HEAD
     if (Optional<PseudoProbe> Probe = extractProbe(I)) {
       uint64_t Hash = computeCallStackHash(I);
       ProbeFactors[{Probe->Id, Hash}] += Probe->Factor;
     }
+=======
+    if (Optional<PseudoProbe> Probe = extractProbe(I))
+      ProbeFactors[Probe->Id] += Probe->Factor;
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   }
 }
 
@@ -159,7 +167,11 @@ void PseudoProbeVerifier::verifyProbeFactors(
           dbgs() << "Function " << F->getName() << ":\n";
           BannerPrinted = true;
         }
+<<<<<<< HEAD
         dbgs() << "Probe " << I.first.first << "\tprevious factor "
+=======
+        dbgs() << "Probe " << I.first << "\tprevious factor "
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
                << format("%0.2f", PrevProbeFactor) << "\tcurrent factor "
                << format("%0.2f", CurProbeFactor) << "\n";
       }
@@ -424,6 +436,7 @@ void PseudoProbeUpdatePass::runOnFunction(Function &F,
   ProbeFactorMap ProbeFactors;
   for (auto &Block : F) {
     for (auto &I : Block) {
+<<<<<<< HEAD
       if (Optional<PseudoProbe> Probe = extractProbe(I)) {
         // Do not count dangling probes since they are logically deleted and the
         // current block that a dangling probe resides in doesn't reflect the
@@ -435,6 +448,10 @@ void PseudoProbeUpdatePass::runOnFunction(Function &F,
           ProbeFactors[{Probe->Id, Hash}] += BBProfileCount(&Block);
         }
       }
+=======
+      if (Optional<PseudoProbe> Probe = extractProbe(I))
+        ProbeFactors[Probe->Id] += BBProfileCount(&Block);
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
     }
   }
 
@@ -442,6 +459,7 @@ void PseudoProbeUpdatePass::runOnFunction(Function &F,
   for (auto &Block : F) {
     for (auto &I : Block) {
       if (Optional<PseudoProbe> Probe = extractProbe(I)) {
+<<<<<<< HEAD
         // Ignore danling probes since they are logically deleted and should do
         // not consume any profile samples in the subsequent profile annotation.
         if (!Probe->isDangling()) {
@@ -450,6 +468,11 @@ void PseudoProbeUpdatePass::runOnFunction(Function &F,
           if (Sum != 0)
             setProbeDistributionFactor(I, BBProfileCount(&Block) / Sum);
         }
+=======
+        float Sum = ProbeFactors[Probe->Id];
+        if (Sum != 0)
+          setProbeDistributionFactor(I, BBProfileCount(&Block) / Sum);
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
       }
     }
   }

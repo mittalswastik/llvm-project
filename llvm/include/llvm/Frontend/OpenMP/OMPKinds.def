@@ -854,6 +854,7 @@ __OMP_RTL_ATTRS(__kmpc_init_allocator, DefaultAttrs, ReturnPtrAttrs,
 __OMP_RTL_ATTRS(__kmpc_destroy_allocator, AllocAttrs, AttributeSet(),
                 ParamAttrs())
 
+<<<<<<< HEAD
 __OMP_RTL_ATTRS(__kmpc_push_target_tripcount_mapper, SetterAttrs,
                 AttributeSet(), ParamAttrs())
 __OMP_RTL_ATTRS(__tgt_target_mapper, ForkAttrs, AttributeSet(), ParamAttrs())
@@ -867,6 +868,15 @@ __OMP_RTL_ATTRS(__tgt_register_requires, ForkAttrs, AttributeSet(),
                 ParamAttrs())
 __OMP_RTL_ATTRS(__tgt_target_data_begin_mapper, ForkAttrs, AttributeSet(),
                 ParamAttrs())
+=======
+__OMP_RTL_ATTRS(__kmpc_push_target_tripcount_mapper, SetterAttrs, AttributeSet(), {})
+__OMP_RTL_ATTRS(__tgt_target_mapper, ForkAttrs, AttributeSet(), {})
+__OMP_RTL_ATTRS(__tgt_target_nowait_mapper, ForkAttrs, AttributeSet(), {})
+__OMP_RTL_ATTRS(__tgt_target_teams_mapper, ForkAttrs, AttributeSet(), {})
+__OMP_RTL_ATTRS(__tgt_target_teams_nowait_mapper, ForkAttrs, AttributeSet(), {})
+__OMP_RTL_ATTRS(__tgt_register_requires, ForkAttrs, AttributeSet(), {})
+__OMP_RTL_ATTRS(__tgt_target_data_begin_mapper, ForkAttrs, AttributeSet(), {})
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 __OMP_RTL_ATTRS(__tgt_target_data_begin_nowait_mapper, ForkAttrs,
                 AttributeSet(), ParamAttrs())
 __OMP_RTL_ATTRS(__tgt_target_data_end_mapper, ForkAttrs, AttributeSet(),

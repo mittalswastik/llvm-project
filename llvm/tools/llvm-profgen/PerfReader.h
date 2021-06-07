@@ -258,7 +258,10 @@ struct UnwindState {
       BranchSamples.emplace_back(std::make_tuple(Source, Target, Count));
     }
     bool isDummyRoot() { return Address == 0; }
+<<<<<<< HEAD
     bool isLeafFrame() { return Children.empty(); }
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   };
 
   ProfiledFrame DummyTrieRoot;
@@ -441,6 +444,7 @@ struct ProbeStack {
     // Callsite merging may cause the loss of original probe IDs.
     // Cutting off the context from here since the inliner will
     // not know how to consume a context with unknown callsites.
+<<<<<<< HEAD
     if (!CallProbe) {
       if (!Cur->isLeafFrame())
         WithColor::warning()
@@ -448,6 +452,10 @@ struct ProbeStack {
             << " due to missing call probe\n";
       return false;
     }
+=======
+    if (!CallProbe)
+      return false;
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
     Stack.push_back(CallProbe);
     return true;
   }

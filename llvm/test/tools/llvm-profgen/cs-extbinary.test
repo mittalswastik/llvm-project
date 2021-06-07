@@ -1,5 +1,9 @@
 ; test for dwarf-based cs profile
+<<<<<<< HEAD
 ; RUN: llvm-profgen --format=extbinary --perfscript=%S/Inputs/recursion-compression-noprobe.perfscript --binary=%S/Inputs/recursion-compression-noprobe.perfbin --output=%t1 --profile-summary-cold-count=0
+=======
+; RUN: llvm-profgen --format=extbinary --perfscript=%S/Inputs/recursion-compression-noprobe.perfscript --binary=%S/Inputs/recursion-compression-noprobe.perfbin --output=%t1 --csprof-cold-thres=0
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ; RUN: llvm-profdata merge --sample --text --output=%t2 %t1
 ; RUN: FileCheck %S/recursion-compression-noprobe.test --input-file %t2
 ; RUN: llvm-profdata merge --sample --extbinary --output=%t3 %t2 && llvm-profdata merge --sample --text --output=%t4 %t3
@@ -7,7 +11,11 @@
 
 
 ; test for probe-based cs profile
+<<<<<<< HEAD
 ; RUN: llvm-profgen --format=extbinary --perfscript=%S/Inputs/recursion-compression-pseudoprobe.perfscript --binary=%S/Inputs/recursion-compression-pseudoprobe.perfbin --output=%t5 --profile-summary-cold-count=0
+=======
+; RUN: llvm-profgen --format=extbinary --perfscript=%S/Inputs/recursion-compression-pseudoprobe.perfscript --binary=%S/Inputs/recursion-compression-pseudoprobe.perfbin --output=%t5 --csprof-cold-thres=0
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ; RUN: llvm-profdata merge --sample --text --output=%t6 %t5
 ; RUN: FileCheck %S/recursion-compression-pseudoprobe.test --input-file %t6
 ; RUN: llvm-profdata merge --sample --extbinary --output=%t7 %t6 && llvm-profdata merge --sample --text --output=%t8 %t7

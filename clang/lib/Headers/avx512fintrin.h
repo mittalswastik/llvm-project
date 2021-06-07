@@ -9300,11 +9300,16 @@ _mm512_mask_abs_pd(__m512d __W, __mmask8 __K, __m512d __A)
  * computations. In vector-reduction arithmetic, the evaluation order is
  * independent of the order of the input elements of V.
 
+<<<<<<< HEAD
  * For floating-point intrinsics:
  * 1. When using fadd/fmul intrinsics, the order of operations within the
  * vector is unspecified (associative math).
  * 2. When using fmin/fmax intrinsics, NaN or -0.0 elements within the vector
  * produce unspecified results.
+=======
+ * For floating point types, we always assume the elements are reassociable even
+ * if -fast-math is off.
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
  * Used bisection method. At each step, we partition the vector with previous
  * step in half, and the operation is performed on its two halves.

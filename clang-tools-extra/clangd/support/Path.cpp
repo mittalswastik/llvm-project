@@ -19,6 +19,7 @@ std::string maybeCaseFoldPath(PathRef Path) { return Path.str(); }
 bool pathEqual(PathRef A, PathRef B) { return A == B; }
 #endif // CLANGD_PATH_CASE_INSENSITIVE
 
+<<<<<<< HEAD
 PathRef absoluteParent(PathRef Path) {
   assert(llvm::sys::path::is_absolute(Path));
 #if defined(_WIN32)
@@ -33,6 +34,8 @@ PathRef absoluteParent(PathRef Path) {
   return Result;
 }
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 bool pathStartsWith(PathRef Ancestor, PathRef Path,
                     llvm::sys::path::Style Style) {
   assert(llvm::sys::path::is_absolute(Ancestor) &&

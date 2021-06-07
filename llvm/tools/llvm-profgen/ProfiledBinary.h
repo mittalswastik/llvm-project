@@ -226,7 +226,11 @@ public:
     return FuncStartAddrMap[Offset];
   }
 
+<<<<<<< HEAD
   Optional<FrameLocation> getInlineLeafFrameLoc(uint64_t Offset) {
+=======
+  Optional<const FrameLocation> getInlineLeafFrameLoc(uint64_t Offset) {
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
     const auto &Stack = getFrameLocationStack(Offset);
     if (Stack.empty())
       return {};
@@ -239,8 +243,13 @@ public:
   // Get the context string of the current stack with inline context filled in.
   // It will search the disassembling info stored in Offset2LocStackMap. This is
   // used as the key of function sample map
+<<<<<<< HEAD
   std::string getExpandedContextStr(const SmallVectorImpl<uint64_t> &Stack,
                                     bool &WasLeafInlined) const;
+=======
+  std::string
+  getExpandedContextStr(const SmallVectorImpl<uint64_t> &Stack) const;
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
   const PseudoProbe *getCallProbeForAddr(uint64_t Address) const {
     return ProbeDecoder.getCallProbeForAddr(Address);

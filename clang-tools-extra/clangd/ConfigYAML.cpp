@@ -64,7 +64,10 @@ public:
     Dict.handle("Index", [&](Node &N) { parse(F.Index, N); });
     Dict.handle("Style", [&](Node &N) { parse(F.Style, N); });
     Dict.handle("Diagnostics", [&](Node &N) { parse(F.Diagnostics, N); });
+<<<<<<< HEAD
     Dict.handle("Completion", [&](Node &N) { parse(F.Completion, N); });
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
     Dict.parse(N);
     return !(N.failed() || HadError);
   }

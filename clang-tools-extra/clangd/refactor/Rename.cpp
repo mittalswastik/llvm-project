@@ -63,6 +63,30 @@ bool isInMacroBody(const SourceManager &SM, SourceLocation Loc) {
   return false;
 }
 
+<<<<<<< HEAD
+=======
+// Query the index to find some other files where the Decl is referenced.
+llvm::Optional<std::string> getOtherRefFile(const Decl &D, StringRef MainFile,
+                                            const SymbolIndex &Index) {
+  RefsRequest Req;
+  // We limit the number of results, this is a correctness/performance
+  // tradeoff. We expect the number of symbol references in the current file
+  // is smaller than the limit.
+  Req.Limit = 100;
+  Req.IDs.insert(getSymbolID(&D));
+  llvm::Optional<std::string> OtherFile;
+  Index.refs(Req, [&](const Ref &R) {
+    if (OtherFile)
+      return;
+    if (auto RefFilePath = filePath(R.Location, /*HintFilePath=*/MainFile)) {
+      if (!pathEqual(*RefFilePath, MainFile))
+        OtherFile = *RefFilePath;
+    }
+  });
+  return OtherFile;
+}
+
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 // Canonical declarations help simplify the process of renaming. Examples:
 // - Template's canonical decl is the templated declaration (i.e.
 //   ClassTemplateDecl is canonicalized to its child CXXRecordDecl,

@@ -1,7 +1,13 @@
 ; Firstly test uncompression(--compress-recursion=0)
+<<<<<<< HEAD
 ; RUN: llvm-profgen --format=text --perfscript=%S/Inputs/recursion-compression-noprobe.perfscript --binary=%S/Inputs/recursion-compression-noprobe.perfbin --output=%t --compress-recursion=0 --profile-summary-cold-count=0
 ; RUN: FileCheck %s --input-file %t -check-prefix=CHECK-UNCOMPRESS
 ; RUN: llvm-profgen --format=text --perfscript=%S/Inputs/recursion-compression-noprobe.perfscript --binary=%S/Inputs/recursion-compression-noprobe.perfbin --output=%t --profile-summary-cold-count=0
+=======
+; RUN: llvm-profgen --perfscript=%S/Inputs/recursion-compression-noprobe.perfscript --binary=%S/Inputs/recursion-compression-noprobe.perfbin --output=%t --compress-recursion=0 --csprof-cold-thres=0
+; RUN: FileCheck %s --input-file %t -check-prefix=CHECK-UNCOMPRESS
+; RUN: llvm-profgen --perfscript=%S/Inputs/recursion-compression-noprobe.perfscript --binary=%S/Inputs/recursion-compression-noprobe.perfbin --output=%t --csprof-cold-thres=0
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ; RUN: FileCheck %s --input-file %t
 
 ; CHECK-UNCOMPRESS:[main:1 @ foo:3 @ fa:2 @ fb]:48:0
@@ -10,6 +16,7 @@
 ; CHECK-UNCOMPRESS:[main:1 @ foo:3 @ fa]:24:0
 ; CHECK-UNCOMPRESS: 1: 1
 ; CHECK-UNCOMPRESS: 2: 13 fb:11
+<<<<<<< HEAD
 ; CHECK-UNCOMPRESS:[main:1 @ foo:3 @ fa:2 @ fb:2 @ fa]:7:0
 ; CHECK-UNCOMPRESS: 1: 1
 ; CHECK-UNCOMPRESS: 2: 2 fb:1
@@ -20,6 +27,18 @@
 ; CHECK-UNCOMPRESS: 4: 1
 ; CHECK-UNCOMPRESS:[main:1 @ foo:3 @ fa:2 @ fb:2 @ fa:2 @ fb]:2:0
 ; CHECK-UNCOMPRESS: 2: 1 fa:1
+=======
+; CHECK-UNCOMPRESS:[main:1 @ foo]:7:0
+; CHECK-UNCOMPRESS: 2: 1
+; CHECK-UNCOMPRESS: 3: 2 fa:1
+; CHECK-UNCOMPRESS:[main:1 @ foo:3 @ fa:2 @ fb:2 @ fa]:7:0
+; CHECK-UNCOMPRESS: 1: 1
+; CHECK-UNCOMPRESS: 2: 2 fb:1
+; CHECK-UNCOMPRESS:[main:1 @ foo:3 @ fa:2 @ fb:2 @ fa:2 @ fb]:2:0
+; CHECK-UNCOMPRESS: 2: 1 fa:1
+; CHECK-UNCOMPRESS:[main:1 @ foo:3 @ fa:2 @ fb:2 @ fa:2 @ fb:2 @ fa]:2:0
+; CHECK-UNCOMPRESS: 4: 1
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 
 ; CHECK: [main:1 @ foo:3 @ fa:2 @ fb]:48:0

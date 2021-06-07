@@ -421,7 +421,10 @@ class StandardInstrumentations {
   PreservedCFGCheckerInstrumentation PreservedCFGChecker;
   IRChangedPrinter PrintChangedIR;
   PseudoProbeVerifier PseudoProbeVerification;
+<<<<<<< HEAD
   InLineChangePrinter PrintChangedDiff;
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   VerifyInstrumentation Verify;
 
   bool VerifyEach;

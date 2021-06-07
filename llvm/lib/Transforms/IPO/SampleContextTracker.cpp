@@ -183,7 +183,11 @@ SampleContextTracker::SampleContextTracker(
     SampleContext Context(FuncSample.first(), RawContext);
     LLVM_DEBUG(dbgs() << "Tracking Context for function: " << Context << "\n");
     if (!Context.isBaseContext())
+<<<<<<< HEAD
       FuncToCtxtProfiles[Context.getNameWithoutContext()].push_back(FSamples);
+=======
+      FuncToCtxtProfileSet[Context.getNameWithoutContext()].insert(FSamples);
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
     ContextTrieNode *NewNode = getOrCreateContextPath(Context, true);
     assert(!NewNode->getFunctionSamples() &&
            "New node can't have sample profile");
@@ -199,8 +203,11 @@ SampleContextTracker::getCalleeContextSamplesFor(const CallBase &Inst,
   if (!DIL)
     return nullptr;
 
+<<<<<<< HEAD
   CalleeName = FunctionSamples::getCanonicalFnName(CalleeName);
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   // For indirect call, CalleeName will be empty, in which case the context
   // profile for callee with largest total samples will be returned.
   ContextTrieNode *CalleeContext = getCalleeContextFor(DIL, CalleeName);
@@ -268,12 +275,20 @@ SampleContextTracker::getContextSamplesFor(const SampleContext &Context) {
 SampleContextTracker::ContextSamplesTy &
 SampleContextTracker::getAllContextSamplesFor(const Function &Func) {
   StringRef CanonName = FunctionSamples::getCanonicalFnName(Func);
+<<<<<<< HEAD
   return FuncToCtxtProfiles[CanonName];
+=======
+  return FuncToCtxtProfileSet[CanonName];
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 }
 
 SampleContextTracker::ContextSamplesTy &
 SampleContextTracker::getAllContextSamplesFor(StringRef Name) {
+<<<<<<< HEAD
   return FuncToCtxtProfiles[Name];
+=======
+  return FuncToCtxtProfileSet[Name];
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 }
 
 FunctionSamples *SampleContextTracker::getBaseSamplesFor(const Function &Func,
@@ -568,4 +583,29 @@ ContextTrieNode &SampleContextTracker::promoteMergeContextSamplesTree(
 
   return *ToNode;
 }
+<<<<<<< HEAD
+=======
+
+// Replace call graph edges with dynamic call edges from the profile.
+void SampleContextTracker::addCallGraphEdges(CallGraph &CG,
+                                             StringMap<Function *> &SymbolMap) {
+  // Add profile call edges to the call graph.
+  std::queue<ContextTrieNode *> NodeQueue;
+  NodeQueue.push(&RootContext);
+  while (!NodeQueue.empty()) {
+    ContextTrieNode *Node = NodeQueue.front();
+    NodeQueue.pop();
+    Function *F = SymbolMap.lookup(Node->getFuncName());
+    for (auto &I : Node->getAllChildContext()) {
+      ContextTrieNode *ChildNode = &I.second;
+      NodeQueue.push(ChildNode);
+      if (F && !F->isDeclaration()) {
+        Function *Callee = SymbolMap.lookup(ChildNode->getFuncName());
+        if (Callee && !Callee->isDeclaration())
+          CG[F]->addCalledFunction(nullptr, CG[Callee]);
+      }
+    }
+  }
+}
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 } // namespace llvm

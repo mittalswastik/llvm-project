@@ -510,6 +510,7 @@ void RISCVDAGToDAGISel::Select(SDNode *Node) {
       // Only custom select scalar second operand.
       if (Src2.getValueType() != XLenVT)
         break;
+<<<<<<< HEAD
       // Small constants are handled with patterns.
       if (auto *C = dyn_cast<ConstantSDNode>(Src2)) {
         int64_t CVal = C->getSExtValue();
@@ -684,6 +685,31 @@ void RISCVDAGToDAGISel::Select(SDNode *Node) {
         ReplaceNode(Node, CurDAG->getMachineNode(VMANDNOTOpcode, DL, VT,
                                                  {Mask, Cmp, VL, MaskSEW}));
         return;
+=======
+
+      assert(Node->getNumOperands() == 5);
+
+      RISCVVSEW VSEW =
+          static_cast<RISCVVSEW>(Node->getConstantOperandVal(3) & 0x7);
+      RISCVVLMUL VLMul =
+          static_cast<RISCVVLMUL>(Node->getConstantOperandVal(4) & 0x7);
+
+      unsigned VTypeI = RISCVVType::encodeVTYPE(
+          VLMul, VSEW, /*TailAgnostic*/ true, /*MaskAgnostic*/ false);
+      SDValue VTypeIOp = CurDAG->getTargetConstant(VTypeI, DL, XLenVT);
+
+      SDValue VLOperand = Node->getOperand(2);
+      if (auto *C = dyn_cast<ConstantSDNode>(VLOperand)) {
+        uint64_t AVL = C->getZExtValue();
+        if (isUInt<5>(AVL)) {
+          SDValue VLImm = CurDAG->getTargetConstant(AVL, DL, XLenVT);
+          ReplaceNode(Node,
+                      CurDAG->getMachineNode(RISCV::PseudoVSETIVLI, DL, XLenVT,
+                                             MVT::Other, VLImm, VTypeIOp,
+                                             /* Chain */ Node->getOperand(0)));
+          return;
+        }
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
       }
 
       // Otherwise use
@@ -1304,6 +1330,7 @@ bool RISCVDAGToDAGISel::SelectBaseAddr(SDValue Addr, SDValue &Base) {
   return true;
 }
 
+<<<<<<< HEAD
 bool RISCVDAGToDAGISel::selectShiftMask(SDValue N, unsigned ShiftWidth,
                                         SDValue &ShAmt) {
   // Shift instructions on RISCV only read the lower 5 or 6 bits of the shift
@@ -1374,6 +1401,8 @@ bool RISCVDAGToDAGISel::selectZExti32(SDValue N, SDValue &Val) {
   return false;
 }
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 // Check that it is a SLLIUW (Shift Logical Left Immediate Unsigned i32
 // on RV64).
 // SLLIUW is the same as SLLI except for the fact that it clears the bits
@@ -1409,6 +1438,7 @@ bool RISCVDAGToDAGISel::MatchSLLIUW(SDNode *N) const {
   return (VC1 >> VC2) == UINT64_C(0xFFFFFFFF);
 }
 
+<<<<<<< HEAD
 // Select VL as a 5 bit immediate or a value that will become a register. This
 // allows us to choose betwen VSETIVLI or VSETVLI later.
 bool RISCVDAGToDAGISel::selectVLOp(SDValue N, SDValue &VL) {
@@ -1416,6 +1446,19 @@ bool RISCVDAGToDAGISel::selectVLOp(SDValue N, SDValue &VL) {
   if (C && isUInt<5>(C->getZExtValue()))
     VL = CurDAG->getTargetConstant(C->getZExtValue(), SDLoc(N),
                                    N->getValueType(0));
+=======
+// X0 has special meaning for vsetvl/vsetvli.
+//  rd | rs1 |   AVL value | Effect on vl
+//--------------------------------------------------------------
+// !X0 |  X0 |       VLMAX | Set vl to VLMAX
+//  X0 |  X0 | Value in vl | Keep current vl, just change vtype.
+bool RISCVDAGToDAGISel::selectVLOp(SDValue N, SDValue &VL) {
+  // If the VL value is a constant 0, manually select it to an ADDI with 0
+  // immediate to prevent the default selection path from matching it to X0.
+  auto *C = dyn_cast<ConstantSDNode>(N);
+  if (C && C->isNullValue())
+    VL = SDValue(selectImm(CurDAG, SDLoc(N), 0, Subtarget->getXLenVT()), 0);
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   else
     VL = N;
 

@@ -8,7 +8,10 @@ declare double @llvm.vector.reduce.fmax.v1f64(<1 x double> %a)
 declare fp128 @llvm.vector.reduce.fmax.v1f128(<1 x fp128> %a)
 
 declare half @llvm.vector.reduce.fmax.v4f16(<4 x half> %a)
+<<<<<<< HEAD
 declare half @llvm.vector.reduce.fmax.v11f16(<11 x half> %a)
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 declare float @llvm.vector.reduce.fmax.v3f32(<3 x float> %a)
 declare fp128 @llvm.vector.reduce.fmax.v2f128(<2 x fp128> %a)
 declare float @llvm.vector.reduce.fmax.v16f32(<16 x float> %a)
@@ -105,6 +108,7 @@ define half @test_v4f16_ninf(<4 x half> %a) nounwind {
   ret half %b
 }
 
+<<<<<<< HEAD
 define half @test_v11f16(<11 x half> %a) nounwind {
 ; CHECK-NOFP-LABEL: test_v11f16:
 ; CHECK-NOFP:       // %bb.0:
@@ -320,6 +324,8 @@ define half @test_v11f16_ninf(<11 x half> %a) nounwind {
   ret half %b
 }
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 define float @test_v3f32(<3 x float> %a) nounwind {
 ; CHECK-LABEL: test_v3f32:
 ; CHECK:       // %bb.0:

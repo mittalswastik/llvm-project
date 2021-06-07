@@ -1,7 +1,15 @@
+<<<<<<< HEAD
 // RUN: %libomptarget-compilexx-run-and-check-generic
 
 // Currently hangs on amdgpu
 // UNSUPPORTED: amdgcn-amd-amdhsa
+=======
+// RUN: %libomptarget-compilexx-run-and-check-aarch64-unknown-linux-gnu
+// RUN: %libomptarget-compilexx-run-and-check-powerpc64-ibm-linux-gnu
+// RUN: %libomptarget-compilexx-run-and-check-powerpc64le-ibm-linux-gnu
+// RUN: %libomptarget-compilexx-run-and-check-x86_64-pc-linux-gnu
+// RUN: %libomptarget-compilexx-run-and-check-nvptx64-nvidia-cuda
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 #include <cassert>
 #include <iostream>

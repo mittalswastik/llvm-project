@@ -4092,7 +4092,11 @@ static Value *simplifySelectWithICmpCond(Value *CondVal, Value *TrueVal,
   // Note that the equivalence/replacement opportunity does not hold for vectors
   // because each element of a vector select is chosen independently.
   if (Pred == ICmpInst::ICMP_EQ && !CondVal->getType()->isVectorTy()) {
+<<<<<<< HEAD
     if (simplifyWithOpReplaced(FalseVal, CmpLHS, CmpRHS, Q,
+=======
+    if (SimplifyWithOpReplaced(FalseVal, CmpLHS, CmpRHS, Q,
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
                                /* AllowRefinement */ false, MaxRecurse) ==
             TrueVal ||
         simplifyWithOpReplaced(FalseVal, CmpRHS, CmpLHS, Q,

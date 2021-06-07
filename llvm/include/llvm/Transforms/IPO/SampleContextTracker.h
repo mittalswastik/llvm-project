@@ -18,6 +18,7 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/Analysis/CallGraph.h"
 #include "llvm/IR/DebugInfoMetadata.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/ProfileData/SampleProf.h"
@@ -90,7 +91,11 @@ private:
 // calling context and the context is identified by path from root to the node.
 class SampleContextTracker {
 public:
+<<<<<<< HEAD
   using ContextSamplesTy = SmallVector<FunctionSamples *, 16>;
+=======
+  using ContextSamplesTy = SmallSet<FunctionSamples *, 16>;
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
   SampleContextTracker(StringMap<FunctionSamples> &Profiles);
   // Query context profile for a specific callee with given name at a given
@@ -120,9 +125,15 @@ public:
   // This makes sure that inlined context profile will be excluded in
   // function's base profile.
   void markContextSamplesInlined(const FunctionSamples *InlinedSamples);
+<<<<<<< HEAD
   ContextTrieNode &getRootContext();
   void promoteMergeContextSamplesTree(const Instruction &Inst,
                                       StringRef CalleeName);
+=======
+  void promoteMergeContextSamplesTree(const Instruction &Inst,
+                                      StringRef CalleeName);
+  void addCallGraphEdges(CallGraph &CG, StringMap<Function *> &SymbolMap);
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
   // Dump the internal context profile trie.
   void dump();
 
@@ -142,7 +153,11 @@ private:
                                                   StringRef ContextStrToRemove);
 
   // Map from function name to context profiles (excluding base profile)
+<<<<<<< HEAD
   StringMap<ContextSamplesTy> FuncToCtxtProfiles;
+=======
+  StringMap<ContextSamplesTy> FuncToCtxtProfileSet;
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
   // Root node for context trie tree
   ContextTrieNode RootContext;

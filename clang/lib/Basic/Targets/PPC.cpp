@@ -334,11 +334,14 @@ bool PPCTargetInfo::initFeatureMap(
                         .Case("pwr9", true)
                         .Case("pwr8", true)
                         .Default(false);
+<<<<<<< HEAD
 
   // ROP Protect is off by default.
   Features["rop-protect"] = false;
   // Privileged instructions are off by default.
   Features["privileged"] = false;
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
   Features["spe"] = llvm::StringSwitch<bool>(CPU)
                         .Case("8548", true)

@@ -1,4 +1,5 @@
 ; Used the data from recursion-compression.test, refer it for the unmerged output
+<<<<<<< HEAD
 ; RUN: llvm-profgen --format=text --perfscript=%S/Inputs/recursion-compression-pseudoprobe.perfscript --binary=%S/Inputs/recursion-compression-pseudoprobe.perfbin --output=%t1 --compress-recursion=-1 --profile-summary-cold-count=8
 ; RUN: FileCheck %s --input-file %t1
 
@@ -13,13 +14,27 @@
 ; CHECK:     [fa]:14:4
 ; CHECK-NEXT: 1: 4
 ; CHECK-NEXT: 2: 18446744073709551615
+=======
+; RUN: llvm-profgen --perfscript=%S/Inputs/recursion-compression-pseudoprobe.perfscript --binary=%S/Inputs/recursion-compression-pseudoprobe.perfbin --output=%t --compress-recursion=-1 --csprof-cold-thres=8
+; RUN: FileCheck %s --input-file %t
+
+; Test --csprof-keep-cold
+; RUN: llvm-profgen --perfscript=%S/Inputs/recursion-compression-pseudoprobe.perfscript --binary=%S/Inputs/recursion-compression-pseudoprobe.perfbin --output=%t --compress-recursion=-1 --csprof-cold-thres=100 --csprof-keep-cold
+; RUN: FileCheck %s --input-file %t --check-prefix=CHECK-KEEP-COLD
+
+; CHECK:     [fa]:14:4
+; CHECK-NEXT: 1: 4
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ; CHECK-NEXT: 3: 4
 ; CHECK-NEXT: 4: 2
 ; CHECK-NEXT: 5: 1
 ; CHECK-NEXT: 7: 2 fb:2
 ; CHECK-NEXT: 8: 1 fa:1
 ; CHECK-NEXT: !CFGChecksum: 120515930909
+<<<<<<< HEAD
 ; CHECK-NEXT: !Attributes: 0
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ; CHECK-NEXT:[main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb]:13:4
 ; CHECK-NEXT: 1: 4
 ; CHECK-NEXT: 2: 3
@@ -35,10 +50,15 @@
 ; CHECK-KEEP-COLD-NEXT: 5: 4 fb:4
 ; CHECK-KEEP-COLD-NEXT: 6: 3 fa:3
 ; CHECK-KEEP-COLD-NEXT: !CFGChecksum: 72617220756
+<<<<<<< HEAD
 ; CHECK-KEEP-COLD-NEXT: !Attributes: 0
 ; CHECK-KEEP-COLD-NEXT:[fa]:14:4
 ; CHECK-KEEP-COLD-NEXT: 1: 4
 ; CHECK-KEEP-COLD-NEXT: 2: 18446744073709551615
+=======
+; CHECK-KEEP-COLD-NEXT:[fa]:14:4
+; CHECK-KEEP-COLD-NEXT: 1: 4
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 ; CHECK-KEEP-COLD-NEXT: 3: 4
 ; CHECK-KEEP-COLD-NEXT: 4: 2
 ; CHECK-KEEP-COLD-NEXT: 5: 1
@@ -46,6 +66,7 @@
 ; CHECK-KEEP-COLD-NEXT: 8: 1 fa:1
 ; CHECK-KEEP-COLD-NEXT: !CFGChecksum: 120515930909
 
+<<<<<<< HEAD
 ; CHECK-UNMERGED:     [main:2 @ foo:5 @ fa:8 @ fa:7 @ fb:5 @ fb]:13:4
 ; CHECK-UNMERGED-NEXT: 1: 4
 ; CHECK-UNMERGED-NEXT: 2: 3
@@ -56,6 +77,8 @@
 ; CHECK-UNMERGED-NOT: [fa]
 ; CHECK-UNMERGED-NOT: [fb]
 
+=======
+>>>>>>> 0826268d59c6e1bb3530dffd9dc5f6038774486d
 
 ; clang -O3 -fexperimental-new-pass-manager -fuse-ld=lld -fpseudo-probe-for-profiling
 ; -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -Xclang -mdisable-tail-calls
