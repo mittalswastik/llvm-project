@@ -36,6 +36,8 @@
 #include <cassert>
 #include <cstdint>
 #include <vector>
+#include <iostream>
+
 
 using llvm::SmallVector;
 #ifdef OMPT_SUPPORT
@@ -335,6 +337,7 @@ int targetDataBegin(ident_t *Loc, DeviceTy &Device, int32_t ArgNum,
                     int64_t *ArgTypes, map_var_info_t *ArgNames,
                     void **ArgMappers, AsyncInfoTy &AsyncInfo,
                     bool FromMapper) {
+  // swastik
   // process each input.
   for (int32_t I = 0; I < ArgNum; ++I) {
     // Ignore private variables and arrays - there is no mapping for them.
@@ -727,6 +730,17 @@ int targetDataEnd(ident_t *Loc, DeviceTy &Device, int32_t ArgNum,
         }
       }
 
+      /**Swastik Debug*/
+      // int *data_temp = static_cast<int*> (Args[I]);
+      // int32_t size_temp = ArgSizes[I]/sizeof(int32_t);
+      
+      // std::cout << "Array elements: ";
+      // for (size_t i = 0; i < size_temp; ++i) {
+      //     std::cout << data_temp[i] << " ";
+      // }
+      // std::cout << std::endl;
+
+      // copy data to the destination on host
       Ret = Device.retrieveData(HstPtrBegin, TgtPtrBegin, DataSize, AsyncInfo,
                                 TPR.getEntry());
       if (Ret != OFFLOAD_SUCCESS) {
@@ -1208,7 +1222,7 @@ static int processDataBefore(ident_t *Loc, int64_t DeviceId, void *HostPtr,
                              SmallVector<ptrdiff_t> &TgtOffsets,
                              PrivateArgumentManagerTy &PrivateArgumentManager,
                              AsyncInfoTy &AsyncInfo) {
-
+  //swastik
   auto DeviceOrErr = PM->getDevice(DeviceId);
   if (!DeviceOrErr)
     FATAL_MESSAGE(DeviceId, "%s", toString(DeviceOrErr.takeError()).c_str());
@@ -1353,6 +1367,8 @@ static int processDataAfter(ident_t *Loc, int64_t DeviceId, void *HostPtr,
     REPORT("Call to targetDataEnd failed, abort target.\n");
     return OFFLOAD_FAIL;
   }
+
+
 
   // Free target memory for private arguments after synchronization.
   // TODO: We might want to remove `mutable` in the future by not changing the

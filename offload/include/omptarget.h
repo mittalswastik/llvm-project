@@ -27,6 +27,7 @@
 #include <type_traits>
 
 #include "llvm/ADT/SmallVector.h"
+//#include "quantum_circuit_wrapper.h"
 
 #define OFFLOAD_SUCCESS (0)
 #define OFFLOAD_FAIL (~0)

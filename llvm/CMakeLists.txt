@@ -116,7 +116,7 @@ endif()
 # LLVM_EXTERNAL_${project}_SOURCE_DIR using LLVM_ALL_PROJECTS
 # This allows an easy way of setting up a build directory for llvm and another
 # one for llvm+clang+... using the same sources.
-set(LLVM_ALL_PROJECTS "bolt;clang;clang-tools-extra;compiler-rt;cross-project-tests;libc;libclc;lld;lldb;mlir;openmp;polly;pstl")
+set(LLVM_ALL_PROJECTS "bolt;clang;clang-tools-extra;compiler-rt;cross-project-tests;libc;libclc;lld;lldb;mlir;openmp;offload;polly;pstl")
 # The flang project is not yet part of "all" projects (see C++ requirements)
 set(LLVM_EXTRA_PROJECTS "flang")
 # List of all known projects in the mono repo
@@ -158,6 +158,8 @@ endif()
 foreach(proj IN LISTS LLVM_ENABLE_RUNTIMES)
   if (NOT "${proj}" IN_LIST LLVM_SUPPORTED_RUNTIMES)
     message(FATAL_ERROR "Runtime \"${proj}\" is not a supported runtime. Supported runtimes are: ${LLVM_SUPPORTED_RUNTIMES}")
+  else()
+  message(STATUS "========================== offload is supported ===============================")
   endif()
 endforeach()
 
@@ -960,6 +962,8 @@ endif()
 # for python modules.
 find_package(Python3 ${LLVM_MINIMUM_PYTHON_VERSION} REQUIRED
     COMPONENTS Interpreter)
+ 
+find_package(pybind11 REQUIRED)
 
 # All options referred to from HandleLLVMOptions have to be specified
 # BEFORE this include, otherwise options will not be correctly set on

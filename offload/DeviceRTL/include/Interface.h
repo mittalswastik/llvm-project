@@ -13,7 +13,6 @@
 #define OMPTARGET_DEVICERTL_INTERFACE_H
 
 #include "Shared/Environment.h"
-
 #include "DeviceTypes.h"
 
 /// External API

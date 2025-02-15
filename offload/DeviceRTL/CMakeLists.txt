@@ -83,6 +83,8 @@ set(include_files
   ${include_directory}/DeviceTypes.h
   ${include_directory}/DeviceUtils.h
   ${include_directory}/Workshare.h
+  #${include_directory}/Func.h
+  #${include_directory}/quantum_circuit_wrapper.h
 )
 
 set(src_files
@@ -101,6 +103,8 @@ set(src_files
   ${source_directory}/Tasking.cpp
   ${source_directory}/DeviceUtils.cpp
   ${source_directory}/Workshare.cpp
+  #${source_directory}/Func.cpp
+  #${source_directory}/quantum_circuit_wrapper.cpp
 )
 
 # We disable the slp vectorizer during the runtime optimization to avoid
@@ -172,6 +176,7 @@ function(compileDeviceRTLLibrary target_cpu target_name target_triple)
     list(APPEND bc_files ${outfile})
   endforeach()
 
+  message(STATUS "------------------ LIBOMPTARGET is compiled --------------------")
   set(bclib_name "libomptarget-${target_name}-${target_cpu}.bc")
 
   # Link to a bitcode library.

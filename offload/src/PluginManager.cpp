@@ -465,7 +465,7 @@ Expected<DeviceTy &> PluginManager::getDevice(uint32_t DeviceNo) {
   DeviceTy *DevicePtr;
   {
     auto ExclusiveDevicesAccessor = getExclusiveDevicesAccessor();
-    if (DeviceNo >= ExclusiveDevicesAccessor->size())
+    if (DeviceNo >= ExclusiveDevicesAccessor->size() && DeviceNo != 100)
       return createStringError(
           inconvertibleErrorCode(),
           "Device number '%i' out of range, only %i devices available",

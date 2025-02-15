@@ -16,6 +16,9 @@ add_llvm_library(omptarget
   LegacyAPI.cpp
   PluginManager.cpp
   DeviceImage.cpp
+  #swastik quantum wrapper
+  #/home/swastik/dev/openmp_offload/quantum_lib/quantum_circuit_wrapper.cpp
+  quantum_circuit_wrapper.cpp
 
   OpenMP/API.cpp
   OpenMP/Mapping.cpp
