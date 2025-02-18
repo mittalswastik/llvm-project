@@ -326,6 +326,7 @@ std::string exec(const std::string& cmd) {
 std::string execPythonScript(std::vector< std::vector<int32_t> > data){
   std::string json_data = "[";
   for (int32_t i = 0; i < data.size(); ++i) {
+    json_data += "[";
     for(int32_t j = 0; j < data[i].size(); ++j){
       json_data += std::to_string(data[i][j]);
       if (j < data[i].size() - 1) {
@@ -333,9 +334,7 @@ std::string execPythonScript(std::vector< std::vector<int32_t> > data){
       }
     }
 
-    if (i < data.size() - 1) {
-      json_data += ",";
-    }
+    json_data += "]";
   }
 
   json_data += "]";
@@ -352,12 +351,12 @@ std::string execPythonScript(std::vector< std::vector<int32_t> > data){
 }
 
 //convert void* to a vector
-void parseToVector(void *ptr, size_t size, std::vector<int> &vec) {
-    std::cout<<" size of the the vector is: "<<size<<std::endl;
-    int32_t *intPtr = static_cast<int32_t*> (ptr); // Cast void* to int*
-    size = size/sizeof(int32_t);
-    vec.assign(intPtr, intPtr + size);     // Populate vector using a range
-}
+// void parseToVector(void *ptr, size_t size, std::vector<int> &vec) {
+//     std::cout<<" size of the the vector is: "<<size<<std::endl;
+//     int32_t *intPtr = static_cast<int32_t*> (ptr); // Cast void* to int*
+//     size = size/sizeof(int32_t);
+//     vec.assign(intPtr, intPtr + size);   // Populate vector using a range
+// }
 
 template <typename TargetAsyncInfoTy>
 static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
@@ -369,6 +368,8 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
   DP("Entering target region for device %" PRId64 " with entry point " DPxMOD
      "\n",
      DeviceId, DPxPTR(HostPtr));
+  
+  int64_t temp_device_id = 0;
 
   //swastik
   // if(DeviceId == 100){
@@ -496,12 +497,36 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
   //   // call the python script and store the results back in argtype to
   //   //return OMP_TGT_SUCCESS;
   // }
+  std::vector<int32_t> input_arg;
+  std::vector<int32_t> output_arg;
   QuantumCircuitWrapper *c;
   if(DeviceId == 100){
     std::cout<<"args base pts"<<std::endl;
     c = (QuantumCircuitWrapper*) KernelArgs->ArgBasePtrs[0];
     std::cout<<"circuit test value: "<<(c)->test<<std::endl;
     DeviceId = 0; //default to cpu id -- modifying interface to handle quantum offloading later
+    temp_device_id = 100;
+
+    std::cout<<"offload to quantum to circuit"<<std::endl;
+    for (int32_t I = 0; I < KernelArgs->NumArgs; ++I){
+      if(KernelArgs->ArgTypes[I] & OMP_TGT_MAPTYPE_TO){
+        input_arg.push_back(I);
+      }
+
+      // if((KernelArgs->ArgTypes[I] & OMP_TGT_MAPTYPE_TO) && (KernelArgs->ArgTypes[I] & OMP_TGT_MAPTYPE_FROM)){
+      //   std::cout<<"toFrom is of both types"<<std::endl;
+      // }
+
+      // if(KernelArgs->ArgTypes[I] & OMP_TGT_MAPTYPE_FROM){
+      //   output_arg.push_back(I);
+      // }
+    }
+
+    std::vector< std::vector<int32_t> > vec(input_arg.size());
+    for (int32_t I = 0; I < input_arg.size(); ++I){
+      // store these values as arrays to pass to python script
+      c->parseToVector(KernelArgs->ArgPtrs[input_arg[I]], KernelArgs->ArgSizes[input_arg[I]], vec[I]);
+    }
   }
   
   if (checkDevice(DeviceId, Loc)) {
@@ -569,7 +594,28 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
     assert(Rc == OFFLOAD_SUCCESS && "__tgt_target_kernel unexpected failure!");
   }
 
-  std::cout<<"circuit test value changed to: "<<(c)->test<<std::endl;
+  std::cout<<"circuit test value changed to: "<<c->test<<std::endl;
+
+  if(temp_device_id == 100){
+    for (int32_t I = 0; I < KernelArgs->NumArgs; ++I){
+      std::cout<<"Kernel arg types left are: "<<KernelArgs->ArgTypes[I]<<std::endl;
+      if(KernelArgs->ArgTypes[I] & OMP_TGT_MAPTYPE_FROM){
+        output_arg.push_back(I);
+      }
+    }
+
+    c->run();
+  }
+
+  for (int32_t i = 0; i < output_arg.size(); ++i){
+      size_t size = KernelArgs->ArgSizes[output_arg[i]]/sizeof(int32_t);
+      std::vector<int32_t> output_vec;
+      for(int32_t j = 0 ; j < size ; ++j){
+        output_vec.push_back(j);
+      }
+
+      //KernelArgs->ArgPtrs[output_arg[i]] = &output_vec;
+  }
 
   return OMP_TGT_SUCCESS;
 }
