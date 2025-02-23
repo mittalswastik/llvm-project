@@ -14,13 +14,19 @@ void QuantumCircuitWrapper::apply_x(int qubit) {
     gates += " circuit.x(" + std::to_string(qubit) + ")\n";
 }
 
-void QuantumCircuitWrapper::parseToVector(void* ptr, size_t size, std::vector<int32_t> vec){
+std::vector<int32_t> QuantumCircuitWrapper::parseToVector(void* ptr, size_t size, std::vector<int32_t> vec){
     std::cout<<" size of the the vector is: "<<size<<std::endl;
     intptr_t intPtr = reinterpret_cast<intptr_t> (ptr); // Cast void* to int*
     int32_t *intVal = reinterpret_cast<int32_t*>(intPtr);
     size = size/sizeof(int32_t);
+    std::cout<<"array value is"<<std::endl;
+    for(int i = 0 ; i < size ; i++){
+        std::cout<<intVal[i]<<" "<<std::endl;
+    }
+
+    std::cout<<"end of array value"<<std::endl;
     vec.assign(intVal, intVal + size);   // Populate vector using a range
-    vec_data.push_back(vec);
+    return vec;
 }
 
 

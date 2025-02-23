@@ -13,19 +13,19 @@
 class QuantumCircuitWrapper {
 public:
         std::string test;
-
+        std::vector<std::vector<int32_t> > vec_data;
+        std::vector<void*> vec_out_data;
         QuantumCircuitWrapper(int num_qubits);
 
         void apply_hadamard(int qubit);
         void apply_cnot(int control, int target);
         void apply_x(int qubit);
-        void parseToVector(void* ptr, size_t size, std::vector<int32_t> vec);
+        std::vector<int32_t> parseToVector(void* ptr, size_t size, std::vector<int32_t> vec);
         std::string run();
 
 private:
     int num_qubits;
     std::string gates;
-    std::vector<std::vector<int32_t> > vec_data;
     std::string generate_python_script(const std::string& circuit_name, int num_qubits, const std::string& gates);
     std::string execute_python_script(const std::string& script);
 };

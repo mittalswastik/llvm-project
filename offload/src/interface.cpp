@@ -499,6 +499,7 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
   // }
   std::vector<int32_t> input_arg;
   std::vector<int32_t> output_arg;
+  std::vector<size_t> output_sizes;
   QuantumCircuitWrapper *c;
   if(DeviceId == 100){
     std::cout<<"args base pts"<<std::endl;
@@ -517,15 +518,18 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
       //   std::cout<<"toFrom is of both types"<<std::endl;
       // }
 
-      // if(KernelArgs->ArgTypes[I] & OMP_TGT_MAPTYPE_FROM){
-      //   output_arg.push_back(I);
-      // }
+      if(KernelArgs->ArgTypes[I] & OMP_TGT_MAPTYPE_FROM){
+        c->vec_out_data.push_back(KernelArgs->ArgBasePtrs[I]);
+        output_sizes.push_back(KernelArgs->ArgSizes[I]);
+        //output_arg.push_back(I);
+      }
     }
 
     std::vector< std::vector<int32_t> > vec(input_arg.size());
     for (int32_t I = 0; I < input_arg.size(); ++I){
       // store these values as arrays to pass to python script
-      c->parseToVector(KernelArgs->ArgPtrs[input_arg[I]], KernelArgs->ArgSizes[input_arg[I]], vec[I]);
+      c->vec_data.push_back(c->parseToVector(KernelArgs->ArgPtrs[input_arg[I]], KernelArgs->ArgSizes[input_arg[I]], vec[I]));
+      //c->vec_output_data.push_back(c->parseToVector(KernelArgs->ArgPtrs[output_arg[I]], KernelArgs->ArgSizes[output_arg[I]], vec[I]));
     }
   }
   
@@ -596,24 +600,38 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
 
   std::cout<<"circuit test value changed to: "<<c->test<<std::endl;
 
-  if(temp_device_id == 100){
-    for (int32_t I = 0; I < KernelArgs->NumArgs; ++I){
-      std::cout<<"Kernel arg types left are: "<<KernelArgs->ArgTypes[I]<<std::endl;
-      if(KernelArgs->ArgTypes[I] & OMP_TGT_MAPTYPE_FROM){
-        output_arg.push_back(I);
+  // if(temp_device_id == 100){
+  //   // for (int32_t I = 0; I < KernelArgs->NumArgs; ++I){
+  //   //   std::cout<<"Kernel arg types left are: "<<KernelArgs->ArgTypes[I]<<std::endl;
+  //   //   if(KernelArgs->ArgTypes[I] & OMP_TGT_MAPTYPE_FROM){
+  //   //     output_arg.push_back(I);
+  //   //   }
+  //   // }
+
+
+
+  //   c->run();
+  // }
+
+  for (int32_t i = 0; i < c->vec_out_data.size(); ++i){
+      // size_t size = KernelArgs->ArgSizes[output_arg[i]]/sizeof(int32_t);
+      // std::vector<int32_t> output_vec;
+      // for(int32_t j = 0 ; j < size ; ++j){
+      //   output_vec.push_back(j);
+      // }
+      std::vector<int32_t> output_vec_test;
+      //output_vec_test = c->parseToVector(*(c->vec_out_data[i]), output_sizes[i], output_vec_test);
+      intptr_t intPtr = reinterpret_cast<intptr_t> (c->vec_out_data[i]); // Cast void* to int*
+      int32_t *intVal = reinterpret_cast<int32_t*>(intPtr);
+      size_t tsize = output_sizes[i]/sizeof(int32_t);
+      output_vec_test.assign(intVal, intVal+tsize);
+      std::cout<<"output vec val is: "<<std::endl;
+      for(int j = 0 ; j < output_vec_test.size(); j++){
+        intVal[j] = 3; 
+        std::cout<<output_vec_test[j]<<" "<<std::endl;
       }
-    }
 
-    c->run();
-  }
-
-  for (int32_t i = 0; i < output_arg.size(); ++i){
-      size_t size = KernelArgs->ArgSizes[output_arg[i]]/sizeof(int32_t);
-      std::vector<int32_t> output_vec;
-      for(int32_t j = 0 ; j < size ; ++j){
-        output_vec.push_back(j);
-      }
-
+      std::cout<<std::endl;
       //KernelArgs->ArgPtrs[output_arg[i]] = &output_vec;
   }
 
