@@ -3,15 +3,15 @@
 QuantumCircuitWrapper::QuantumCircuitWrapper(int num_qubits) : num_qubits(num_qubits) {}
 
 void QuantumCircuitWrapper::apply_hadamard(int qubit) {
-    gates += " circuit.h(" + std::to_string(qubit) + ")\n";
+    gates += "circuit.h(" + std::to_string(qubit) + ")\n";
 }
 
 void QuantumCircuitWrapper::apply_cnot(int control, int target) {
-    gates += " circuit.cx(" + std::to_string(control) + ", " + std::to_string(target) + ")\n";
+    gates += "circuit.cx(" + std::to_string(control) + ", " + std::to_string(target) + ")\n";
 }
 
 void QuantumCircuitWrapper::apply_x(int qubit) {
-    gates += " circuit.x(" + std::to_string(qubit) + ")\n";
+    gates += "circuit.x(" + std::to_string(qubit) + ")\n     ";
 }
 
 std::vector<int32_t> QuantumCircuitWrapper::parseToVector(void* ptr, size_t size, std::vector<int32_t> vec){
@@ -32,8 +32,13 @@ std::vector<int32_t> QuantumCircuitWrapper::parseToVector(void* ptr, size_t size
 
 std::string QuantumCircuitWrapper::generate_python_script(const std::string& circuit_name, int num_qubits, const std::string& gates) {
     std::ostringstream script;
-    script << "from qiskit import QuantumCircuit, Aer, execute\n";
-    script << "circuit = QuantumCircuit(" << num_qubits << ")\n";
+    script << "import sys\n";
+    script << "import json\n";
+    script << "import matplotlib.pyplot as plt\n";
+    script << "import numpy as np\n";
+    script << "from qiskit import QuantumCircuit, execute\n";
+    script << "from qiskit.providers.dax import DAX\n";
+    script << "import sequre\n";
     //processong function
     script << "def process_data(data):\n";
     script << "    # Example processing: square each number\n";
@@ -41,18 +46,27 @@ std::string QuantumCircuitWrapper::generate_python_script(const std::string& cir
 
     // Read JSON data from command line argument
     script << "if __name__ == \"__main__\":\n";
-    script << " if len(sys.argv) < 2:\n";
-    script << "     print('Error: No input data provided')\n";
-    script << "     sys.exit(1)\n\n";
-
-    script << " input_data = json.loads(sys.argv[1])\n";
-    script << " processed_data = process_data(input_data)\n";
-    script << " print('Processed Data:', processed_data)\n\n";
-    script << gates;
-    script << " backend = Aer.get_backend('statevector_simulator')\n";
-    script << " result = execute(circuit, backend).result()\n";
-    script << " statevector = result.get_statevector()\n";
-    script << " print(statevector)\n";
+    script << "    if len(sys.argv) < 2:\n";
+    script << "        print('Error: No input data provided')\n";
+    script << "        sys.exit(1)\n\n";
+    script << "    circuit = QuantumCircuit(" << num_qubits << "," <<num_qubits << ")\n";
+    script << "    input_data = json.loads(sys.argv[1])\n";
+    script << "    processed_data = process_data(input_data)\n";
+    std::string line;
+    std::istringstream ss(gates);
+    while(std::getline(ss, line)) {
+        script << "    " << line << "\n"; // Adds indentation to each line
+    }
+    //script << gates;
+    script << "    circuit.measure_all()\n";
+    script << "    backend_name = 'dax_code_simulator'\n";
+    script << "    backend_name = 'dax_code_printer'\n";
+    script << "    backend = dax.get_backend(backend_name)\n";
+    script << "    backend.load_config("<<"\"resources.toml\""<<")\n";
+    script << "    dax_job = execute(circuit, backend, shots=30, optimization_level=0)\n";
+    script << "    client = sequre.UserClient()\n";
+    script << "    workload = dax_job.get_dax()\n";
+    script << "    print(workload)";
     return script.str();
 }
 
@@ -61,10 +75,10 @@ std::string QuantumCircuitWrapper::execute_python_script(const std::string& scri
     for (int32_t i = 0; i < vec_data.size(); ++i) {
         json_data += "[";
         for(int32_t j = 0; j < vec_data[i].size(); ++j){
-        json_data += std::to_string(vec_data[i][j]);
-        if (j < vec_data[i].size() - 1) {
-            json_data += ",";
-        }
+            json_data += std::to_string(vec_data[i][j]);
+            if (j < vec_data[i].size() - 1) {
+                json_data += ",";
+            }
         }
 
         json_data += "]";

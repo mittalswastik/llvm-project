@@ -610,7 +610,7 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
 
 
 
-  //   c->run();
+  c->run();
   // }
 
   for (int32_t i = 0; i < c->vec_out_data.size(); ++i){
