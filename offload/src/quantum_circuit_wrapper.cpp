@@ -11,7 +11,19 @@ void QuantumCircuitWrapper::apply_cnot(int control, int target) {
 }
 
 void QuantumCircuitWrapper::apply_x(int qubit) {
-    gates += "circuit.x(" + std::to_string(qubit) + ")\n     ";
+    gates += "circuit.x(" + std::to_string(qubit) + ")\n";
+}
+
+void QuantumCircuitWrapper::apply_barrier(){
+    gates += "circuit.barrier()\n";
+}
+
+void QuantumCircuitWrapper::measure(){
+    gates += "circuit.measure_all()\n";
+}
+
+void QuantumCircuitWrapper::apply_qiskit(){
+    gates += "smarq.qisket_circuit()\n";
 }
 
 std::vector<int32_t> QuantumCircuitWrapper::parseToVector(void* ptr, size_t size, std::vector<int32_t> vec){
@@ -34,6 +46,8 @@ std::string QuantumCircuitWrapper::generate_python_script(const std::string& cir
     std::ostringstream script;
     script << "import sys\n";
     script << "import json\n";
+    script << "import supermarq\n";
+    script << "import qiskit\n";
     script << "import matplotlib.pyplot as plt\n";
     script << "import numpy as np\n";
     script << "from qiskit import QuantumCircuit, execute\n";
@@ -50,8 +64,10 @@ std::string QuantumCircuitWrapper::generate_python_script(const std::string& cir
     script << "        print('Error: No input data provided')\n";
     script << "        sys.exit(1)\n\n";
     script << "    circuit = QuantumCircuit(" << num_qubits << "," <<num_qubits << ")\n";
+    script << "    smarq = supermarq.hamiltonian_simulation.HamiltonianSimulation(" << num_qubits << ")\n";
+    script << "    smarq = supermarq.ghz.GHZ(" << num_qubits << ")\n";
     script << "    input_data = json.loads(sys.argv[1])\n";
-    script << "    processed_data = process_data(input_data)\n";
+    //script << "    processed_data = process_data(input_data)\n";
     std::string line;
     std::istringstream ss(gates);
     while(std::getline(ss, line)) {

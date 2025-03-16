@@ -627,7 +627,7 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
       output_vec_test.assign(intVal, intVal+tsize);
       std::cout<<"output vec val is: "<<std::endl;
       for(int j = 0 ; j < output_vec_test.size(); j++){
-        intVal[j] = 3; 
+        intVal[j] = 3;
         std::cout<<output_vec_test[j]<<" "<<std::endl;
       }
 

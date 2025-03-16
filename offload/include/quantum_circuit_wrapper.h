@@ -20,6 +20,9 @@ public:
         void apply_hadamard(int qubit);
         void apply_cnot(int control, int target);
         void apply_x(int qubit);
+        void apply_barrier();
+        void apply_qiskit();
+        void measure();
         std::vector<int32_t> parseToVector(void* ptr, size_t size, std::vector<int32_t> vec);
         std::string run();
 
