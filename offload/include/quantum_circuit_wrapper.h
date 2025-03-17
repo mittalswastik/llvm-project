@@ -21,7 +21,9 @@ public:
         void apply_cnot(int control, int target);
         void apply_x(int qubit);
         void apply_barrier();
-        void apply_qiskit();
+        void apply_hamiltonian_qiskit();
+        void apply_ghz_qiskit();
+        void execute_basic_quantum();
         void measure();
         std::vector<int32_t> parseToVector(void* ptr, size_t size, std::vector<int32_t> vec);
         std::string run();
@@ -29,6 +31,7 @@ public:
 private:
     int num_qubits;
     std::string gates;
+    std::string scr;
     std::string generate_python_script(const std::string& circuit_name, int num_qubits, const std::string& gates);
     std::string execute_python_script(const std::string& script);
 };

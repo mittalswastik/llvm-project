@@ -22,8 +22,27 @@ void QuantumCircuitWrapper::measure(){
     gates += "circuit.measure_all()\n";
 }
 
-void QuantumCircuitWrapper::apply_qiskit(){
-    gates += "smarq.qisket_circuit()\n";
+void QuantumCircuitWrapper::apply_hamiltonian_qiskit(){
+    gates += "smarq = supermarq.hamiltonian_simulation.HamiltonianSimulation(" + std::to_string(num_qubits) + ")\n";
+    gates += "circuit = smarq.qisket_circuit()\n";
+    gates += "print(circuit)\n";
+}
+
+void QuantumCircuitWrapper::apply_ghz_qiskit(){
+    gates += "smarq = supermarq.ghz.GHZ(" + std::to_string(num_qubits) + ")\n";
+    gates += "circuit = smarq.qisket_circuit()\n";
+    gates += "print(circuit)\n";
+}
+
+void QuantumCircuitWrapper::execute_basic_quantum(){
+    scr += "    backend_name = 'dax_code_simulator'\n";
+    scr += "    backend_name = 'dax_code_printer'\n";
+    scr += "    backend = dax.get_backend(backend_name)\n";
+    scr += "    backend.load_config(\"resources.toml\")\n";
+    scr += "    dax_job = execute(circuit, backend, shots=30, optimization_level=0)\n";
+    scr += "    client = sequre.UserClient()\n";
+    scr += "    workload = dax_job.get_dax()\n";
+    scr += "    print(workload)";
 }
 
 std::vector<int32_t> QuantumCircuitWrapper::parseToVector(void* ptr, size_t size, std::vector<int32_t> vec){
@@ -63,26 +82,29 @@ std::string QuantumCircuitWrapper::generate_python_script(const std::string& cir
     script << "    if len(sys.argv) < 2:\n";
     script << "        print('Error: No input data provided')\n";
     script << "        sys.exit(1)\n\n";
-    script << "    circuit = QuantumCircuit(" << num_qubits << "," <<num_qubits << ")\n";
-    script << "    smarq = supermarq.hamiltonian_simulation.HamiltonianSimulation(" << num_qubits << ")\n";
-    script << "    smarq = supermarq.ghz.GHZ(" << num_qubits << ")\n";
     script << "    input_data = json.loads(sys.argv[1])\n";
+    script << "    circuit = QuantumCircuit(" << num_qubits << "," <<num_qubits << ")\n";
     //script << "    processed_data = process_data(input_data)\n";
     std::string line;
     std::istringstream ss(gates);
     while(std::getline(ss, line)) {
         script << "    " << line << "\n"; // Adds indentation to each line
     }
+
+    std::string line2;
+    std::istringstream ss2(scr);
+    while(std::getline(ss, line2)) {
+        script << "    " << line2 << "\n"; // Adds indentation to each line
+    }
     //script << gates;
-    script << "    circuit.measure_all()\n";
-    script << "    backend_name = 'dax_code_simulator'\n";
-    script << "    backend_name = 'dax_code_printer'\n";
-    script << "    backend = dax.get_backend(backend_name)\n";
-    script << "    backend.load_config("<<"\"resources.toml\""<<")\n";
-    script << "    dax_job = execute(circuit, backend, shots=30, optimization_level=0)\n";
-    script << "    client = sequre.UserClient()\n";
-    script << "    workload = dax_job.get_dax()\n";
-    script << "    print(workload)";
+    // script << "    backend_name = 'dax_code_simulator'\n";
+    // script << "    backend_name = 'dax_code_printer'\n";
+    // script << "    backend = dax.get_backend(backend_name)\n";
+    // script << "    backend.load_config("<<"\"resources.toml\""<<")\n";
+    // script << "    dax_job = execute(circuit, backend, shots=30, optimization_level=0)\n";
+    // script << "    client = sequre.UserClient()\n";
+    // script << "    workload = dax_job.get_dax()\n";
+    // script << "    print(workload)";
     return script.str();
 }
 
