@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <vector>
+#include <cstdint> 
 
 class QuantumCircuitWrapper {
 public:
