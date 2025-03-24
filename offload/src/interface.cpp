@@ -532,10 +532,13 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
       //c->vec_output_data.push_back(c->parseToVector(KernelArgs->ArgPtrs[output_arg[I]], KernelArgs->ArgSizes[output_arg[I]], vec[I]));
     }
   }
+
+  std::cout<<"Target Offload Policy Value Is: "<<__kmpc_get_target_offload()<<std::endl;
   
   if (checkDevice(DeviceId, Loc)) {
     //swastik
     DP("Not offloading to device %" PRId64 "\n", DeviceId);
+    std::cout<<"failed"<<std::endl;
     return OMP_TGT_FAIL;
   }
 
@@ -609,30 +612,31 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
   //   // }
 
 
+  if(temp_device_id == 100){
+    c->run();
+    // }
 
-  c->run();
-  // }
+    for (int32_t i = 0; i < c->vec_out_data.size(); ++i){
+        // size_t size = KernelArgs->ArgSizes[output_arg[i]]/sizeof(int32_t);
+        // std::vector<int32_t> output_vec;
+        // for(int32_t j = 0 ; j < size ; ++j){
+        //   output_vec.push_back(j);
+        // }
+        std::vector<int32_t> output_vec_test;
+        //output_vec_test = c->parseToVector(*(c->vec_out_data[i]), output_sizes[i], output_vec_test);
+        intptr_t intPtr = reinterpret_cast<intptr_t> (c->vec_out_data[i]); // Cast void* to int*
+        int32_t *intVal = reinterpret_cast<int32_t*>(intPtr);
+        size_t tsize = output_sizes[i]/sizeof(int32_t);
+        output_vec_test.assign(intVal, intVal+tsize);
+        std::cout<<"output vec val is: "<<std::endl;
+        for(int j = 0 ; j < output_vec_test.size(); j++){
+          intVal[j] = 3;
+          std::cout<<output_vec_test[j]<<" "<<std::endl;
+        }
 
-  for (int32_t i = 0; i < c->vec_out_data.size(); ++i){
-      // size_t size = KernelArgs->ArgSizes[output_arg[i]]/sizeof(int32_t);
-      // std::vector<int32_t> output_vec;
-      // for(int32_t j = 0 ; j < size ; ++j){
-      //   output_vec.push_back(j);
-      // }
-      std::vector<int32_t> output_vec_test;
-      //output_vec_test = c->parseToVector(*(c->vec_out_data[i]), output_sizes[i], output_vec_test);
-      intptr_t intPtr = reinterpret_cast<intptr_t> (c->vec_out_data[i]); // Cast void* to int*
-      int32_t *intVal = reinterpret_cast<int32_t*>(intPtr);
-      size_t tsize = output_sizes[i]/sizeof(int32_t);
-      output_vec_test.assign(intVal, intVal+tsize);
-      std::cout<<"output vec val is: "<<std::endl;
-      for(int j = 0 ; j < output_vec_test.size(); j++){
-        intVal[j] = 3;
-        std::cout<<output_vec_test[j]<<" "<<std::endl;
-      }
-
-      std::cout<<std::endl;
-      //KernelArgs->ArgPtrs[output_arg[i]] = &output_vec;
+        std::cout<<std::endl;
+        //KernelArgs->ArgPtrs[output_arg[i]] = &output_vec;
+    }
   }
 
   return OMP_TGT_SUCCESS;
