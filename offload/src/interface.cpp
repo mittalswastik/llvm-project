@@ -601,8 +601,6 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
     assert(Rc == OFFLOAD_SUCCESS && "__tgt_target_kernel unexpected failure!");
   }
 
-  std::cout<<"circuit test value changed to: "<<c->test<<std::endl;
-
   // if(temp_device_id == 100){
   //   // for (int32_t I = 0; I < KernelArgs->NumArgs; ++I){
   //   //   std::cout<<"Kernel arg types left are: "<<KernelArgs->ArgTypes[I]<<std::endl;
@@ -613,6 +611,7 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
 
 
   if(temp_device_id == 100){
+    std::cout<<"circuit test value changed to: "<<c->test<<std::endl;
     c->run();
     // }
 
