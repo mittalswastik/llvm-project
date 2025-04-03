@@ -10,12 +10,14 @@
 #include <iostream>
 #include <vector>
 #include <cstdint> 
+#include <json/json.h>
 
 class QuantumCircuitWrapper {
 public:
         std::string test;
         std::vector<std::vector<int32_t> > vec_data;
         std::vector<void*> vec_out_data;
+        std::vector<int> evaluated_qubits;
         QuantumCircuitWrapper(int num_qubits);
 
         void apply_hadamard(int qubit);
@@ -35,6 +37,7 @@ private:
     std::string scr;
     std::string generate_python_script(const std::string& circuit_name, int num_qubits, const std::string& gates);
     std::string execute_python_script(const std::string& script);
+    std::vector<int> readQubits(const std::string& result);
 };
 
 #endif // QUANTUM_CIRCUIT_WRAPPER_H

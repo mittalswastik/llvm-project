@@ -109,6 +109,31 @@ std::string QuantumCircuitWrapper::generate_python_script(const std::string& cir
     return script.str();
 }
 
+std::vector<int> QuantumCircuitWrapper::readQubits(const std::string& result) {
+    Json::Value root;
+    Json::CharReaderBuilder reader;
+    std::string errs;
+    std::istringstream s(result);
+    if (!Json::parseFromStream(reader, s, &root, &errs)) {
+        std::cerr << "Failed to parse JSON: " << errs << std::endl;
+        return {};
+    }
+
+    // Determine the number of possible states (bitstrings)
+    size_t num_states = root.size();
+    std::vector<int> qubit_results(num_states, 0);
+
+    // Parse JSON into vector<int> where index represents the bitstring
+    for (Json::Value::const_iterator it = root.begin(); it != root.end(); ++it) {
+        std::string bitstring = it.key().asString();
+        int decimal_index = std::stoi(bitstring, nullptr, 2); // Convert "000", "001" -> 0, 1, 2...
+        qubit_results[decimal_index] = it->asInt(); // Store the count at the correct index
+    }
+
+    return qubit_results;
+}
+
+
 std::string QuantumCircuitWrapper::execute_python_script(const std::string& script) {
     std::string json_data = "[";
     for (int32_t i = 0; i < vec_data.size(); ++i) {
@@ -140,6 +165,9 @@ std::string QuantumCircuitWrapper::execute_python_script(const std::string& scri
     while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
         result += buffer;
     }
+
+    evaluated_qubits = readQubits(result);
+
     pclose(pipe);
 
     return result;

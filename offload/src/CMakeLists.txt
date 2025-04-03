@@ -47,6 +47,9 @@ target_include_directories(omptarget PRIVATE
   ${LIBOMPTARGET_INCLUDE_DIR} ${LIBOMPTARGET_BINARY_INCLUDE_DIR}
 )
 
+include_directories(/usr/include/jsoncpp)
+target_link_libraries(omptarget PRIVATE jsoncpp)
+
 if (LIBOMP_HAVE_VERSION_SCRIPT_FLAG)
   target_link_libraries(omptarget PRIVATE
     "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/exports")
