@@ -1,4 +1,5 @@
 #include "quantum_circuit_wrapper.h"
+#include "omptarget.h"
  
 QuantumCircuitWrapper::QuantumCircuitWrapper(int num_qubits) : num_qubits(num_qubits) {}
 
@@ -150,6 +151,13 @@ std::string QuantumCircuitWrapper::execute_python_script(const std::string& scri
 
     json_data += "]";
     
+    int tid = omp_get_thread_num();
+    pid_t pid = getpid();
+    std::ostringstream oss;
+    oss << "temp_script_" << pid << "_" << tid << ".py";
+    std::string filename = oss.str();
+
+
     // Write the script to a temporary file
     std::ofstream file("temp_script.py");
     file << script;

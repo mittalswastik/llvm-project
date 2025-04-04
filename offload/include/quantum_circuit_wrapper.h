@@ -11,6 +11,7 @@
 #include <vector>
 #include <cstdint> 
 #include <json/json.h>
+#include <unistd.h>
 
 class QuantumCircuitWrapper {
 public:

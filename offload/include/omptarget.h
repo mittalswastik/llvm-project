@@ -275,6 +275,7 @@ extern "C" {
 #endif
 
 void ompx_dump_mapping_tables(void);
+int omp_get_thread_num(void);
 int omp_get_num_devices(void);
 int omp_get_device_num(void);
 int omp_get_initial_device(void);
