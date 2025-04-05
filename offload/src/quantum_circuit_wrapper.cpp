@@ -159,7 +159,7 @@ std::string QuantumCircuitWrapper::execute_python_script(const std::string& scri
 
 
     // Write the script to a temporary file
-    std::ofstream file("temp_script.py");
+    std::ofstream file(filename);
     file << script;
     file.close();
 
