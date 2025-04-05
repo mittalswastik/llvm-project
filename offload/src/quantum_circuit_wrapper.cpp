@@ -164,7 +164,7 @@ std::string QuantumCircuitWrapper::execute_python_script(const std::string& scri
     file.close();
 
     // Run the script and capture the output
-    std::string command = "python3 temp_script.py "+json_data;
+    std::string command = "python3 "+filename+" "+json_data;
     char buffer[4000];
     std::string result;
     FILE* pipe = popen(command.c_str(), "r");
