@@ -30,8 +30,8 @@ void QuantumCircuitWrapper::apply_x(int qubit) {
 //     gates += "apply_ry(" + json_vector + ", "+  std::to_string(val) + ")\n";
 // }
 
-void QuantumCircuitWrapper::apply_ry(double angle, int val) {
-    gates += "apply_ry(" + std::to_string(angle) + ", "+  std::to_string(val) + ")\n";
+void QuantumCircuitWrapper::apply_ry(double angle, int qubit) {
+    gates += "circuit.ry(" + std::to_string(angle) + ", "+  std::to_string(qubit) + ")\n";
 }
 
 void QuantumCircuitWrapper::apply_barrier(){
@@ -56,13 +56,13 @@ void QuantumCircuitWrapper::apply_ghz_qiskit(){
 
 void QuantumCircuitWrapper::execute_basic_quantum(){
     scr += "backend_name = 'dax_code_simulator'\n";
-    scr += "backend_name = 'dax_code_printer'\n";
+    // scr += "backend_name = 'dax_code_printer'\n";
     scr += "backend = dax.get_backend(backend_name)\n";
     scr += "backend.load_config(\"resources.toml\")\n";
     scr += "dax_job = execute(circuit, backend, shots=30, optimization_level=0)\n";
-    scr += "client = sequre.UserClient()\n";
-    scr += "workload = dax_job.get_dax()\n";
-    scr += "print(workload)";
+    // scr += "client = sequre.UserClient()\n";
+    // scr += "workload = dax_job.get_dax()\n";
+    // scr += "print(workload)";
 }
 
 std::vector<int32_t> QuantumCircuitWrapper::parseToVector(void* ptr, size_t size, std::vector<int32_t> vec){
@@ -85,13 +85,13 @@ std::string QuantumCircuitWrapper::generate_python_script(const std::string& cir
     std::ostringstream script;
     script << "import sys\n";
     script << "import json\n";
-    script << "import supermarq\n";
+    // script << "import supermarq\n";
     script << "import qiskit\n";
-    script << "import matplotlib.pyplot as plt\n";
+    // script << "import matplotlib.pyplot as plt\n";
     script << "import numpy as np\n";
     script << "from qiskit import QuantumCircuit, execute\n";
-    script << "from qiskit.providers.dax import DAX\n";
-    script << "import sequre\n";
+    // script << "from qiskit.providers.dax import DAX\n";
+    // script << "import sequre\n";
     //processong function
     script << "def process_data(data):\n";
     script << "    # Example processing: square each number\n";
