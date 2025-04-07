@@ -89,7 +89,9 @@ std::string QuantumCircuitWrapper::generate_python_script(const std::string& cir
     script << "import qiskit\n";
     // script << "import matplotlib.pyplot as plt\n";
     script << "import numpy as np\n";
-    script << "from qiskit import QuantumCircuit, execute\n";
+    script << "from qiskit import QuantumCircuit, execute, Aer\n";
+    script << "import warnings\n";
+    script << "warnings.filterwarnings(\"ignore\")\n";
     // script << "from qiskit.providers.dax import DAX\n";
     // script << "import sequre\n";
     //processong function
@@ -102,7 +104,7 @@ std::string QuantumCircuitWrapper::generate_python_script(const std::string& cir
     script << "    if len(sys.argv) < 2:\n";
     script << "        print('Error: No input data provided')\n";
     script << "        sys.exit(1)\n\n";
-    script << "    input_data = json.loads(sys.argv[1])\n";
+    // script << "    input_data = json.loads(sys.argv[1])\n";
     script << "    circuit = QuantumCircuit(" << num_qubits << "," <<num_qubits << ")\n";
     //script << "    processed_data = process_data(input_data)\n";
     std::string line;
