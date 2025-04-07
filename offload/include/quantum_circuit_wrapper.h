@@ -40,7 +40,7 @@ private:
     std::string scr;
     std::string generate_python_script(const std::string& circuit_name, int num_qubits, const std::string& gates);
     std::string execute_python_script(const std::string& script);
-    std::vector<int> readQubits(const std::string& result);
+    std::vector<int> readQubits(const std::string& result, int num_qs);
 };
 
 #endif // QUANTUM_CIRCUIT_WRAPPER_H
