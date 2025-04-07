@@ -15,6 +15,25 @@ void QuantumCircuitWrapper::apply_x(int qubit) {
     gates += "circuit.x(" + std::to_string(qubit) + ")\n";
 }
 
+// void QuantumCircuitWrapper::apply_ry(std::vector<double> vec, int val) {
+//     std::ostringstream oss;
+//     oss << "[";
+//     for (size_t i = 0; i < vec.size(); ++i) {
+//         oss << vec[i];
+//         if (i < vec.size() - 1) oss << ",";
+//     }
+//     oss << "]";
+
+//     std::string json_vector = oss.str();
+
+//     // Append to the gates string to be written into the Python script
+//     gates += "apply_ry(" + json_vector + ", "+  std::to_string(val) + ")\n";
+// }
+
+void QuantumCircuitWrapper::apply_ry(double angle, int val) {
+    gates += "apply_ry(" + std::to_string(angle) + ", "+  std::to_string(val) + ")\n";
+}
+
 void QuantumCircuitWrapper::apply_barrier(){
     gates += "circuit.barrier()\n";
 }
@@ -165,7 +184,7 @@ std::string QuantumCircuitWrapper::execute_python_script(const std::string& scri
 
     // Run the script and capture the output
     std::string command = "python3 "+filename+" "+json_data;
-    char buffer[4000];
+    char buffer[10000];
     std::string result;
     FILE* pipe = popen(command.c_str(), "r");
     //if (!pipe) throw std::runtime_error("popen() failed!");

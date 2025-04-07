@@ -503,8 +503,8 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
   QuantumCircuitWrapper *c;
   if(DeviceId == 100){
     std::cout<<"args base pts"<<std::endl;
-    c = (QuantumCircuitWrapper*) KernelArgs->ArgBasePtrs[0];
-    std::cout<<"circuit test value: "<<(c)->test<<std::endl;
+    c = (QuantumCircuitWrapper*) KernelArgs->ArgBasePtrs[1]; // forced fix - find a better way
+    //std::cout<<"circuit test value: "<<(c)->test<<std::endl;
     DeviceId = 0; //default to cpu id -- modifying interface to handle quantum offloading later
     temp_device_id = 100;
 

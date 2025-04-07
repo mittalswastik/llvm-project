@@ -27,6 +27,8 @@ public:
         void apply_barrier();
         void apply_hamiltonian_qiskit();
         void apply_ghz_qiskit();
+        //void apply_ry(std::vector<double> vec, int val);
+        void apply_ry(double angle, int val);
         void execute_basic_quantum();
         void measure();
         std::vector<int32_t> parseToVector(void* ptr, size_t size, std::vector<int32_t> vec);
