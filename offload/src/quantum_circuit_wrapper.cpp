@@ -105,7 +105,7 @@ std::string QuantumCircuitWrapper::generate_python_script(const std::string& cir
     script << "        print('Error: No input data provided')\n";
     script << "        sys.exit(1)\n\n";
     // script << "    input_data = json.loads(sys.argv[1])\n";
-    script << "    circuit = QuantumCircuit(" << num_qubits << "," <<num_qubits << ")\n";
+    script << "    circuit = QuantumCircuit(" << num_qubits << ")\n";//"," <<num_qubits << ")\n";
     //script << "    processed_data = process_data(input_data)\n";
     std::string line;
     std::istringstream ss(gates);
