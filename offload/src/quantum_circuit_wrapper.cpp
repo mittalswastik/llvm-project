@@ -137,6 +137,7 @@ std::vector<int> QuantumCircuitWrapper::readQubits(const std::string& result, in
     std::string errs;
     std::istringstream s(result);
     if (!Json::parseFromStream(reader, s, &root, &errs)) {
+        std::cerr<<"Result: " << result << "s: " << s.str() << std::endl;  
         std::cerr << "Failed to parse JSON: " << errs << std::endl;
         return {};
     }
