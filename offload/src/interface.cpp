@@ -502,13 +502,13 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
   std::vector<size_t> output_sizes;
   QuantumCircuitWrapper *c;
   if(DeviceId == 100){
-    std::cout<<"args base pts"<<std::endl;
+    // std::cout<<"args base pts"<<std::endl;
     c = (QuantumCircuitWrapper*) KernelArgs->ArgBasePtrs[1]; // forced fix - find a better way
     //std::cout<<"circuit test value: "<<(c)->test<<std::endl;
     DeviceId = 0; //default to cpu id -- modifying interface to handle quantum offloading later
     temp_device_id = 100;
 
-    std::cout<<"offload to quantum to circuit"<<std::endl;
+    // std::cout<<"offload to quantum to circuit"<<std::endl;
     for (int32_t I = 0; I < KernelArgs->NumArgs; ++I){
       if(KernelArgs->ArgTypes[I] & OMP_TGT_MAPTYPE_TO){
         input_arg.push_back(I);
@@ -533,7 +533,7 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
     }
   }
 
-  std::cout<<"Target Offload Policy Value Is: "<<__kmpc_get_target_offload()<<std::endl;
+  // std::cout<<"Target Offload Policy Value Is: "<<__kmpc_get_target_offload()<<std::endl;
   
   if (checkDevice(DeviceId, Loc)) {
     //swastik
@@ -611,7 +611,7 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
 
 
   if(temp_device_id == 100){
-    std::cout<<"circuit test value changed to: "<<c->test<<std::endl;
+    // std::cout<<"circuit test value changed to: "<<c->test<<std::endl;
     c->run();
     // }
 

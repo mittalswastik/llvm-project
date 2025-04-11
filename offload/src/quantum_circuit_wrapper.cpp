@@ -56,26 +56,25 @@ void QuantumCircuitWrapper::apply_ghz_qiskit(){
 
 void QuantumCircuitWrapper::execute_basic_quantum(){
     scr += "backend_name = 'dax_code_simulator'\n";
-    scr += "backend_name = 'dax_code_printer'\n";
-    scr += "backend = dax.get_backend(backend_name)\n";
+    scr += "backend = DAX.get_backend(backend_name)\n";
     scr += "backend.load_config(\"resources.toml\")\n";
-    scr += "dax_job = execute(circuit, backend, shots=30, optimization_level=0)\n";
+    scr += "dax_job = execute(circuit, backend, shots=100, optimization_level=0)\n";
     scr += "client = sequre.UserClient()\n";
     scr += "workload = dax_job.get_dax()\n";
     scr += "print(workload)";
 }
 
 std::vector<int32_t> QuantumCircuitWrapper::parseToVector(void* ptr, size_t size, std::vector<int32_t> vec){
-    std::cout<<" size of the the vector is: "<<size<<std::endl;
+    // std::cout<<" size of the the vector is: "<<size<<std::endl;
     intptr_t intPtr = reinterpret_cast<intptr_t> (ptr); // Cast void* to int*
     int32_t *intVal = reinterpret_cast<int32_t*>(intPtr);
     size = size/sizeof(int32_t);
-    std::cout<<"array value is"<<std::endl;
-    for(int i = 0 ; i < size ; i++){
-        std::cout<<intVal[i]<<" "<<std::endl;
-    }
+    // std::cout<<"array value is"<<std::endl;
+    // for(int i = 0 ; i < size ; i++){
+    //     std::cout<<intVal[i]<<" "<<std::endl;
+    // }
 
-    std::cout<<"end of array value"<<std::endl;
+    // std::cout<<"end of array value"<<std::endl;
     vec.assign(intVal, intVal + size);   // Populate vector using a range
     return vec;
 }
@@ -85,13 +84,10 @@ std::string QuantumCircuitWrapper::generate_python_script(const std::string& cir
     std::ostringstream script;
     script << "import sys\n";
     script << "import json\n";
-    script << "import supermarq\n";
     script << "import qiskit\n";
-    script << "import matplotlib.pyplot as plt\n";
-    script << "import numpy as np\n";
     script << "from qiskit import QuantumCircuit, execute\n";
-    script << "from qiskit.providers.dax import DAX\n";
-    script << "import sequre\n";
+    // script << "from qiskit.providers.dax import DAX\n";
+    // script << "import sequre\n";
     //processong function
     script << "def process_data(data):\n";
     script << "    # Example processing: square each number\n";
@@ -114,7 +110,7 @@ std::string QuantumCircuitWrapper::generate_python_script(const std::string& cir
     std::string line2;
     std::istringstream ss2(scr);
     while(std::getline(ss2, line2)) {
-        std::cout<<line2<<std::endl;  
+    //     std::cout<<line2<<std::endl;  
         script << "    " << line2 << "\n"; // Adds indentation to each line
     }
     //script << gates;
