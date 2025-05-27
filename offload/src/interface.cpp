@@ -377,7 +377,7 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
   QuantumCircuitWrapper *c;
   if(DeviceId == 100){
     std::cout<<"----------------- args base pts is "<<KernelArgs->Tripcount<<std::endl;
-    c = (QuantumCircuitWrapper*) KernelArgs->ArgBasePtrs[3]; // forced fix - find a better way
+    c = (QuantumCircuitWrapper*) KernelArgs->ArgBasePtrs[0]; // forced fix - find a better way
     c->num_iterations = KernelArgs->Tripcount;
     //std::cout<<"circuit test value: "<<(c)->test<<std::endl;
     DeviceId = 0; //default to cpu id -- modifying interface to handle quantum offloading later
