@@ -3798,6 +3798,8 @@ public:
     Address SizesArray = Address::invalid();
     Address MappersArray = Address::invalid();
     unsigned NumberOfTargetItems = 0;
+    llvm::Value *CircuitPtr = nullptr;   // host‑side QuantumCircuitWrapper *
+    llvm::Value *Iteration   = nullptr;  // host‑side int
     explicit OMPTargetDataInfo() = default;
     OMPTargetDataInfo(Address BasePointersArray, Address PointersArray,
                       Address SizesArray, Address MappersArray,

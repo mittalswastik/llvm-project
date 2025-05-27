@@ -902,6 +902,15 @@ void StmtPrinter::VisitOMPOrderedDirective(OMPOrderedDirective *Node) {
   PrintOMPExecutableDirective(Node, Node->hasClausesOfKind<OMPDependClause>());
 }
 
+// In clang/lib/AST/StmtPrinter.cpp
+void OMPClausePrinter::VisitOMPCircuitClause(OMPCircuitClause *) {
+  // No-op: not user printed
+}
+
+void OMPClausePrinter::VisitOMPIterationClause(OMPIterationClause *) {
+  // No-op: not user printed
+}
+
 void StmtPrinter::VisitOMPAtomicDirective(OMPAtomicDirective *Node) {
   Indent() << "#pragma omp atomic";
   PrintOMPExecutableDirective(Node);

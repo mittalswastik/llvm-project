@@ -3279,6 +3279,14 @@ OMPClause *Parser::ParseOpenMPClause(OpenMPDirectiveKind DKind,
   case OMPC_if:
     Clause = ParseOpenMPSingleExprWithArgClause(DKind, CKind, WrongDirective);
     break;
+  case OMPC_circuit:
+  case OMPC_iteration:
+    if (!FirstClause) {
+      Diag(Tok, diag::err_omp_more_one_clause)
+          << getOpenMPDirectiveName(DKind) << getOpenMPClauseName(CKind) << 0;
+      ErrorFound = true;
+    }
+    [[fallthrough]];
   case OMPC_holds:
     Clause = ParseOpenMPSingleExprClause(CKind, WrongDirective);
     break;

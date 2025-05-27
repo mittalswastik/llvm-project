@@ -1389,6 +1389,8 @@ public:
       CodeGenFunction &CGF, const OMPExecutableDirective &D,
       llvm::Function *OutlinedFn, llvm::Value *OutlinedFnID, const Expr *IfCond,
       llvm::PointerIntPair<const Expr *, 2, OpenMPDeviceClauseModifier> Device,
+      //llvm::Value *CircuitVal,
+      llvm::Value *IterationVal,
       llvm::function_ref<llvm::Value *(CodeGenFunction &CGF,
                                        const OMPLoopDirective &D)>
           SizeEmitter);
@@ -2195,6 +2197,7 @@ public:
       CodeGenFunction &CGF, const OMPExecutableDirective &D,
       llvm::Function *OutlinedFn, llvm::Value *OutlinedFnID, const Expr *IfCond,
       llvm::PointerIntPair<const Expr *, 2, OpenMPDeviceClauseModifier> Device,
+      llvm::Value *IterationVal,
       llvm::function_ref<llvm::Value *(CodeGenFunction &CGF,
                                        const OMPLoopDirective &D)>
           SizeEmitter) override;

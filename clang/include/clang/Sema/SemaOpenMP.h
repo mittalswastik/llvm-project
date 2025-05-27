@@ -1245,6 +1245,15 @@ public:
                                      SourceLocation LParenLoc,
                                      SourceLocation EndLoc);
   /// Called on well-formed 'device' clause.
+  OMPClause *ActOnOpenMPCircuitClause(Expr *Condition,
+                                    SourceLocation StartLoc,
+                                    SourceLocation LParenLoc,
+                                    SourceLocation EndLoc);  
+
+  OMPClause *ActOnOpenMPIterationClause( Expr *Device, SourceLocation StartLoc,
+                                    SourceLocation LParenLoc,
+                                    SourceLocation EndLoc);
+
   OMPClause *ActOnOpenMPDeviceClause(OpenMPDeviceClauseModifier Modifier,
                                      Expr *Device, SourceLocation StartLoc,
                                      SourceLocation LParenLoc,

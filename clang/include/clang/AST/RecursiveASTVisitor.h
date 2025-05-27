@@ -3639,6 +3639,16 @@ bool RecursiveASTVisitor<Derived>::VisitOMPFirstprivateClause(
 }
 
 template <typename Derived>
+bool RecursiveASTVisitor<Derived>::VisitOMPCircuitClause(
+    OMPCircuitClause *C) {
+    TRY_TO(TraverseStmt(C->getExpr()));
+    TRY_TO(TraverseStmt(C->getPrivateCopy()));
+    TRY_TO(TraverseStmt(C->getInitExpr()));
+  return true;
+}
+
+
+template <typename Derived>
 bool RecursiveASTVisitor<Derived>::VisitOMPLastprivateClause(
     OMPLastprivateClause *C) {
   TRY_TO(VisitOMPClauseList(C));
@@ -3824,6 +3834,13 @@ template <typename Derived>
 bool RecursiveASTVisitor<Derived>::VisitOMPDeviceClause(OMPDeviceClause *C) {
   TRY_TO(VisitOMPClauseWithPreInit(C));
   TRY_TO(TraverseStmt(C->getDevice()));
+  return true;
+}
+
+template <typename Derived>
+bool RecursiveASTVisitor<Derived>::VisitOMPIterationClause(OMPIterationClause *C) {
+  //TRY_TO(VisitOMPClauseWithPreInit(C));
+  TRY_TO(TraverseStmt(C->getIteration()));
   return true;
 }
 

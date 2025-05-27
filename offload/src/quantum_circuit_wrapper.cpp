@@ -1,10 +1,19 @@
 #include "quantum_circuit_wrapper.h"
 #include "omptarget.h"
  
-QuantumCircuitWrapper::QuantumCircuitWrapper(int num_qubits) : num_qubits(num_qubits) {}
+QuantumCircuitWrapper::QuantumCircuitWrapper(int num_qubits) : num_qubits(num_qubits) {
+    inFD  = -1;   // parent writes   -> child stdin
+    outFD = -1;   // parent reads    <- child stdout
+    pid = -1;
+}
 
 void QuantumCircuitWrapper::apply_hadamard(int qubit) {
     gates += "circuit.h(" + std::to_string(qubit) + ")\n";
+}
+
+void QuantumCircuitWrapper::debug()
+{
+    std::cout<<scr<<std::endl;
 }
 
 void QuantumCircuitWrapper::apply_cnot(int control, int target) {
@@ -59,10 +68,12 @@ void QuantumCircuitWrapper::execute_basic_quantum(){
     scr += "backend_name = 'dax_code_printer'\n";
     scr += "backend = dax.get_backend(backend_name)\n";
     scr += "backend.load_config(\"resources.toml\")\n";
-    scr += "dax_job = execute(circuit, backend, shots=30, optimization_level=0)\n";
-    scr += "client = sequre.UserClient()\n";
-    scr += "workload = dax_job.get_dax()\n";
-    scr += "print(workload)";
+    scr += "for i in input_itr:\n";
+    scr += "    response_data = json.loads(sys.stdin.readline().strip())\n"; // put execute in a loop
+    scr += "    dax_job = execute(circuit, backend, shots=30, optimization_level=0)\n";
+    scr += "    client = sequre.UserClient()\n";
+    scr += "    workload = dax_job.get_dax()\n";
+    scr += "    print(workload)\n";
 }
 
 std::vector<int32_t> QuantumCircuitWrapper::parseToVector(void* ptr, size_t size, std::vector<int32_t> vec){
@@ -102,7 +113,7 @@ std::string QuantumCircuitWrapper::generate_python_script(const std::string& cir
     script << "    if len(sys.argv) < 2:\n";
     script << "        print('Error: No input data provided')\n";
     script << "        sys.exit(1)\n\n";
-    script << "    input_data = json.loads(sys.argv[1])\n";
+    script << "    input_itr = json.loads(sys.argv[2])\n";
     script << "    circuit = QuantumCircuit(" << num_qubits << "," <<num_qubits << ")\n";
     //script << "    processed_data = process_data(input_data)\n";
     std::string line;
@@ -153,8 +164,7 @@ std::vector<int> QuantumCircuitWrapper::readQubits(const std::string& result, in
     return qubit_results;
 }
 
-
-std::string QuantumCircuitWrapper::execute_python_script(const std::string& script) {
+std::string QuantumCircuitWrapper::returnJsonString(){
     std::string json_data = "[";
     for (int32_t i = 0; i < vec_data.size(); ++i) {
         json_data += "[";
@@ -169,7 +179,14 @@ std::string QuantumCircuitWrapper::execute_python_script(const std::string& scri
     }
 
     json_data += "]";
+
+    return json_data;
+}
+
+std::string QuantumCircuitWrapper::execute_python_script(const std::string& script) {
     
+    std::string json_data = returnJsonString();
+
     int tid = omp_get_thread_num();
     pid_t pid = getpid();
     std::ostringstream oss;
@@ -183,7 +200,7 @@ std::string QuantumCircuitWrapper::execute_python_script(const std::string& scri
     file.close();
 
     // Run the script and capture the output
-    std::string command = "python3 "+filename+" "+json_data;
+    std::string command = "python3 "+ filename + " " + json_data + " " + (char) num_iterations;
     char buffer[10000];
     std::string result;
     FILE* pipe = popen(command.c_str(), "r");

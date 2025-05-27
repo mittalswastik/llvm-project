@@ -7358,6 +7358,14 @@ void OMPClauseWriter::VisitOMPFirstprivateClause(OMPFirstprivateClause *C) {
   }
 }
 
+void OMPClauseWriter::VisitOMPCircuitClause(OMPCircuitClause *C) {
+  Record.AddStmt(C->getExpr());
+  Record.AddStmt(C->getPrivateCopy());
+  Record.AddStmt(C->getInitExpr());
+  Record.AddSourceLocation(C->getLParenLoc());
+  //VisitOMPClauseWithPreInit(C);
+}
+
 void OMPClauseWriter::VisitOMPLastprivateClause(OMPLastprivateClause *C) {
   Record.push_back(C->varlist_size());
   VisitOMPClauseWithPostUpdate(C);
@@ -7549,6 +7557,12 @@ void OMPClauseWriter::VisitOMPDeviceClause(OMPDeviceClause *C) {
   Record.AddStmt(C->getDevice());
   Record.AddSourceLocation(C->getModifierLoc());
   Record.AddSourceLocation(C->getLParenLoc());
+}
+
+void OMPClauseWriter::VisitOMPIterationClause(OMPIterationClause *C) {
+  Record.AddStmt(C->getIteration());
+  Record.AddSourceLocation(C->getLParenLoc());
+  //VisitOMPClauseWithPreInit(C);
 }
 
 void OMPClauseWriter::VisitOMPMapClause(OMPMapClause *C) {

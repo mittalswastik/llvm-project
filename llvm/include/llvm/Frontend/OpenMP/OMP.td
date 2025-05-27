@@ -137,6 +137,16 @@ def OMPC_Device : Clause<"device"> {
   let clangClass = "OMPDeviceClause";
   let flangClass = "OmpDeviceClause";
 }
+
+def OMPC_iteration: Clause<"iteration"> {
+  let clangClass = "OMPIterationClause";
+}
+
+def OMPC_circuit : Clause<"circuit"> {
+  let clangClass = "OMPCircuitClause";
+}
+
+
 def OMPC_DeviceType : Clause<"device_type"> {
   let flangClass = "OmpDeviceTypeClause";
 }
@@ -172,6 +182,7 @@ def OMPC_FirstPrivate : Clause<"firstprivate"> {
   let clangClass = "OMPFirstprivateClause";
   let flangClass = "OmpObjectList";
 }
+
 def OMPC_Flush : Clause<"flush"> {
   let clangClass = "OMPFlushClause";
   let isImplicit = true;
@@ -978,6 +989,8 @@ def OMP_Target : Directive<"target"> {
   let allowedOnceClauses = [
     VersionedClause<OMPC_DefaultMap>,
     VersionedClause<OMPC_Device>,
+    VersionedClause<OMPC_iteration>,
+    VersionedClause<OMPC_circuit>,
     VersionedClause<OMPC_If>,
     VersionedClause<OMPC_NoWait>,
     VersionedClause<OMPC_OMPX_DynCGroupMem>,
@@ -1378,6 +1391,8 @@ def OMP_target_loop : Directive<"target loop"> {
     VersionedClause<OMPC_OMPX_DynCGroupMem>,
     VersionedClause<OMPC_If>,
     VersionedClause<OMPC_Device>,
+    VersionedClause<OMPC_iteration>,
+    VersionedClause<OMPC_circuit>,
     VersionedClause<OMPC_DefaultMap>,
     VersionedClause<OMPC_NoWait>,
   ];
@@ -1829,6 +1844,8 @@ def OMP_TargetParallel : Directive<"target parallel"> {
   let allowedOnceClauses = [
     VersionedClause<OMPC_DefaultMap>,
     VersionedClause<OMPC_Device>,
+    VersionedClause<OMPC_iteration>,
+    VersionedClause<OMPC_circuit>,
     VersionedClause<OMPC_NumThreads>,
     VersionedClause<OMPC_OMPX_DynCGroupMem>,
     VersionedClause<OMPC_ProcBind>,
@@ -1858,6 +1875,8 @@ def OMP_TargetParallelDo : Directive<"target parallel do"> {
     VersionedClause<OMPC_Collapse>,
     VersionedClause<OMPC_DefaultMap>,
     VersionedClause<OMPC_Device>,
+    VersionedClause<OMPC_iteration>,
+    VersionedClause<OMPC_circuit>,
     VersionedClause<OMPC_NoWait>,
     VersionedClause<OMPC_NumThreads>,
     VersionedClause<OMPC_Order, 50>,

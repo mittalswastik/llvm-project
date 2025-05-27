@@ -12,6 +12,7 @@
 #include <cstdint> 
 #include <json/json.h>
 #include <unistd.h>
+#include <pthread.h>
 
 class QuantumCircuitWrapper {
 public:
@@ -19,9 +20,14 @@ public:
         std::vector<std::vector<int32_t> > vec_data;
         std::vector<void*> vec_out_data;
         std::vector<int> evaluated_qubits;
+        FILE* pipe_cpp;
+        FILE* pipe_py;
+        int num_iterations;
+        pid_t pid[2];
         QuantumCircuitWrapper(int num_qubits);
 
         void apply_hadamard(int qubit);
+        void debug();
         void apply_cnot(int control, int target);
         void apply_x(int qubit);
         void apply_barrier();
@@ -31,6 +37,7 @@ public:
         void apply_ry(double angle, int val);
         void execute_basic_quantum();
         void measure();
+        void exec_pipes();
         std::vector<int32_t> parseToVector(void* ptr, size_t size, std::vector<int32_t> vec);
         std::string run();
 
@@ -41,6 +48,7 @@ private:
     std::string generate_python_script(const std::string& circuit_name, int num_qubits, const std::string& gates);
     std::string execute_python_script(const std::string& script);
     std::vector<int> readQubits(const std::string& result, int num_qs);
+    std::string QuantumCircuitWrapper::returnJsonString();
 };
 
 #endif // QUANTUM_CIRCUIT_WRAPPER_H

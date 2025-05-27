@@ -2523,6 +2523,10 @@ void OMPClauseEnqueue::VisitOMPDeviceClause(const OMPDeviceClause *C) {
   Visitor->AddStmt(C->getDevice());
 }
 
+void OMPClauseEnqueue::VisitOMPIterationClause(const OMPIterationClause *C) {
+  Visitor->AddStmt(C->getIteration());
+}
+
 void OMPClauseEnqueue::VisitOMPNumTeamsClause(const OMPNumTeamsClause *C) {
   VisitOMPClauseList(C);
   VisitOMPClauseWithPreInit(C);
@@ -2583,6 +2587,21 @@ void OMPClauseEnqueue::VisitOMPFirstprivateClause(
     Visitor->AddStmt(E);
   }
 }
+
+void OMPClauseEnqueue::VisitOMPCircuitClause(const OMPCircuitClause *C) {
+  // Add original expression (e.g., pointer)
+  if (const auto *E = C->getExpr())
+    Visitor->AddStmt(E);
+
+  // Add the private copy (*ptr on device)
+  if (const auto *E = C->getPrivateCopy())
+    Visitor->AddStmt(E);
+
+  // Add the initializer (*copy = *ptr)
+  if (const auto *E = C->getInitExpr())
+    Visitor->AddStmt(E);
+}
+
 void OMPClauseEnqueue::VisitOMPLastprivateClause(
     const OMPLastprivateClause *C) {
   VisitOMPClauseList(C);

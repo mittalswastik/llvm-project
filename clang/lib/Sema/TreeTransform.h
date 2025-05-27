@@ -10667,6 +10667,17 @@ OMPClause *TreeTransform<Derived>::TransformOMPFirstprivateClause(
 }
 
 template <typename Derived>
+OMPClause *TreeTransform<Derived>::TransformOMPCircuitClause(
+    OMPCircuitClause *C) {
+    Expr *CircuitExpr = getDerived().TransformExpr(C->getExpr()).get();
+    Expr *Copy = getDerived().TransformExpr(C->getPrivateCopy()).get();
+    Expr *Init = getDerived().TransformExpr(C->getInitExpr()).get();
+    return OMPCircuitClause::Create(SemaRef.Context,
+                                    C->getBeginLoc(), C->getLParenLoc(), C->getEndLoc(),
+                                    CircuitExpr, Copy, Init);
+}
+
+template <typename Derived>
 OMPClause *
 TreeTransform<Derived>::TransformOMPLastprivateClause(OMPLastprivateClause *C) {
   llvm::SmallVector<Expr *, 16> Vars;
@@ -10962,6 +10973,14 @@ TreeTransform<Derived>::TransformOMPDeviceClause(OMPDeviceClause *C) {
   return getDerived().RebuildOMPDeviceClause(
       C->getModifier(), E.get(), C->getBeginLoc(), C->getLParenLoc(),
       C->getModifierLoc(), C->getEndLoc());
+}
+
+template<typename Derived>
+OMPClause *TreeTransform<Derived>::TransformOMPIterationClause(OMPIterationClause *C) {
+  Expr *E = getDerived().TransformExpr(C->getIteration()).get();
+  return new (SemaRef.Context) OMPIterationClause(E, /* HelperExpr = */ nullptr,
+                                                  /* CaptureRegion = */ OMPD_unknown,C->getBeginLoc(),
+                                                  C->getLParenLoc(), C->getEndLoc());
 }
 
 template <typename Derived, class T>

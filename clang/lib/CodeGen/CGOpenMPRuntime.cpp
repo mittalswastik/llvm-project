@@ -9400,6 +9400,14 @@ llvm::Value *CGOpenMPRuntime::emitTargetNumIterationsCall(
         SizeEmitter) {
   OpenMPDirectiveKind Kind = D.getDirectiveKind();
   const OMPExecutableDirective *TD = &D;
+
+  if (const auto *IC = D.getSingleClause<OMPIterationClause>()) {
+    // Generate the value of the expression in the clause.
+    llvm::Value *V = CGF.EmitScalarExpr(IC->getIteration());
+    // ABI requires a 64‑bit unsigned integer.
+    return CGF.Builder.CreateIntCast(V, CGF.Int64Ty, /*isSigned=*/false);
+  }
+
   // Get nested teams distribute kind directive, if any. For now, treat
   // 'target_teams_loop' as if it's really a target_teams_distribute.
   if ((!isOpenMPDistributeDirective(Kind) || !isOpenMPTeamsDirective(Kind)) &&
@@ -9726,6 +9734,8 @@ void CGOpenMPRuntime::emitTargetCall(
     CodeGenFunction &CGF, const OMPExecutableDirective &D,
     llvm::Function *OutlinedFn, llvm::Value *OutlinedFnID, const Expr *IfCond,
     llvm::PointerIntPair<const Expr *, 2, OpenMPDeviceClauseModifier> Device,
+    //llvm::Value *CircuitVal,
+    llvm::Value *IterationVal,
     llvm::function_ref<llvm::Value *(CodeGenFunction &CGF,
                                      const OMPLoopDirective &D)>
         SizeEmitter) {
@@ -9755,6 +9765,7 @@ void CGOpenMPRuntime::emitTargetCall(
   CodeGenFunction::OMPTargetDataInfo InputInfo;
   llvm::Value *MapTypesArray = nullptr;
   llvm::Value *MapNamesArray = nullptr;
+  InputInfo.Iteration = IterationVal;
 
   auto &&TargetThenGen = [this, OutlinedFn, &D, &CapturedVars,
                           RequiresOuterTask, &CS, OffloadingMandatory, Device,
@@ -12217,6 +12228,8 @@ void CGOpenMPSIMDRuntime::emitTargetCall(
     CodeGenFunction &CGF, const OMPExecutableDirective &D,
     llvm::Function *OutlinedFn, llvm::Value *OutlinedFnID, const Expr *IfCond,
     llvm::PointerIntPair<const Expr *, 2, OpenMPDeviceClauseModifier> Device,
+    //llvm::Value *CircuitPtr,
+    llvm::Value *IterationVal,
     llvm::function_ref<llvm::Value *(CodeGenFunction &CGF,
                                      const OMPLoopDirective &D)>
         SizeEmitter) {

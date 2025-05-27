@@ -11208,6 +11208,14 @@ void OMPClauseReader::VisitOMPFirstprivateClause(OMPFirstprivateClause *C) {
   C->setInits(Vars);
 }
 
+void OMPClauseReader::VisitOMPCircuitClause(OMPCircuitClause *C) {
+  C->setExpr(Record.readExpr());
+  C->setPrivateCopy(Record.readExpr());
+  C->setInitExpr(Record.readExpr());
+  C->setLParenLoc(Record.readSourceLocation());
+  // VisitOMPClauseWithPreInit(C);
+}
+
 void OMPClauseReader::VisitOMPLastprivateClause(OMPLastprivateClause *C) {
   VisitOMPClauseWithPostUpdate(C);
   C->setLParenLoc(Record.readSourceLocation());
@@ -11497,6 +11505,12 @@ void OMPClauseReader::VisitOMPDeviceClause(OMPDeviceClause *C) {
   C->setDevice(Record.readSubExpr());
   C->setModifierLoc(Record.readSourceLocation());
   C->setLParenLoc(Record.readSourceLocation());
+}
+
+void OMPClauseReader::VisitOMPIterationClause(OMPIterationClause *C) {
+  C->setIteration(Record.readExpr());
+  C->setLParenLoc(Record.readSourceLocation());
+  //VisitOMPClauseWithPreInit(C);
 }
 
 void OMPClauseReader::VisitOMPMapClause(OMPMapClause *C) {

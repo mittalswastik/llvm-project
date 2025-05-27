@@ -15162,6 +15162,12 @@ OMPClause *SemaOpenMP::ActOnOpenMPSingleExprClause(OpenMPClauseKind Kind,
   case OMPC_holds:
     Res = ActOnOpenMPHoldsClause(Expr, StartLoc, LParenLoc, EndLoc);
     break;
+  case OMPC_circuit:
+    Res = ActOnOpenMPCircuitClause(Expr, StartLoc, LParenLoc, EndLoc);
+    break;
+  case OMPC_iteration:
+    Res = ActOnOpenMPIterationClause(Expr, StartLoc, LParenLoc, EndLoc);
+    break;
   case OMPC_grainsize:
   case OMPC_num_tasks:
   case OMPC_device:
@@ -15420,6 +15426,52 @@ OMPClause *SemaOpenMP::ActOnOpenMPFinalClause(Expr *Condition,
 
   return new (getASTContext()) OMPFinalClause(
       ValExpr, HelperValStmt, CaptureRegion, StartLoc, LParenLoc, EndLoc);
+}
+
+OMPClause *SemaOpenMP::ActOnOpenMPCircuitClause(Expr *VarExpr,
+                                                SourceLocation StartLoc,
+                                                SourceLocation LParenLoc,
+                                                SourceLocation EndLoc) {
+    
+    
+    if (StartLoc.isInvalid())
+      return nullptr; 
+
+    SourceLocation Loc = VarExpr->getExprLoc();
+    ASTContext &C = getASTContext();
+    
+    if (!VarExpr->getType()->isPointerType()) {
+      llvm::errs() << "error: 'circuit' clause requires a pointer\n";
+      return nullptr;
+    }
+
+    QualType PtrType = VarExpr->getType();
+
+    QualType PointeeType = VarExpr->getType()->getPointeeType();
+    if (!PointeeType->isRecordType()) {
+      llvm::errs() << "error: 'circuit' clause requires pointer to class/struct\n";
+      return nullptr;
+    }
+
+    // 1. Create private variable on device (copy of *ptr)
+    VarDecl *PrivateVD = buildVarDecl(SemaRef, Loc, PointeeType, ".circuit.copy");
+    ExprResult PrivateRef = buildDeclRefExpr(SemaRef, PrivateVD, PtrType, Loc);
+
+    auto *OrigVD = cast<ValueDecl>(cast<DeclRefExpr>(VarExpr->IgnoreParens())->getDecl()->getCanonicalDecl());
+    DSAStack->addDSA(OrigVD, VarExpr->IgnoreParens(), OMPC_circuit,cast<DeclRefExpr>(PrivateRef.get()));
+
+    // 2. Create initializer: *copy = *ptr;
+    ExprResult DerefLHS = SemaRef.CreateBuiltinUnaryOp(Loc, UO_Deref, PrivateRef.get());
+    ExprResult DerefRHS = SemaRef.CreateBuiltinUnaryOp(Loc, UO_Deref, VarExpr);
+    ExprResult Assign = SemaRef.BuildBinOp(nullptr, Loc, BO_Assign, DerefLHS.get(), DerefRHS.get());
+
+    // 3. Add initializer to Decl
+    //SemaRef.AddInitializerToDecl(PrivateVD, DerefRHS.get(), /*DirectInit=*/false);
+    SemaRef.CurContext->addDecl(PrivateVD);
+
+    // 4. Build clause node
+    return OMPCircuitClause::Create(getASTContext(), StartLoc, LParenLoc, EndLoc,
+    VarExpr, PrivateRef.get(), Assign.get());
 }
 
 ExprResult
@@ -16191,6 +16243,10 @@ OMPClause *SemaOpenMP::ActOnOpenMPSingleExprWithArgClause(
         static_cast<OpenMPOrderClauseKind>(Argument[OrderKind]), StartLoc,
         LParenLoc, ArgumentLoc[OrderModifier], ArgumentLoc[OrderKind], EndLoc);
     break;
+  // case OMPC_iteration: //swastik
+  //   assert(Argument.size() == 1 && ArgumentLoc.size() == 1);
+  //   Res = ActOnOpenMPIterationClause(Expr, StartLoc, LParenLoc, EndLoc);
+  //   break;
   case OMPC_device:
     assert(Argument.size() == 1 && ArgumentLoc.size() == 1);
     Res = ActOnOpenMPDeviceClause(
@@ -20076,6 +20132,38 @@ OMPClause *SemaOpenMP::ActOnOpenMPDependClause(
       DSAStack->isParentOrderedRegion())
     DSAStack->addDoacrossDependClause(C, OpsOffs);
   return C;
+}
+
+OMPClause *SemaOpenMP::ActOnOpenMPIterationClause(
+  Expr *Iteration, SourceLocation StartLoc,
+  SourceLocation LParenLoc, SourceLocation EndLoc) {
+
+bool ErrorFound = false;
+
+Expr *ValExpr = Iteration;
+Stmt *HelperValStmt = nullptr;
+
+ErrorFound = !isNonNegativeIntegerValue(ValExpr, SemaRef, OMPC_iteration,
+                                        /*StrictlyPositive=*/false);
+if (ErrorFound)
+  return nullptr;
+
+OpenMPDirectiveKind DKind = DSAStack->getCurrentDirective();
+OpenMPDirectiveKind CaptureRegion =
+    getOpenMPCaptureRegionForClause(DKind, OMPC_iteration,
+                                    getLangOpts().OpenMP);
+
+if (CaptureRegion != OMPD_unknown &&
+    !SemaRef.CurContext->isDependentContext()) {
+  ValExpr = SemaRef.MakeFullExpr(ValExpr).get();
+  llvm::MapVector<const Expr *, DeclRefExpr *> Captures;
+  ValExpr = tryBuildCapture(SemaRef, ValExpr, Captures).get();
+  HelperValStmt = buildPreInits(getASTContext(), Captures);
+}
+
+return new (getASTContext()) OMPIterationClause(ValExpr, HelperValStmt,
+                                                CaptureRegion, StartLoc,
+                                                LParenLoc, EndLoc);
 }
 
 OMPClause *SemaOpenMP::ActOnOpenMPDeviceClause(

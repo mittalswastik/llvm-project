@@ -6785,6 +6785,34 @@ static void emitCommonOMPTargetDirective(CodeGenFunction &CGF,
   if (auto *C = S.getSingleClause<OMPDeviceClause>())
     Device.setPointerAndInt(C->getDevice(), C->getModifier());
 
+  // const Expr *CircuitExpr = nullptr;
+  // // if (const auto *CC = S.getSingleClause<OMPCircuitClause>())
+  // //   CircuitExpr = CC->getExpr();
+  
+  // const OMPCircuitClause *CircuitC = nullptr;
+  // llvm::Value *CircuitVal = nullptr;
+  // auto Circuits = S.getClausesOfKind<OMPCircuitClause>();
+  // if (!Circuits.empty()){
+  //   CircuitC = *Circuits.begin();
+  //   CircuitExpr = CircuitC->getExpr();
+  //   if (CircuitExpr) {
+  //     CircuitVal = CGF.EmitScalarExpr(CircuitExpr);        // pointer value
+  //     CircuitVal = CGF.Builder.CreatePointerCast(
+  //                     CircuitVal, CGF.VoidPtrTy);          // pass as void*
+  //   }
+  // }
+
+  const Expr *IterationExpr = nullptr;
+  if (const auto *IC = S.getSingleClause<OMPIterationClause>())
+    IterationExpr = IC->getIteration();
+  
+  llvm::Value *IterVal = nullptr;
+  if (IterationExpr) {
+    // Scalar on the host only – 32‑bit is enough
+    IterVal = CGF.EmitScalarExpr(IterationExpr);
+    IterVal = CGF.Builder.CreateIntCast(IterVal, CGF.Int32Ty, /*isSigned*/false);
+  }
+
   // Check if we have an if clause whose conditional always evaluates to false
   // or if we do not have any targets specified. If so the target region is not
   // an offload entry point.
@@ -6834,6 +6862,7 @@ static void emitCommonOMPTargetDirective(CodeGenFunction &CGF,
     return nullptr;
   };
   CGM.getOpenMPRuntime().emitTargetCall(CGF, S, Fn, FnID, IfCond, Device,
+                                        IterVal,
                                         SizeEmitter);
 }
 

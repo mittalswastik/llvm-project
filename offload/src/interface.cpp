@@ -36,6 +36,7 @@
 #include <unordered_map>
 #include <string>
 #include <sstream>
+#include <unistd.h>
 
 // #include <pybind11/pybind11.h>
 // #include <pybind11/embed.h>
@@ -370,144 +371,19 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
      DeviceId, DPxPTR(HostPtr));
   
   int64_t temp_device_id = 0;
-
-  //swastik
-  // if(DeviceId == 100){
-
-  //   // QuantumCircuitWrapper* qc = new QuantumCircuitWrapper(2);
-  //   // qc->apply_hadamard(2);
-  //   // qc->run();
-  //   std::vector<int32_t> input_arg;
-  //   std::vector<int32_t> output_arg;
-  //   std::cout<<"offload to quantum to circuit"<<std::endl;
-  //   for (int32_t I = 0; I < KernelArgs->NumArgs; ++I){
-  //     if(KernelArgs->ArgTypes[I] & OMP_TGT_MAPTYPE_TO){
-  //       input_arg.push_back(I);
-  //     }
-
-  //     if((KernelArgs->ArgTypes[I] & OMP_TGT_MAPTYPE_TO) && (KernelArgs->ArgTypes[I] & OMP_TGT_MAPTYPE_FROM)){
-  //       std::cout<<"toFrom is of both types"<<std::endl;
-  //     }
-
-  //     if(KernelArgs->ArgTypes[I] & OMP_TGT_MAPTYPE_FROM){
-  //       output_arg.push_back(I);
-  //     }
-  //   }
-
-  //   std::vector< std::vector<int32_t> > vec(input_arg.size());
-  //   for (int32_t I = 0; I < input_arg.size(); ++I){
-  //     // store these values as arrays to pass to python script
-  //     parseToVector(KernelArgs->ArgPtrs[input_arg[I]], KernelArgs->ArgSizes[input_arg[I]], vec[I]);
-  //   }
-
-  //   //DP("vecotr values are\n");
-  //   for(int32_t i = 0 ; i < vec.size() ; i++){
-  //     for(int32_t j = 0 ; j < vec[i].size() ; j++){
-  //       //DP("%" PRId32 " ", vec[i][j]);
-  //       std::cout << vec[i][j] <<" ";
-  //     }
-  //     std::cout<<std::endl;
-  //     //DP("\n");
-  //   }
-
-  //   std::string result = execPythonScript(vec);
-  //   if (!result.empty() && result.front() == '[') {
-  //       result.erase(0, 1); // Remove the first character
-  //   }
-  //   if (!result.empty() && result.back() == ']') {
-  //       result.pop_back(); // Remove the last character
-  //   }
-  //   std::string item;
-  //   std::stringstream ss(result);
-  //   std::vector<int32_t> ret_result;
-  //   while (std::getline(ss, item, ',')) {
-  //       // Convert each substring to an integer and add to the vector
-  //       ret_result.push_back(std::stoi(item));
-  //   }
-
-  //   // std::cout<<"pr8ingting the result"<<std::endl;
-
-  //   // for(int32_t i = 0 ; i < ret_result.size() ; i++){
-  //   //   std::cout<<ret_result[i]<<std::endl;
-  //   // }
-
-  //   // std::cout<<std::endl;
-
-  //   int32_t ctr = 0;
-
-  //   auto DeviceOrErr = PM->getDevice(DeviceId);
-  //   if (!DeviceOrErr)
-  //     FATAL_MESSAGE(DeviceId, "%s", toString(DeviceOrErr.takeError()).c_str());
-  //   TargetAsyncInfoTy TargetAsyncInfo(*DeviceOrErr);
-  //   AsyncInfoTy &AsyncInfo = TargetAsyncInfo;
-
-  //   while(ctr < output_arg.size()){
-  //     std::vector<int32_t> temp(ret_result.begin() + ctr, ret_result.begin() + (KernelArgs->ArgSizes[output_arg[ctr]]/sizeof(int32_t)));
-  //     // std::cout<<"temp value is"<<std::endl;
-  //     // for(int32_t i = 0 ; i < temp.size() ; i++){
-  //     //   std::cout<<temp[i]<<std::endl;
-  //     // }
-  //     KernelArgs->ArgPtrs[output_arg[ctr]] = static_cast<void*>(temp.data());
-  //     ctr++;
-
-  //     /**storing it at the host memory of the destination*/
-
-  //     void *HstPtrBegin = KernelArgs->ArgPtrs[output_arg[ctr]];
-  //     int64_t DataSize = KernelArgs->ArgSizes[output_arg[ctr]];
-  //     bool IsImplicit = KernelArgs->ArgTypes[output_arg[ctr]] & OMP_TGT_MAPTYPE_IMPLICIT;
-  //     bool UpdateRef = (!(KernelArgs->ArgTypes[output_arg[ctr]] & OMP_TGT_MAPTYPE_MEMBER_OF) ||
-  //                       (KernelArgs->ArgTypes[output_arg[ctr]] & OMP_TGT_MAPTYPE_PTR_AND_OBJ)) &&
-  //                     !(true && output_arg[ctr] == 0);
-  //     bool ForceDelete = KernelArgs->ArgTypes[output_arg[ctr]] & OMP_TGT_MAPTYPE_DELETE;
-  //     bool HasPresentModifier = KernelArgs->ArgTypes[output_arg[ctr]] & OMP_TGT_MAPTYPE_PRESENT;
-  //     bool HasHoldModifier = KernelArgs->ArgTypes[output_arg[ctr]] & OMP_TGT_MAPTYPE_OMPX_HOLD;
-
-  //     // If PTR_AND_OBJ, HstPtrBegin is address of pointee
-  //     TargetPointerResultTy TPR = DeviceOrErr->getMappingInfo().getTgtPtrBegin(
-  //         HstPtrBegin, DataSize, UpdateRef, HasHoldModifier, !IsImplicit,
-  //         ForceDelete, /*FromDataEnd=*/true);
-  //     void *TgtPtrBegin = TPR.TargetPointer;
-
-  //     int Ret = DeviceOrErr->retrieveData(HstPtrBegin, TgtPtrBegin, DataSize, AsyncInfo,
-  //                               TPR.getEntry());
-  //     if (Ret != OFFLOAD_SUCCESS) {
-  //       REPORT("Copying data from device failed.\n");
-  //       return OFFLOAD_FAIL;
-  //     }
-  //   }
-
-  //   std::vector< std::vector<int32_t> > vec_temp(output_arg.size());
-  //   for (int32_t I = 0; I < output_arg.size(); ++I){
-  //     // store these values as arrays to pass to python script
-  //     parseToVector(KernelArgs->ArgPtrs[output_arg[I]], KernelArgs->ArgSizes[output_arg[I]], vec_temp[I]);
-  //   }
-
-  //   std::cout<<"Printing output kernel arg"<<std::endl;
-
-  //   //DP("vecotr values are\n");
-  //   for(int32_t i = 0 ; i < vec_temp.size() ; i++){
-  //     for(int32_t j = 0 ; j < vec_temp[i].size() ; j++){
-  //       //DP("%" PRId32 " ", vec[i][j]);
-  //       std::cout << vec_temp[i][j] <<" ";
-  //     }
-  //     std::cout<<std::endl;
-  //     //DP("\n");
-  //   }
-
-  //   // call the python script and store the results back in argtype to
-  //   //return OMP_TGT_SUCCESS;
-  // }
   std::vector<int32_t> input_arg;
   std::vector<int32_t> output_arg;
   std::vector<size_t> output_sizes;
   QuantumCircuitWrapper *c;
   if(DeviceId == 100){
-    std::cout<<"args base pts"<<std::endl;
-    c = (QuantumCircuitWrapper*) KernelArgs->ArgBasePtrs[1]; // forced fix - find a better way
+    std::cout<<"----------------- args base pts is "<<KernelArgs->Tripcount<<std::endl;
+    c = (QuantumCircuitWrapper*) KernelArgs->ArgBasePtrs[3]; // forced fix - find a better way
+    c->num_iterations = KernelArgs->Tripcount;
     //std::cout<<"circuit test value: "<<(c)->test<<std::endl;
     DeviceId = 0; //default to cpu id -- modifying interface to handle quantum offloading later
     temp_device_id = 100;
 
+    c->debug();
     std::cout<<"offload to quantum to circuit"<<std::endl;
     for (int32_t I = 0; I < KernelArgs->NumArgs; ++I){
       if(KernelArgs->ArgTypes[I] & OMP_TGT_MAPTYPE_TO){
@@ -531,6 +407,8 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
       c->vec_data.push_back(c->parseToVector(KernelArgs->ArgPtrs[input_arg[I]], KernelArgs->ArgSizes[input_arg[I]], vec[I]));
       //c->vec_output_data.push_back(c->parseToVector(KernelArgs->ArgPtrs[output_arg[I]], KernelArgs->ArgSizes[output_arg[I]], vec[I]));
     }
+
+    c->run();
   }
 
   std::cout<<"Target Offload Policy Value Is: "<<__kmpc_get_target_offload()<<std::endl;
@@ -612,7 +490,7 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
 
   if(temp_device_id == 100){
     std::cout<<"circuit test value changed to: "<<c->test<<std::endl;
-    c->run();
+    //c->run();
     // }
 
     for (int32_t i = 0; i < c->vec_out_data.size(); ++i){

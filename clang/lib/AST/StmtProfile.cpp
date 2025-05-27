@@ -664,6 +664,13 @@ OMPClauseProfiler::VisitOMPFirstprivateClause(const OMPFirstprivateClause *C) {
       Profiler->VisitStmt(E);
   }
 }
+
+void OMPClauseProfiler::VisitOMPCircuitClause(const OMPCircuitClause *C) {
+  Profiler->VisitStmt(C->getExpr());
+  Profiler->VisitStmt(C->getPrivateCopy());
+  Profiler->VisitStmt(C->getInitExpr());
+}
+
 void
 OMPClauseProfiler::VisitOMPLastprivateClause(const OMPLastprivateClause *C) {
   VisitOMPClauseList(C);
@@ -848,6 +855,11 @@ void OMPClauseProfiler::VisitOMPDeviceClause(const OMPDeviceClause *C) {
   if (C->getDevice())
     Profiler->VisitStmt(C->getDevice());
 }
+
+void OMPClauseProfiler::VisitOMPIterationClause(const OMPIterationClause *C) {
+  Profiler->VisitStmt(C->getIteration());
+}
+
 void OMPClauseProfiler::VisitOMPMapClause(const OMPMapClause *C) {
   VisitOMPClauseList(C);
 }

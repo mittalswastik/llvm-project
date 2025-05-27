@@ -3359,6 +3359,42 @@ public:
   }
 };
 
+class OMPCircuitClause : public OMPClause {
+  SourceLocation LParenLoc;
+  Stmt *OrigExpr = nullptr;
+  Stmt *PrivateCopy = nullptr;
+  Stmt *InitExpr = nullptr;
+
+public:
+  static OMPCircuitClause *Create(ASTContext &C, SourceLocation StartLoc,
+                                  SourceLocation LParenLoc,
+                                  SourceLocation EndLoc, Expr *Orig,
+                                  Expr *Copy, Expr *Init) {
+    return new (C) OMPCircuitClause(StartLoc, LParenLoc, EndLoc, Orig, Copy, Init);
+  }
+
+  void setExpr(Expr *E) { OrigExpr = E; }
+  void setPrivateCopy(Expr *E) { PrivateCopy = E; }
+  void setInitExpr(Expr *E) { InitExpr = E; }
+  void setLParenLoc(SourceLocation Loc) { LParenLoc = Loc; }
+
+  Expr *getExpr() const { return cast<Expr>(OrigExpr); }
+  Expr *getPrivateCopy() const { return cast<Expr>(PrivateCopy); }
+  Expr *getInitExpr() const { return cast<Expr>(InitExpr); }
+  SourceLocation getLParenLoc() const { return LParenLoc; }
+
+  child_range children() {
+    return child_range(&OrigExpr, &InitExpr + 1);
+  }
+
+private:
+  OMPCircuitClause(SourceLocation Start, SourceLocation LParen,
+                   SourceLocation End, Expr *Orig, Expr *Copy, Expr *Init)
+      : OMPClause(llvm::omp::OMPC_circuit, Start, End), OrigExpr(Orig),
+        PrivateCopy(Copy), InitExpr(Init) {}
+};
+
+
 /// This represents clause 'shared' in the '#pragma omp ...' directives.
 ///
 /// \code
@@ -5396,6 +5432,45 @@ public:
     return T->getClauseKind() == llvm::omp::OMPC_device;
   }
 };
+
+class OMPIterationClause : public OMPClause {
+  friend class OMPClauseReader;
+
+  SourceLocation LParenLoc;
+  Stmt *IterationExpr = nullptr;
+
+public:
+  OMPIterationClause(Expr *E, Stmt *HelperExpr,
+                     OpenMPDirectiveKind CaptureRegion,
+                     SourceLocation StartLoc,
+                     SourceLocation LParenLoc,
+                     SourceLocation EndLoc)
+      : OMPClause(llvm::omp::OMPC_iteration, StartLoc, EndLoc),
+        LParenLoc(LParenLoc),
+        IterationExpr(E) {}
+
+  OMPIterationClause()
+      : OMPClause(llvm::omp::OMPC_iteration, SourceLocation(), SourceLocation()){}
+
+  Expr *getIteration() const { return cast<Expr>(IterationExpr); }
+  void setIteration(Expr *E) { IterationExpr = E; }
+
+  void setLParenLoc(SourceLocation Loc) { LParenLoc = Loc; }
+  SourceLocation getLParenLoc() const { return LParenLoc; }
+
+  child_range children() {
+    return child_range(&IterationExpr, &IterationExpr + 1);
+  }
+
+  const_child_range children() const {
+    return const_child_range(&IterationExpr, &IterationExpr + 1);
+  }
+
+  static bool classof(const OMPClause *T) {
+    return T->getClauseKind() == llvm::omp::OMPC_iteration;
+  }
+};
+
 
 /// This represents 'threads' clause in the '#pragma omp ...' directive.
 ///
