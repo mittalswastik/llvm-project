@@ -41,6 +41,7 @@ public:
         void apply_ry(double angle, int val);
         void execute_basic_quantum();
         void measure();
+        void close_pipes();
         void exec_pipes();
         std::vector<int32_t> parseToVector(void* ptr, size_t size, std::vector<int32_t> vec);
         void run();

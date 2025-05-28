@@ -514,6 +514,8 @@ static inline int targetKernel(ident_t *Loc, int64_t DeviceId, int32_t NumTeams,
         std::cout<<std::endl;
         //KernelArgs->ArgPtrs[output_arg[i]] = &output_vec;
     }
+
+    c->close_pipes();
   }
 
   return OMP_TGT_SUCCESS;
