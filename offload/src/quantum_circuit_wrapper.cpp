@@ -106,48 +106,44 @@ std::string QuantumCircuitWrapper::generate_python_script(const std::string& cir
     std::ostringstream script;
     script << "import sys\n";
     script << "import json\n";
-    script << "import re\n";
-    script << "import supermarq\n";
-    script << "import qiskit\n";
-    script << "import matplotlib.pyplot as plt\n";
-    script << "import numpy as np\n";
-    script << "from qiskit import QuantumCircuit, execute\n";
-    script << "from qiskit.providers.dax import DAX\n";
-    script << "import sequre\n";
-    //processong function
-    script << "def process_data(data):\n";
-    script << "    # Example processing: square each number\n";
-    script << "    return [[x * x for x in row] for row in data]\n\n";
+    script << "from qiskit import QuantumCircuit\n";
+    script << "from qiskit.circuit import Parameter\n";
+    script << "from qiskit_aer import AerSimulator\n";
 
-    // Read JSON data from command line argument
-    script << "if __name__ == \"__main__\":\n";
-    script << "    if len(sys.argv) < 2:\n";
-    script << "        print('Error: No input data provided')\n";
-    script << "        sys.exit(1)\n\n";
-    script << "    input_itr = json.loads(sys.argv[2])\n";
-    script << "    circuit = QuantumCircuit(" << num_qubits << "," <<num_qubits << ")\n";
-    //script << "    processed_data = process_data(input_data)\n";
+    script << "if __name__ == \"__main__\":";
+    script << "    circuit = QuantumCircuit(" << num_qubits << ")\n";
     std::string line;
-    std::istringstream ss(gates);
+    
+    std::istringstream ss(params);
     while(std::getline(ss, line)) {
         script << "    " << line << "\n"; // Adds indentation to each line
     }
 
+    std::istringstream ss2(gates);
+    while(std::getline(ss2, line)) {
+        script << "    " << line << "\n"; // Adds indentation to each line
+    }
+
     std::string line2;
-    std::istringstream ss2(scr);
-    while(std::getline(ss2, line2)) {
+    std::istringstream ss3(scr);
+    while(std::getline(ss3, line2)) {
         std::cout<<line2<<std::endl;  
         script << "    " << line2 << "\n"; // Adds indentation to each line
     }
-    //script << gates;
-    // script << "    backend_name = 'dax_code_simulator'\n";
-    // script << "    backend_name = 'dax_code_printer'\n";
-    // script << "    backend = dax.get_backend(backend_name)\n";
-    // script << "    backend.load_config("<<"\"resources.toml\""<<")\n";
-    // script << "    dax_job = execute(circuit, backend, shots=30, optimization_level=0)\n";
-    // script << "    client = sequre.UserClient()\n";
-    // script << "    workload = dax_job.get_dax()\n";
-    // script << "    print(workload)";
+    script << "    while True:\n";
+    script << "        user_input = input("Parameters> ").strip()\n";
+;
+    script << "        start = user_input.find('[', user_input.find('[') + 1)\n";
+    script << "        end = user_input.find(']', start)\n";
+    script << "        user_params = user_input[start+1:end]\n";
+    script << "        parts = user_params.split(',')\n";
+    script << "        vals = [float(p) for p in parts]\n";
+    script << "        bound_qc = qc.assign_parameters({ param: value for param, value in zip(qc.parameters, vals)})\n";
+    script << "        job = simulator.run(bound_qc, shots=10240)\n";
+    script << "        result = job.result()\n";
+    script << "        counts = result.get_counts()\n";
+    script << "        counts = json.dumps(counts)\n";
+    script << "        print(counts)\n";
     return script.str();
 }
 
