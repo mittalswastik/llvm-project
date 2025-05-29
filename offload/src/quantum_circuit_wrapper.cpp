@@ -67,10 +67,6 @@ void QuantumCircuitWrapper::apply_ghz_qiskit(){
 }
 
 void QuantumCircuitWrapper::execute_basic_quantum(){
-    scr += "backend_name = 'dax_code_simulator'\n";
-    scr += "backend_name = 'dax_code_printer'\n";
-    scr += "backend = dax.get_backend(backend_name)\n";
-    scr += "backend.load_config(\"resources.toml\")\n";
     scr += "print(\"itr val is:\", input_itr, file=sys.stderr, flush=True)\n";
     scr += "for i in range(input_itr):\n";
     scr += "    resp = sys.stdin.readline().strip()\n"; // put execute in a loop
@@ -78,11 +74,15 @@ void QuantumCircuitWrapper::execute_basic_quantum(){
     scr += "    response_data = json.loads(resp)\n";
     scr += "    if isinstance(response_data, list) and len(response_data)==1 and isinstance(response_data[0], list):\n";
     scr += "        response_data = response_data[0]\n";
-    scr += "    dax_job = execute(circuit, backend, shots=30, optimization_level=0)\n";
-    scr += "    client = sequre.UserClient()\n";
-    scr += "    workload = dax_job.get_dax()\n"; //assuming a string is returned
-    //scr += "    workload = json.dumps(response_data)\n";
-    scr += "    sys.stdout.write(workload)\n";
+    scr += "    user_params = response_data[0]\n";
+    scr += "    vals = [float(p) for p in user_params]\n";
+    scr += "    bound_qc = qc.assign_parameters({ param: value for param, value in zip(qc.parameters, vals)})\n";
+    scr += "    job = simulator.run(bound_qc, shots=10240)\n";
+    scr += "    result = job.result()\n";
+    scr += "    counts = result.get_counts()\n";
+    scr += "    counts = json.dumps(counts)\n";
+    // scr += "    print(counts)\n";
+    scr += "    sys.stdout.write(counts)\n";
     scr += "    sys.stdout.flush()\n";
 }
 
@@ -131,13 +131,13 @@ std::string QuantumCircuitWrapper::generate_python_script(const std::string& cir
         script << "    " << line2 << "\n"; // Adds indentation to each line
     }
     script << "    while True:\n";
-    script << "        user_input = input("Parameters> ").strip()\n";
-;
-    script << "        start = user_input.find('[', user_input.find('[') + 1)\n";
-    script << "        end = user_input.find(']', start)\n";
-    script << "        user_params = user_input[start+1:end]\n";
-    script << "        parts = user_params.split(',')\n";
-    script << "        vals = [float(p) for p in parts]\n";
+    script << "        resp = sys.stdin.readline().strip()\n"; // put execute in a loop
+    script << "        resp = re.sub(r',\\s*]', ']', resp)\n";
+    script << "        response_data = json.loads(resp)\n";
+    script << "        if isinstance(response_data, list) and len(response_data)==1 and isinstance(response_data[0], list):\n";
+    script << "            response_data = response_data[0]\n";
+    script << "        user_params = response_data[0]\n";
+    script << "        vals = [float(p) for p in user_params]\n";
     script << "        bound_qc = qc.assign_parameters({ param: value for param, value in zip(qc.parameters, vals)})\n";
     script << "        job = simulator.run(bound_qc, shots=10240)\n";
     script << "        result = job.result()\n";
