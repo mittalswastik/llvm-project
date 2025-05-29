@@ -106,6 +106,7 @@ std::string QuantumCircuitWrapper::generate_python_script(const std::string& cir
     std::ostringstream script;
     script << "import sys\n";
     script << "import json\n";
+    script << "import re\n";
     script << "from qiskit import QuantumCircuit\n";
     script << "from qiskit.circuit import Parameter\n";
     script << "from qiskit_aer import AerSimulator\n";
