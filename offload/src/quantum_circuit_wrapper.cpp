@@ -130,20 +130,20 @@ std::string QuantumCircuitWrapper::generate_python_script(const std::string& cir
         std::cout<<line2<<std::endl;  
         script << "    " << line2 << "\n"; // Adds indentation to each line
     }
-    script << "    while True:\n";
-    script << "        resp = sys.stdin.readline().strip()\n"; // put execute in a loop
-    script << "        resp = re.sub(r',\\s*]', ']', resp)\n";
-    script << "        response_data = json.loads(resp)\n";
-    script << "        if isinstance(response_data, list) and len(response_data)==1 and isinstance(response_data[0], list):\n";
-    script << "            response_data = response_data[0]\n";
-    script << "        user_params = response_data[0]\n";
-    script << "        vals = [float(p) for p in user_params]\n";
-    script << "        bound_qc = qc.assign_parameters({ param: value for param, value in zip(qc.parameters, vals)})\n";
-    script << "        job = simulator.run(bound_qc, shots=10240)\n";
-    script << "        result = job.result()\n";
-    script << "        counts = result.get_counts()\n";
-    script << "        counts = json.dumps(counts)\n";
-    script << "        print(counts)\n";
+    // script << "    while True:\n";
+    // script << "        resp = sys.stdin.readline().strip()\n"; // put execute in a loop
+    // script << "        resp = re.sub(r',\\s*]', ']', resp)\n";
+    // script << "        response_data = json.loads(resp)\n";
+    // script << "        if isinstance(response_data, list) and len(response_data)==1 and isinstance(response_data[0], list):\n";
+    // script << "            response_data = response_data[0]\n";
+    // script << "        user_params = response_data[0]\n";
+    // script << "        vals = [float(p) for p in user_params]\n";
+    // script << "        bound_qc = qc.assign_parameters({ param: value for param, value in zip(qc.parameters, vals)})\n";
+    // script << "        job = simulator.run(bound_qc, shots=10240)\n";
+    // script << "        result = job.result()\n";
+    // script << "        counts = result.get_counts()\n";
+    // script << "        counts = json.dumps(counts)\n";
+    // script << "        print(counts)\n";
     return script.str();
 }
 
