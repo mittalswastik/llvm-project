@@ -50,6 +50,7 @@ private:
     int num_qubits;
     std::string gates;
     std::string scr;
+    std::string params;
     std::string generate_python_script(const std::string& circuit_name, int num_qubits, const std::string& gates);
     void execute_python_script(const std::string& script);
     std::vector<int> readQubits(const std::string& result, int num_qs);
