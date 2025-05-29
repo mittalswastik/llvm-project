@@ -30,6 +30,7 @@ public:
         int fromPy[2];
         QuantumCircuitWrapper(int num_qubits);
 
+        void create_params(int num_params);
         void apply_hadamard(int qubit);
         void debug();
         void apply_cnot(int control, int target);
@@ -38,6 +39,7 @@ public:
         void apply_hamiltonian_qiskit();
         void apply_ghz_qiskit();
         //void apply_ry(std::vector<double> vec, int val);
+        void apply_ry_param(int index, int qubit);
         void apply_ry(double angle, int val);
         void execute_basic_quantum();
         void measure();
