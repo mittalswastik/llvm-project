@@ -74,16 +74,8 @@
 #include "llvm/Analysis/LoopInfo.h"
 using namespace llvm;
 
-struct TaskPrivLayout {
-  StructType *RootTy = nullptr;            // %task_with_privates
-  SmallVector<unsigned, 4> Indices;        // e.g., {0,1,0} -> privates.name
-  uint64_t ByteOffset = 0;                 // fallback (if you prefer)
-  bool HasTyped = false;
-};
-
 
 llvm::DenseMap<llvm::Function*, llvm::Constant*> NameConstByEntry;
-std::unordered_map<Function*, struct TaskPrivLayout> umap;
 
 static Function *stripToFunc(Value *V) {
   if (auto *CE = dyn_cast<ConstantExpr>(V))
@@ -105,222 +97,75 @@ static void dumpUsers(Value *V) {
   }
 }
 
-static bool deriveLayoutFromAlloc(CallBase *AllocCB, TaskPrivLayout &Out, const DataLayout &DL, uint64_t *OffOut) {
-  Value *Task = AllocCB; // return value
-  dumpUsers(Task);
-  bool Found = false;
-
-  for (User *U : Task->users()) {
-    auto *GEP = dyn_cast<GetElementPtrInst>(U);
-    if (!GEP || GEP->getPointerOperand() != Task) continue;
-
-    errs()<<"checking status\n";
-
-    // Look for a store into that GEP of a pointer-typed value (char* candidate).
-    for (User *GU : GEP->users()) {
-      auto *SI = dyn_cast<StoreInst>(GU);
-      if (!SI) continue;
-
-
-
-      if (GEP->getSourceElementType()->isIntegerTy(8) && GEP->getNumIndices() == 1) {
-        if (auto *CI = dyn_cast<ConstantInt>(GEP->idx_begin()->get())) {
-          uint64_t Off = CI->getZExtValue();
-
-          // Require: store <ptr>, ptr %gep
-          for (User *W : GEP->users()) {
-            if (auto *SI = dyn_cast<StoreInst>(W)) {
-              if (SI->getPointerOperand() != GEP) continue;
-              if (!SI->getValueOperand()->getType()->isPointerTy()) continue; // filters out i32 at 32
-              OffOut = &Off;   // e.g., 40
-              return true;
-            }
-          }
-        }
-      }
-
-      auto *Root = dyn_cast<StructType>(GEP->getSourceElementType());
-      if (!Root) continue; // may be i8 GEP; keep scanning
-
-      if (!SI->getValueOperand()->getType()->isPointerTy()) continue;
-
-      SmallVector<unsigned,4> Idx;
-      bool AllConst = true;
-      for (auto &Op : GEP->indices()) {
-        auto *CI = dyn_cast<ConstantInt>(Op.get());
-        if (!CI) { AllConst = false; break; }
-        Idx.push_back((unsigned)CI->getZExtValue());
-      }
-      if (!AllConst || Idx.size() < 3) continue; // expect {0, 1, field}
-
-      Out.RootTy   = Root;
-      Out.Indices  = std::move(Idx);
-      Out.HasTyped = true;
-
-      // Also compute a byte offset as optional fallback:
-      StructType *T0 = Root;               // %task_with_privates
-      const auto *SL0 = DL.getStructLayout(T0);
-      unsigned I0 = Out.Indices[1];              // privates field index
-      auto *PrivST = dyn_cast<StructType>(T0->getElementType(I0));
-      const auto *SL1 = DL.getStructLayout(PrivST);
-      unsigned I1 = Out.Indices[2];              // 'name' field index
-      Out.ByteOffset = SL0->getElementOffset(I0) + SL1->getElementOffset(I1);
-      Found = true;
-      break;
-    }
-  }
-  return Found;
-}
-
 PreservedAnalyses PreloadPass::run(Module &M, ModuleAnalysisManager &MA) {
 
-    LLVMContext &CTX = M.getContext();
-    errs()<<" Reading from a file llvm\n";
-    // if ((Options.count("set_ttex") && input_ttex)){
-    //   return PreservedAnalyses::all();
-    // }
+  LLVMContext &CTX = M.getContext();
+  errs()<<" Reading from a file llvm\n";
 
-    for (Module::iterator func_iter = M.begin(), func_iter_end = M.end(); func_iter != func_iter_end; ++func_iter) {
-      Function &F = *func_iter;
+  for (Module::iterator func_iter = M.begin(), func_iter_end = M.end(); func_iter != func_iter_end; ++func_iter) {
+    Function &F = *func_iter;
 
-      if(F.getName().contains("__kmpc_omp_task_alloc")){
-        errs()<<"Function name is: "<<F.getName()<<"\n";
-        const DataLayout &DL = M.getDataLayout();
+    if(F.getName().contains("__kmpc_omp_task_alloc")){
+      errs()<<"Function name is: "<<F.getName()<<"\n";
+      const DataLayout &DL = M.getDataLayout();
 
-        for (User *U : F.users()) {
-          auto *CB = dyn_cast<CallBase>(U);
-          if (!CB) continue;
+      for (User *U : F.users()) {
+        auto *CB = dyn_cast<CallBase>(U);
+        if (!CB) continue;
 
-          // Last arg is the task entry routine in both variants.
-          Value *EntryArg = CB->getArgOperand(CB->arg_size()-1);
-          Function *EntryF = stripToFunc(EntryArg);
-          if (!EntryF) continue;
-          if (!EntryF->getName().contains(".omp_task_entry.")) continue;
+        // Last arg is the task entry routine in both variants.
+        Value *EntryArg = CB->getArgOperand(CB->arg_size()-1);
+        Function *EntryF = stripToFunc(EntryArg);
+        if (!EntryF) continue;
+        if (!EntryF->getName().contains(".omp_task_entry.")) continue;
 
-          // struct TaskPrivLayout T;
-          // uint64_t OffOut;
-          // bool Ok = deriveLayoutFromAlloc(CB, T, DL, &OffOut);
-          // errs()<<"OK value is: "<<Ok<<"\n";
-          // if (!Ok) continue; // try next alloc; maybe another user has typed GEPs
+        Value *Task = CB; // return value
+        dumpUsers(Task);
+        bool Found = false;
 
-          Value *Task = CB; // return value
-          dumpUsers(Task);
-          bool Found = false;
+        for(User *U : Task->users()) {
+          auto *GEP = dyn_cast<GetElementPtrInst>(U);
+          if (!GEP || GEP->getPointerOperand() != Task) continue;
 
-          for (User *U : Task->users()) {
-            auto *GEP = dyn_cast<GetElementPtrInst>(U);
-            if (!GEP || GEP->getPointerOperand() != Task) continue;
+          errs()<<"checking status\n";
 
-            errs()<<"checking status\n";
+          // Look for a store into that GEP of a pointer-typed value (char* candidate).
+          for (User *GU : GEP->users()) {
+            auto *SI = dyn_cast<StoreInst>(GU);
+            if (!SI) continue;
+            // Require: store <ptr>, ptr %gep
+            for (User *W : GEP->users()) {
+              if (auto *SI = dyn_cast<StoreInst>(W)) {
+                if (SI->getPointerOperand() != GEP) continue;
+                if (!SI->getValueOperand()->getType()->isPointerTy()) continue; // filters out i32 at 32
+              
+                Value *V = SI->getValueOperand()->stripPointerCasts();
+                if (auto *K = dyn_cast<Constant>(V)) {
+                  NameConstByEntry[EntryF] = K;   // e.g., ptr @.str.1 or a constexpr GEP
+                  errs()<<"name entry string is: "<<NameConstByEntry[EntryF]<<"\n";
+                  std::string test_str;
+                  raw_string_ostream stream(test_str);
+                  K->print(stream);
+                  errs()<<test_str<<"\n";
+                  
+                  Instruction *IP = &*EntryF->getEntryBlock().getFirstNonPHIOrDbgOrAlloca();
+                  // Type *I8Ty    = Type::getInt8Ty(CTX);
+                  // Type *I8PtrTy = I8Ty->getPointerTo();
+                  Type *PtrTy = PointerType::get(CTX, 0); 
+                  IRBuilder<> B(IP);
 
-            // Look for a store into that GEP of a pointer-typed value (char* candidate).
-            for (User *GU : GEP->users()) {
-              auto *SI = dyn_cast<StoreInst>(GU);
-              if (!SI) continue;
-              // Require: store <ptr>, ptr %gep
-              for (User *W : GEP->users()) {
-                if (auto *SI = dyn_cast<StoreInst>(W)) {
-                  if (SI->getPointerOperand() != GEP) continue;
-                  if (!SI->getValueOperand()->getType()->isPointerTy()) continue; // filters out i32 at 32
-                
-                  Value *V = SI->getValueOperand()->stripPointerCasts();
-                  if (auto *K = dyn_cast<Constant>(V)) {
-                    NameConstByEntry[EntryF] = K;   // e.g., ptr @.str.1 or a constexpr GEP
-                    
-                    // Instruction *IP = &*EntryF->getEntryBlock().getFirstNonPHIOrDbgOrAlloca();
-                    // Type *I8Ty    = Type::getInt8Ty(CTX);
-                    // Type *I8PtrTy = I8Ty->getPointerTo(); 
-                    // IRBuilder<> B(IP);
-                    // Value *Task  = EntryF->getArg(1);
-                    // Value *Addr  = B.CreateGEP(I8Ty, Task, B.getInt64(OffOut)); // 40
-                    // Value *Name  = B.CreateLoad(I8PtrTy, Addr);
-
-                    // auto Callee = EntryF->getParent()->getOrInsertFunction(
-                    //                 "unique_task", FunctionType::get(B.getVoidTy(), {I8PtrTy}, false));
-                    // Function *UF = cast<Function>(Callee.getCallee());
-                    // UF->setLinkage(Function::ExternalWeakLinkage);
-                    // B.CreateCall(Callee, {Name});
-                  }
+                  auto Callee = EntryF->getParent()->getOrInsertFunction("unique_task", FunctionType::get(B.getVoidTy(), {PtrTy}, false));
+                  Function *UF = cast<Function>(Callee.getCallee());
+                  UF->setLinkage(Function::ExternalWeakLinkage);
+                  B.CreateCall(Callee, {K});
                 }
               }
             }
           }
-
-          // auto It = umap.find(EntryF);
-          // if (It == umap.end()) {
-          //   umap[EntryF] = T;
-          // } else {
-          //   // Multiple allocs → verify consistency (defensive)
-          //   auto &Prev = It->second;
-          //   if (T.HasTyped && Prev.HasTyped) {
-          //     if (T.RootTy != Prev.RootTy || T.Indices != Prev.Indices) {
-          //       errs() << "warning: differing task priv layouts for " << EntryF->getName() << "\n";
-          //     }
-          //   }
-          //   // Prefer first typed layout; keep as-is.
-          // }
         }
       }
-    }    
-
-
-    // for(auto itr = umap.begin() ; itr != umap.end() ; ++itr){
-    //   Function &F = *(itr->first);
-    //   errs()<<"function names in map: "<<F.getName()<<"\n";
-
-    //   for (Function::iterator block_iter = F.begin(), block_iter_end = F.end(); block_iter != block_iter_end; ++block_iter) {
-    //       BasicBlock &B = *block_iter;
-    //       for(BasicBlock::iterator instr_iter = B.begin(), instr_iter_end = B.end(); instr_iter != instr_iter_end; ++instr_iter){
-    //           Instruction &I = *instr_iter;
-
-    //           //errs()<<"Basic block name "<<B.getName()<<"\n";
-
-    //           if(PHINode *Pi = dyn_cast<PHINode>(&I)){
-    //             continue;
-    //           }
-
-    //           if(&I == nullptr){
-    //               continue; // null instruction?
-    //           }
-
-    //           //AddFunc(M,B,I,itr->second);
-    //       }
-    //   }
-
-    // }
-
-    // for (Module::iterator func_iter = M.begin(), func_iter_end = M.end(); func_iter != func_iter_end; ++func_iter) {
-    
-    //     Function &F = *func_iter;
-
-    //     if (!F.isDeclaration()) {
-    //         errs()<<"Function name is:"<<F.getName()<<"\n";
-    //         if(!F.getName().contains(".omp_task_entry.") && !F.getName().contains("ompt") && !F.getName().contains("debug")){ //F.getName() != ".omp_outlined._debug__"){
-    //             auto &FM = MA.getResult<FunctionAnalysisManagerModuleProxy>(M).getManager();
-    //             LoopInfo *LI = &FM.getResult<LoopAnalysis>(F);
-    //             errs()<<"Calling analysis manager above for loops\n";
-
-                // for (Function::iterator block_iter = F.begin(), block_iter_end = F.end(); block_iter != block_iter_end; ++block_iter) {
-                //     BasicBlock &B = *block_iter;
-                //     for(BasicBlock::iterator instr_iter = B.begin(), instr_iter_end = B.end(); instr_iter != instr_iter_end; ++instr_iter){
-                //         Instruction &I = *instr_iter;
-
-                //         //errs()<<"Basic block name "<<B.getName()<<"\n";
-
-                //         if(PHINode *Pi = dyn_cast<PHINode>(&I)){
-                //           continue;
-                //         }
-
-                //         if(&I == nullptr){
-                //             continue; // null instruction?
-                //         }
-
-                //         AddFunc(M,B,I);
-                //     }
-                // }
-    //         }
-    //     }
-    // }
+    }
+  }
     
     std::cout<<"--------=========== end of pass ==================----------------"<<std::endl;
     return PreservedAnalyses::all();
