@@ -18,12 +18,9 @@
 #include "PluginManager.h"
 #include "omptarget.h"
 #include "private.h"
-
 #include "Shared/EnvironmentVar.h"
 #include "Shared/Profile.h"
-
 #include "Utils/ExponentialBackoff.h"
-
 #include "llvm/Frontend/OpenMP/OMPConstants.h"
 
 #include <cassert>

@@ -44,6 +44,7 @@
 #include "llvm/TargetParser/SubtargetFeature.h"
 #include "llvm/Transforms/IPO/WholeProgramDevirt.h"
 #include "llvm/Transforms/Scalar/LoopPassManager.h"
+#include "llvm/Transforms/Scalar/Preload.h"
 #include "llvm/Transforms/Utils/FunctionImportUtils.h"
 #include "llvm/Transforms/Utils/SplitModule.h"
 #include <optional>
@@ -58,6 +59,10 @@ enum class LTOBitcodeEmbedding {
   EmbedOptimized = 1,
   EmbedPostMergePreOptimized = 2
 };
+
+ static cl::opt<bool> mypreload_2("preload_2",
+  cl::desc("Description of my custom option for LD_PRELOAD"),
+  cl::init(false)); 
 
 static cl::opt<LTOBitcodeEmbedding> EmbedBitcode(
     "lto-embed-bitcode", cl::init(LTOBitcodeEmbedding::DoNotEmbed),
@@ -346,6 +351,13 @@ static void runNewPMPasses(const Config &Conf, Module &Mod, TargetMachine *TM,
       return PassName.empty() ? ClassName : PassName;
     });
     outs() << "pipeline-passes: " << PipelineStr << '\n';
+  }
+
+  auto &Options = cl::getRegisteredOptions();
+
+  if (Options.count("preload_2") && mypreload_2) {
+    errs() << "---------------- preload option recognized --------------------\n";
+    //MPM.addPass(PreloadPass());
   }
 
   MPM.run(Mod, MAM);

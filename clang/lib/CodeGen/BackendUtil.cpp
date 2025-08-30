@@ -83,6 +83,7 @@
 #include "llvm/Transforms/Scalar/EarlyCSE.h"
 #include "llvm/Transforms/Scalar/GVN.h"
 #include "llvm/Transforms/Scalar/JumpThreading.h"
+#include "llvm/Transforms/Scalar/Preload.h"
 #include "llvm/Transforms/Utils/Debugify.h"
 #include "llvm/Transforms/Utils/ModuleUtils.h"
 #include <limits>
@@ -102,6 +103,12 @@ extern cl::opt<bool> PrintPipelinePasses;
 static cl::opt<bool> ClSanitizeOnOptimizerEarlyEP(
     "sanitizer-early-opt-ep", cl::Optional,
     cl::desc("Insert sanitizers on OptimizerEarlyEP."));
+
+ static cl::opt<bool> mypreload("preload",
+  cl::desc("Description of my custom option for LD_PRELOAD"),
+  cl::init(false)); 
+
+bool check = true;
 
 // Experiment to mark cold functions as optsize/minsize/optnone.
 // TODO: remove once this is exposed as a proper driver flag.
@@ -1091,6 +1098,11 @@ void EmitAssemblyHelper::RunOptimizationPipeline(
     } else {
       MPM.addPass(PB.buildPerModuleDefaultPipeline(Level));
     }
+  }
+
+  if(mypreload && check){ 
+    check = false; 
+    MPM.addPass(PreloadPass()); 
   }
 
   // Link against bitcodes supplied via the -mlink-builtin-bitcode option
