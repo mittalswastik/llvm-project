@@ -1,0 +1,2 @@
+cmake -DCMAKE_CXX_COMPILER=/home/swastik/dev/llvm-project/build/bin/clang++  -DCMAKE_C_COMPILER=/home/swastik/dev/llvm-project/build/bin/clang  -DCUDAToolkit_INCLUDE_DIRECTORIES="/usr/local/cuda"  -DCMAKE_BUILD_TYPE=Debug -DLLVM_USE_LINKER=gold -DLLVM_BINUTILS_INCDIR=../binutils/include -DLLVM_TARGETS_TO_BUILD="X86;NVPTX" -DLLVM_ENABLE_PROJECTS="clang;lld;openmp" -DLLVM_ENABLE_RUNTIMES="offload"  -
+DLIBOMP_OMPT_OPTIONAL=ON -DLIBIOMP_OMPT_SUPPORT=ON -DLIBOMP_USE_DEBUGGER=ON -G "Unix Makefiles" ../llvm

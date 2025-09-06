@@ -42,7 +42,7 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Transforms/Scalar.h"
 #include "llvm/Transforms/Scalar/LoopPassManager.h"
-#include "llvm/Transforms/Scalar/Preload.h"
+#include "llvm/Transforms/Preload/Preload.h"
 #include "llvm/Transforms/Utils.h"
 #include "llvm/Transforms/Utils/LoopPeel.h"
 #include "llvm/Transforms/Utils/LoopSimplify.h"
@@ -104,9 +104,9 @@ PreservedAnalyses PreloadPass::run(Module &M, ModuleAnalysisManager &MA) {
 
   for (Module::iterator func_iter = M.begin(), func_iter_end = M.end(); func_iter != func_iter_end; ++func_iter) {
     Function &F = *func_iter;
+    errs()<<"Function name is: "<<F.getName()<<"\n";
 
     if(F.getName().contains("__kmpc_omp_task_alloc")){
-      errs()<<"Function name is: "<<F.getName()<<"\n";
       const DataLayout &DL = M.getDataLayout();
 
       for (User *U : F.users()) {
@@ -174,7 +174,7 @@ PreservedAnalyses PreloadPass::run(Module &M, ModuleAnalysisManager &MA) {
 extern "C" ::llvm::PassPluginLibraryInfo LLVM_ATTRIBUTE_WEAK
 llvmGetPassPluginInfo() {
   return {
-    LLVM_PLUGIN_API_VERSION, "preload_2", "v0.1",
+    LLVM_PLUGIN_API_VERSION, "preload", "v0.1",
     [](PassBuilder &PB) {
       PB.registerPipelineParsingCallback(
         [](StringRef Name, ModulePassManager &MPM,

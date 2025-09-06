@@ -83,7 +83,7 @@
 #include "llvm/Transforms/Scalar/EarlyCSE.h"
 #include "llvm/Transforms/Scalar/GVN.h"
 #include "llvm/Transforms/Scalar/JumpThreading.h"
-#include "llvm/Transforms/Scalar/Preload.h"
+#include "llvm/Transforms/Preload/Preload.h"
 #include "llvm/Transforms/Utils/Debugify.h"
 #include "llvm/Transforms/Utils/ModuleUtils.h"
 #include <limits>
@@ -1102,7 +1102,7 @@ void EmitAssemblyHelper::RunOptimizationPipeline(
 
   if(mypreload && check){ 
     check = false; 
-    MPM.addPass(PreloadPass()); 
+    //MPM.addPass(PreloadPass()); 
   }
 
   // Link against bitcodes supplied via the -mlink-builtin-bitcode option
