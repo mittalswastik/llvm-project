@@ -16,10 +16,21 @@
 #include "kmp_stats.h"
 #include "kmp_wait_release.h"
 #include "kmp_taskdeps.h"
+#include "kmp_edf.h"
 
 #if OMPT_SUPPORT
 #include "ompt-specific.h"
 #endif
+
+#define TIMESPEC_ADD(A,B)              \
+do {                                   \
+    (A).tv_sec  += (B).tv_sec;         \
+    (A).tv_nsec += (B).tv_nsec;        \
+    if ( (A).tv_nsec >= 1000000000 ) { \
+        (A).tv_sec++;                  \
+        (A).tv_nsec -= 1000000000;     \
+    }                                  \
+} while (0)
 
 #if ENABLE_LIBOMPTARGET
 static void (*tgt_target_nowait_query)(void **);
@@ -71,6 +82,27 @@ void set_global_start(int seconds) {
     TIMESPEC_ADD(global_start_time, setup_delay);
     global_start_set = 1;
   }
+}
+
+void kmp_dep_in(kmp_task_t *task){
+  //return;
+  int i;
+  //__kmp_acquire_bootstrap_lock(&kmp_dep_lock);
+  for (i = 0; i < task->ndeps; i++) {
+    
+  }
+  //__kmp_release_bootstrap_lock(&kmp_dep_lock);
+}
+
+void kmp_dep_out(kmp_task_t *task){
+  //return;
+  int i;
+  //__kmp_acquire_bootstrap_lock(&kmp_dep_lock);
+  for (i = 0; i < task->ndeps; i++) {
+    
+  }
+  //__kmp_release_bootstrap_lock(&kmp_dep_lock);
+
 }
 
 void* rt_handler(void* args){

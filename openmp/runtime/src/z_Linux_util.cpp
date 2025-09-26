@@ -119,12 +119,6 @@ struct kmp_sys_timer {
   (((timespec).tv_sec * (long int)1e9) + (timespec).tv_nsec)
 
 
-
-
-struct kmp_sys_timer {
-  struct timespec start;
-};
-
 #ifndef TIMEVAL_TO_TIMESPEC
 // Convert timeval to timespec.
 #define TIMEVAL_TO_TIMESPEC(tv, ts)                                            \
