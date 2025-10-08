@@ -17,6 +17,7 @@
 #include "kmp_wait_release.h"
 #include "kmp_taskdeps.h"
 #include "kmp_edf.h"
+#include "kmp_io.h"
 
 #if OMPT_SUPPORT
 #include "ompt-specific.h"
@@ -2035,6 +2036,7 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
     if (task->routine != NULL) {
 #ifdef KMP_GOMP_COMPAT
       if (taskdata->td_flags.native) {
+        __kmp_printf("-------------------------------calling task routine ----------------------------------\n");
         ((void (*)(void *))(*(task->routine)))(task->shareds);
       } else
 #endif /* KMP_GOMP_COMPAT */
@@ -2060,7 +2062,8 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
       if(!((task_args->task)->is_edf)){ // static FIFO
         ret = pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
         if(ret != 0){__kmp_printf("\nERROR in setschedpolicy: %d\n", ret);}
-        param.sched_priority = (task_args->task)->rt_priority;
+        param.sched_priority = 10;
+        // = (task_args->task)->rt_priority;
         ret = pthread_attr_setschedparam(&attr, &param);
         if(ret != 0){__kmp_printf("\nERROR in setschedparam: %d\n", ret);}
 	__kmp_printf("FIFO task priority: %d\n", param.sched_priority);
@@ -2075,10 +2078,10 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
       //(*(task->routine))(gtid, task); NOT REALTIME, FIXME!!!
       ret = pthread_create(&thread, &attr, rt_handler, task_args);
       // calls ((void* (*)(void *))(*(task->routine)))
-      if(ret != 0){__kmp_printf("\nPTHREAD_CREATE FAILED: %d %d %d\n",ret);}
+      if(ret != 0){__kmp_printf("\nPTHREAD_CREATE FAILED: %d\n",ret);}
       //brayden
       //(*(task->routine))(gtid, task);
-      #endif
+     #endif
       }
     }
     KMP_POP_PARTITIONED_TIMER();
