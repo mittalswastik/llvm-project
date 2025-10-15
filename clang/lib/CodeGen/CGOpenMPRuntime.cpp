@@ -2759,6 +2759,8 @@ enum KmpTaskTFields {
   Data1,
   /// Task priority.
   Data2,
+  /// Task Name
+  Data3,
   /// (Taskloops only) Lower bound.
   KmpTaskTLowerBound,
   /// (Taskloops only) Upper bound.
@@ -3704,6 +3706,7 @@ CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
     DestructorsFlag = 0x8,
     PriorityFlag = 0x20,
     DetachableFlag = 0x40,
+    TaskNameFlag = 0x80, // swastik
   };
   unsigned Flags = Data.Tied ? TiedFlag : 0;
   bool NeedsCleanup = false;
@@ -3715,6 +3718,8 @@ CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
   }
   if (Data.Priority.getInt())
     Flags = Flags | PriorityFlag;
+  if (Data.TaskName.getInt())
+    Flags |= TaskNameFlag;
   if (D.hasClausesOfKind<OMPDetachClause>())
     Flags = Flags | DetachableFlag;
   llvm::Value *TaskFlags =

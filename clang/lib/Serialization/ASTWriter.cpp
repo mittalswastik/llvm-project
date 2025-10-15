@@ -8236,6 +8236,12 @@ void OMPClauseWriter::VisitOMPPriorityClause(OMPPriorityClause *C) {
   Record.AddSourceLocation(C->getLParenLoc());
 }
 
+void OMPClauseWriter::VisitOMPTaskNameClause(OMPTaskNameClause *C) {
+  VisitOMPClauseWithPreInit(C);
+  Record.AddStmt(C->getTaskName());
+  Record.AddSourceLocation(C->getLParenLoc());
+}
+
 void OMPClauseWriter::VisitOMPGrainsizeClause(OMPGrainsizeClause *C) {
   VisitOMPClauseWithPreInit(C);
   Record.writeEnum(C->getModifier());

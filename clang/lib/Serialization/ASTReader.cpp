@@ -11177,6 +11177,9 @@ OMPClause *OMPClauseReader::readClause() {
   case llvm::omp::OMPC_priority:
     C = new (Context) OMPPriorityClause();
     break;
+  case llvm::omp::OMPC_taskname:
+    C = new (Context) OMPTaskNameClause();
+    break;
   case llvm::omp::OMPC_grainsize:
     C = new (Context) OMPGrainsizeClause();
     break;
@@ -11302,6 +11305,7 @@ OMPClause *OMPClauseReader::readClause() {
     unsigned NumLoops = Record.readInt();
     C = OMPDoacrossClause::CreateEmpty(Context, NumVars, NumLoops);
     break;
+  
   }
   case llvm::omp::OMPC_ompx_attribute:
     C = new (Context) OMPXAttributeClause();
@@ -12023,6 +12027,12 @@ void OMPClauseReader::VisitOMPThreadLimitClause(OMPThreadLimitClause *C) {
 void OMPClauseReader::VisitOMPPriorityClause(OMPPriorityClause *C) {
   VisitOMPClauseWithPreInit(C);
   C->setPriority(Record.readSubExpr());
+  C->setLParenLoc(Record.readSourceLocation());
+}
+
+void OMPClauseReader::VisitOMPTaskNameClause(OMPTaskNameClause *C) {
+  VisitOMPClauseWithPreInit(C);
+  C->setTaskName(Record.readSubExpr());
   C->setLParenLoc(Record.readSourceLocation());
 }
 

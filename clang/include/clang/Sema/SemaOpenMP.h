@@ -1289,6 +1289,11 @@ public:
   OMPClause *ActOnOpenMPPriorityClause(Expr *Priority, SourceLocation StartLoc,
                                        SourceLocation LParenLoc,
                                        SourceLocation EndLoc);
+
+  OMPClause *ActOnOpenMPTaskNameClause(Expr *TaskName, SourceLocation StartLoc,
+                                       SourceLocation LParenLoc,
+                                       SourceLocation EndLoc);
+
   /// Called on well-formed 'dist_schedule' clause.
   OMPClause *ActOnOpenMPDistScheduleClause(
       OpenMPDistScheduleClauseKind Kind, Expr *ChunkSize,

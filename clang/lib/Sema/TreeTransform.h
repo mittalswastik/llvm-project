@@ -2125,6 +2125,17 @@ public:
                                                         LParenLoc, EndLoc);
   }
 
+  /// Build a new OpenMP 'priority' clause.
+  ///
+  /// By default, performs semantic analysis to build the new statement.
+  /// Subclasses may override this routine to provide different behavior.
+  OMPClause *RebuildOMPTaskNameClause(Expr *TaskName, SourceLocation StartLoc,
+                                      SourceLocation LParenLoc,
+                                      SourceLocation EndLoc) {
+    return getSema().OpenMP().ActOnOpenMPTaskNameClause(TaskName, StartLoc,
+                                                        LParenLoc, EndLoc);
+  }
+
   /// Build a new OpenMP 'grainsize' clause.
   ///
   /// By default, performs semantic analysis to build the new statement.
@@ -11307,6 +11318,16 @@ TreeTransform<Derived>::TransformOMPPriorityClause(OMPPriorityClause *C) {
   if (E.isInvalid())
     return nullptr;
   return getDerived().RebuildOMPPriorityClause(
+      E.get(), C->getBeginLoc(), C->getLParenLoc(), C->getEndLoc());
+}
+
+template <typename Derived>
+OMPClause *
+TreeTransform<Derived>::TransformOMPTaskNameClause(OMPTaskNameClause *C) {
+  ExprResult E = getDerived().TransformExpr(C->getTaskName());
+  if (E.isInvalid())
+    return nullptr;
+  return getDerived().RebuildOMPTaskNameClause(
       E.get(), C->getBeginLoc(), C->getLParenLoc(), C->getEndLoc());
 }
 

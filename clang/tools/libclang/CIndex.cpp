@@ -2556,6 +2556,10 @@ void OMPClauseEnqueue::VisitOMPPriorityClause(const OMPPriorityClause *C) {
   Visitor->AddStmt(C->getPriority());
 }
 
+void OMPClauseEnqueue::VisitOMPTaskNameClause(const OMPTaskNameClause *C) {
+  Visitor->AddStmt(C->getTaskName());
+}
+
 void OMPClauseEnqueue::VisitOMPGrainsizeClause(const OMPGrainsizeClause *C) {
   Visitor->AddStmt(C->getGrainsize());
 }

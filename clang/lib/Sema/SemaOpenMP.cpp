@@ -15172,6 +15172,9 @@ OMPClause *SemaOpenMP::ActOnOpenMPSingleExprClause(OpenMPClauseKind Kind,
   case OMPC_priority:
     Res = ActOnOpenMPPriorityClause(Expr, StartLoc, LParenLoc, EndLoc);
     break;
+  case OMPC_taskname:
+    Res = ActOnOpenMPTaskNameClause(Expr, StartLoc, LParenLoc, EndLoc);
+    break;
   case OMPC_hint:
     Res = ActOnOpenMPHintClause(Expr, StartLoc, LParenLoc, EndLoc);
     break;
@@ -16370,6 +16373,7 @@ OMPClause *SemaOpenMP::ActOnOpenMPSingleExprWithArgClause(
   case OMPC_affinity:
   case OMPC_when:
   case OMPC_bind:
+  case OMPC_taskname:
   default:
     llvm_unreachable("Clause is not allowed.");
   }
@@ -22196,6 +22200,19 @@ OMPClause *SemaOpenMP::ActOnOpenMPPriorityClause(Expr *Priority,
 
   return new (getASTContext()) OMPPriorityClause(
       ValExpr, HelperValStmt, CaptureRegion, StartLoc, LParenLoc, EndLoc);
+}
+
+OMPClause *SemaOpenMP::ActOnOpenMPTaskNameClause(Expr *TaskName,
+                                           SourceLocation StartLoc,
+                                           SourceLocation LParenLoc,
+                                           SourceLocation EndLoc) {
+
+  Expr *ValExpr = TaskName;
+  Stmt *HelperValStmt = nullptr;
+  OpenMPDirectiveKind CaptureRegion = OMPD_unknown;
+                          
+  return new (getASTContext())
+      OMPTaskNameClause(ValExpr, StartLoc, LParenLoc, EndLoc);
 }
 
 OMPClause *SemaOpenMP::ActOnOpenMPGrainsizeClause(

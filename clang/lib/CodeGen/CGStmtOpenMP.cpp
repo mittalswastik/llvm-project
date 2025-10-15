@@ -4792,6 +4792,17 @@ void CodeGenFunction::EmitOMPTaskBasedDirective(
         getContext().getIntTypeForBitwidth(/*DestWidth=*/32, /*Signed=*/1),
         Prio->getExprLoc()));
   }
+
+  /**Swastik - taskname clause */
+  if (const auto *Clause = S.getSingleClause<OMPTaskNameClause>()) {
+    const Expr *Name = Clause->getTaskName();
+    Data.TaskName.setInt(/*IntVal=*/true);
+    Data.TaskName.setPointer(EmitScalarConversion(
+        EmitScalarExpr(Name), Name->getType(),
+        getContext().getIntTypeForBitwidth(/*DestWidth=*/32, /*Signed=*/1),
+        Name->getExprLoc()));
+  }
+
   // The first function argument for tasks is a thread id, the second one is a
   // part id (0 for tied tasks, >=0 for untied task).
   llvm::DenseSet<const VarDecl *> EmittedAsPrivate;

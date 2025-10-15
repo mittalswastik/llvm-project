@@ -386,6 +386,12 @@ def OMPC_Priority : Clause<"priority"> {
   let clangClass = "OMPPriorityClause";
   let flangClass = "ScalarIntExpr";
 }
+
+def OMPC_TaskName : Clause<"taskname"> {
+  let clangClass = "OMPTaskNameClause";
+  let flangClass = "ScalarIntConstantExpr";
+}
+
 def OMPC_Private : Clause<"private"> {
   let clangClass = "OMPPrivateClause";
   let flangClass = "OmpObjectList";
@@ -1111,6 +1117,7 @@ def OMP_Task : Directive<"task"> {
     VersionedClause<OMPC_Final>,
     VersionedClause<OMPC_If>,
     VersionedClause<OMPC_Priority>,
+    VersionedClause<OMPC_TaskName>,
   ];
   let association = AS_Block;
   let category = CA_Executable;

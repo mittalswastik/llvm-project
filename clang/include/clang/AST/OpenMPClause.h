@@ -6816,6 +6816,73 @@ public:
   }
 };
 
+/**swastik */
+class OMPTaskNameClause
+: public OMPClause, public OMPClauseWithPreInit {
+  // public OMPVarListClause<OMPCollapseClause> {
+  friend class OMPClauseReader;
+
+  /// Location of '('.
+  SourceLocation LParenLoc;
+
+  /// Number of for-loops.
+  Stmt *TaskName = nullptr;
+
+  /// Set the number of associated for-loops.
+  void setTaskName(Expr *Num) { TaskName = Num; }
+
+  // void setConstRefs(Expr x) {
+  //   std::copy(VL.begin(), VL.end(),
+  //             static_cast<T *>(this)->template getTrailingObjects<Expr>());
+  // }
+
+public:
+  /// Build 'collapse' clause.
+  ///
+  /// \param Num Expression associated with this clause.
+  /// \param StartLoc Starting location of the clause.
+  /// \param LParenLoc Location of '('.
+  /// \param EndLoc Ending location of the clause.
+  OMPTaskNameClause(Expr *TaskName, SourceLocation StartLoc,
+                    SourceLocation LParenLoc, SourceLocation EndLoc)
+      : OMPClause(llvm::omp::OMPC_taskname, StartLoc, EndLoc),
+        OMPClauseWithPreInit(this), LParenLoc(LParenLoc), TaskName(TaskName) {}
+
+  /// Build an empty clause.
+  OMPTaskNameClause()
+      : OMPClause(llvm::omp::OMPC_taskname, SourceLocation(), SourceLocation()), 
+      OMPClauseWithPreInit(this) {}
+
+  /// Sets the location of '('.
+  void setLParenLoc(SourceLocation Loc) { LParenLoc = Loc; }
+
+  /// Returns the location of '('.
+  SourceLocation getLParenLoc() const { return LParenLoc; }
+
+  /// Return TaskName number.
+  Expr *getTaskName() { return cast<Expr>(TaskName); }
+
+  /// Return TaskName number.
+  Expr *getTaskName() const { return cast<Expr>(TaskName); }
+
+  child_range children() { return child_range(&TaskName, &TaskName + 1); }
+
+  const_child_range children() const {
+    return const_child_range(&TaskName, &TaskName + 1);
+  }
+
+  child_range used_children() {
+    return child_range(child_iterator(), child_iterator());
+  }
+  const_child_range used_children() const {
+    return const_child_range(const_child_iterator(), const_child_iterator());
+  }
+
+  static bool classof(const OMPClause *T) {
+    return T->getClauseKind() == llvm::omp::OMPC_taskname;
+  }
+};
+
 /// This represents 'grainsize' clause in the '#pragma omp ...'
 /// directive.
 ///

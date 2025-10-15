@@ -112,6 +112,8 @@ void* rt_handler(void* args){
   struct timespec phaseDelay, periodDelay, nextWake, tm0;
   int i = 0;
   int ret;
+  //__kmp_printf("------------------- executing handler------------------------\n");
+  printf("checking it out\n");
 
   if((task_args->task)->is_edf){ // dynamic EDF
     struct sched_attr rt_attr;
@@ -1884,6 +1886,9 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
   kmp_taskdata_t *taskdata = KMP_TASK_TO_TASKDATA(task);
   kmp_info_t *thread;
   int discard = 0 /* false */;
+  
+  __kmp_printf("+++++++checking for call to kmp_nvoke_task and taskname %d +++++++++++++++", task->data3.task_id);
+
   KA_TRACE(
       30, ("__kmp_invoke_task(enter): T#%d invoking task %p, current_task=%p\n",
            gtid, taskdata, current_task));
@@ -2041,7 +2046,7 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
       } else
 #endif /* KMP_GOMP_COMPAT */
       {
-      #ifdef KMP_TSK_RT
+      //#ifdef KMP_TSK_RT
       //brayden
       // setup a shared launch time for all real-time threads
       set_global_start(1); // wait for 1 second
@@ -2053,7 +2058,7 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
       struct rt_args *task_args = (struct rt_args *)malloc(sizeof(struct rt_args));
       task_args->gtid = gtid;
       task_args->task = task;
-      task_args->task_routine = (task->routine);
+      task_args->task_routine = *(task->routine);
       //check each pthread call
       ret = pthread_attr_init(&attr);
       if(ret != 0){__kmp_printf("\nERROR in attr_init: %d\n", ret);}
@@ -2075,13 +2080,14 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
       ret = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED);
       if(ret != 0){__kmp_printf("\nERROR in pthread_attr_setinheritsched(): %d\n", ret);}
 
-      //(*(task->routine))(gtid, task); NOT REALTIME, FIXME!!!
+      //(*(task->routine))(gtid, task); //NOT REALTIME, FIXME!!!
       ret = pthread_create(&thread, &attr, rt_handler, task_args);
+      __kmp_printf("---------------------- checking --------------------\n");
       // calls ((void* (*)(void *))(*(task->routine)))
       if(ret != 0){__kmp_printf("\nPTHREAD_CREATE FAILED: %d\n",ret);}
       //brayden
       //(*(task->routine))(gtid, task);
-     #endif
+     //#endif
       }
     }
     KMP_POP_PARTITIONED_TIMER();

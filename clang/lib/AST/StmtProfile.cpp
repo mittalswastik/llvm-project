@@ -881,6 +881,11 @@ void OMPClauseProfiler::VisitOMPPriorityClause(const OMPPriorityClause *C) {
   if (C->getPriority())
     Profiler->VisitStmt(C->getPriority());
 }
+void OMPClauseProfiler::VisitOMPTaskNameClause(const OMPTaskNameClause *C) {
+  VistOMPClauseWithPreInit(C);
+  if (C->getTaskName())
+    Profiler->VisitStmt(C->getTaskName());
+}
 void OMPClauseProfiler::VisitOMPGrainsizeClause(const OMPGrainsizeClause *C) {
   VistOMPClauseWithPreInit(C);
   if (C->getGrainsize())

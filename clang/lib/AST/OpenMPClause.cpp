@@ -96,6 +96,8 @@ const OMPClauseWithPreInit *OMPClauseWithPreInit::get(const OMPClause *C) {
     return static_cast<const OMPFinalClause *>(C);
   case OMPC_priority:
     return static_cast<const OMPPriorityClause *>(C);
+  case OMPC_taskname:
+    return static_cast<const OMPTaskNameClause *>(C);
   case OMPC_novariants:
     return static_cast<const OMPNovariantsClause *>(C);
   case OMPC_nocontext:
@@ -241,6 +243,7 @@ const OMPClauseWithPostUpdate *OMPClauseWithPostUpdate::get(const OMPClause *C) 
   case OMPC_num_teams:
   case OMPC_thread_limit:
   case OMPC_priority:
+  case OMPC_taskname:
   case OMPC_grainsize:
   case OMPC_nogroup:
   case OMPC_num_tasks:
@@ -2135,6 +2138,12 @@ void OMPClausePrinter::VisitOMPThreadLimitClause(OMPThreadLimitClause *Node) {
 void OMPClausePrinter::VisitOMPPriorityClause(OMPPriorityClause *Node) {
   OS << "priority(";
   Node->getPriority()->printPretty(OS, nullptr, Policy, 0);
+  OS << ")";
+}
+
+void OMPClausePrinter::VisitOMPTaskNameClause(OMPTaskNameClause *Node) {
+  OS << "taskname(";
+  Node->getTaskName()->printPretty(OS, nullptr, Policy, 0);
   OS << ")";
 }
 
