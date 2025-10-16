@@ -1887,7 +1887,7 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
   kmp_info_t *thread;
   int discard = 0 /* false */;
   
-  __kmp_printf("+++++++checking for call to kmp_nvoke_task and taskname %d +++++++++++++++", task->data3.task_id);
+  __kmp_printf("+++++++checking for call to kmp_nvoke_task and taskname\n");// %d +++++++++++++++", task->data2.task_id);
 
   KA_TRACE(
       30, ("__kmp_invoke_task(enter): T#%d invoking task %p, current_task=%p\n",
@@ -2079,7 +2079,7 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
 
       ret = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED);
       if(ret != 0){__kmp_printf("\nERROR in pthread_attr_setinheritsched(): %d\n", ret);}
-
+      //task_id : mapp[task_id] <- phase, period and wcet for that task
       //(*(task->routine))(gtid, task); //NOT REALTIME, FIXME!!!
       ret = pthread_create(&thread, &attr, rt_handler, task_args);
       __kmp_printf("---------------------- checking --------------------\n");

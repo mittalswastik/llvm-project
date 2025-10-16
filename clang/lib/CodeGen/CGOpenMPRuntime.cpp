@@ -3706,7 +3706,7 @@ CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
     DestructorsFlag = 0x8,
     PriorityFlag = 0x20,
     DetachableFlag = 0x40,
-    TaskNameFlag = 0x80, // swastik
+    //TaskNameFlag = 0x80, // swastik
   };
   unsigned Flags = Data.Tied ? TiedFlag : 0;
   bool NeedsCleanup = false;
@@ -3718,8 +3718,8 @@ CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
   }
   if (Data.Priority.getInt())
     Flags = Flags | PriorityFlag;
-  if (Data.TaskName.getInt())
-    Flags |= TaskNameFlag;
+  // if (Data.TaskName.getInt())
+  //   Flags |= TaskNameFlag;
   if (D.hasClausesOfKind<OMPDetachClause>())
     Flags = Flags | DetachableFlag;
   llvm::Value *TaskFlags =
@@ -3974,6 +3974,17 @@ CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
         Data2LV, *std::next(KmpCmplrdataUD->field_begin(), Priority));
     CGF.EmitStoreOfScalar(Data.Priority.getPointer(), PriorityLV);
   }
+
+  // store taskname (integer example) into tt->data2.taskname
+  // if (Data.TaskName.getInt()) {
+  //   LValue Data3LV = CGF.EmitLValueForField(
+  //       TDBase, *std::next(KmpTaskTQTyRD->field_begin(), Data2));
+  //   // Reuse KmpCmplrdataUD (same union decl as above)
+  //   enum { TaskName = 2 /* index within the union fields: priority=0, destructors=1, taskname=2 */ };
+  //   LValue TaskNameLV = CGF.EmitLValueForField(
+  //       Data3LV, *std::next(KmpCmplrdataUD->field_begin(), TaskName));
+  //   CGF.EmitStoreOfScalar(Data.TaskName.getPointer(), TaskNameLV);
+  // }
   Result.NewTask = NewTask;
   Result.TaskEntry = TaskEntry;
   Result.NewTaskNewTaskTTy = NewTaskNewTaskTTy;
