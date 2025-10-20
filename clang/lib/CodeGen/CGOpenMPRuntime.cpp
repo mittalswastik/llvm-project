@@ -3721,8 +3721,8 @@ CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
   }
   if (Data.Priority.getInt())
     Flags = Flags | PriorityFlag;
-  if (Data.TaskName.getInt())
-    Flags |= TaskNameFlag;
+  // if (Data.TaskName.getInt())
+  //   Flags |= TaskNameFlag;
   if (D.hasClausesOfKind<OMPDetachClause>())
     Flags = Flags | DetachableFlag;
   llvm::Value *TaskFlags =

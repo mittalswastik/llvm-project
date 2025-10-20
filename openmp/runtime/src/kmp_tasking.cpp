@@ -1814,6 +1814,7 @@ kmp_task_t *__kmpc_omp_task_alloc(ident_t *loc_ref, kmp_int32 gtid,
                                   kmp_int32 flags, size_t sizeof_kmp_task_t,
                                   size_t sizeof_shareds,
                                   kmp_routine_entry_t task_entry) {
+  __kmp_printf("Invoking kmpc_omp_task_alloc\n");
   kmp_task_t *retval;
   kmp_tasking_flags_t *input_flags = (kmp_tasking_flags_t *)&flags;
   __kmp_assert_valid_gtid(gtid);
@@ -2202,6 +2203,8 @@ kmp_int32 __kmpc_omp_task_parts(ident_t *loc_ref, kmp_int32 gtid,
 kmp_int32 __kmp_omp_task(kmp_int32 gtid, kmp_task_t *new_task,
                          bool serialize_immediate) {
   kmp_taskdata_t *new_taskdata = KMP_TASK_TO_TASKDATA(new_task);
+
+  __kmp_printf("------------------------ calling kmp omp task -----------------------------------\n");
 
 #if OMPX_TASKGRAPH
   if (new_taskdata->is_taskgraph &&
