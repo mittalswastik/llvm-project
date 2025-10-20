@@ -85,88 +85,88 @@ void set_global_start(int seconds) {
   }
 }
 
-void kmp_dep_in(kmp_task_t *task){
-  //return;
-  int i;
-  //__kmp_acquire_bootstrap_lock(&kmp_dep_lock);
-  for (i = 0; i < task->ndeps; i++) {
+// void kmp_dep_in(kmp_task_t *task){
+//   //return;
+//   int i;
+//   //__kmp_acquire_bootstrap_lock(&kmp_dep_lock);
+//   for (i = 0; i < task->ndeps; i++) {
     
-  }
-  //__kmp_release_bootstrap_lock(&kmp_dep_lock);
-}
+//   }
+//   //__kmp_release_bootstrap_lock(&kmp_dep_lock);
+// }
 
-void kmp_dep_out(kmp_task_t *task){
-  //return;
-  int i;
-  //__kmp_acquire_bootstrap_lock(&kmp_dep_lock);
-  for (i = 0; i < task->ndeps; i++) {
+// void kmp_dep_out(kmp_task_t *task){
+//   //return;
+//   int i;
+//   //__kmp_acquire_bootstrap_lock(&kmp_dep_lock);
+//   for (i = 0; i < task->ndeps; i++) {
     
-  }
-  //__kmp_release_bootstrap_lock(&kmp_dep_lock);
+//   }
+//   //__kmp_release_bootstrap_lock(&kmp_dep_lock);
 
-}
+// }
 
-void* rt_handler(void* args){
-  struct rt_args *task_args = (struct rt_args*)args;
-  int period = (task_args->task)->period;
-  struct timespec phaseDelay, periodDelay, nextWake, tm0;
-  int i = 0;
-  int ret;
-  //__kmp_printf("------------------- executing handler------------------------\n");
-  printf("checking it out\n");
+// void* rt_handler(void* args){
+//   struct rt_args *task_args = (struct rt_args*)args;
+//   int period = (task_args->task)->period;
+//   struct timespec phaseDelay, periodDelay, nextWake, tm0;
+//   int i = 0;
+//   int ret;
+//   //__kmp_printf("------------------- executing handler------------------------\n");
+//   printf("checking it out\n");
 
-  if((task_args->task)->is_edf){ // dynamic EDF
-    struct sched_attr rt_attr;
-    rt_attr.size = sizeof(rt_attr);
-    rt_attr.sched_flags = SCHED_FLAG_RECLAIM;
-    rt_attr.sched_nice = 0;
-    rt_attr.sched_priority = 0;
-    rt_attr.sched_policy = SCHED_DEADLINE;
-    // FRANK: NEED WCET() pragma
-    rt_attr.sched_runtime = 10 * 1000000; // (task_args->task)->wcet;
-    rt_attr.sched_period = (task_args->task)->period * 1000000UL;
-    rt_attr.sched_deadline = rt_attr.sched_period;
-    ret = sched_setattr(0, &rt_attr, 0);
-    if(ret != 0) { // we are NOT running as EDF, quit! O/w would silently continue
-      // __kmp_printf() does not work in this handler, nor does perror -> SEGV!!
-      printf("\nERROR (not running as SCHED_DEADLINE) in sched_setattr(): %d errno %d\n", ret, errno);
-      //perror("sched_setattr");
-      exit(EXIT_FAILURE);
-    }
-    printf("DEADLINE task priority3 policy: %d period: %d wcet: %d\n", SCHED_DEADLINE, rt_attr.sched_period, rt_attr.sched_runtime);
-    struct sched_attr check_attr;
-    check_attr.size = sizeof(struct sched_attr);
-    sched_getattr(0, &check_attr, check_attr.size, 0);
-    printf("sched_getattr() returns %d %d %d\n", rt_attr.sched_policy, check_attr.sched_policy, SCHED_DEADLINE);
-  }
-  else // FIFO
-    printf("FIFO task priority3 period: %d\n", period);
+//   if((task_args->task)->is_edf){ // dynamic EDF
+//     struct sched_attr rt_attr;
+//     rt_attr.size = sizeof(rt_attr);
+//     rt_attr.sched_flags = SCHED_FLAG_RECLAIM;
+//     rt_attr.sched_nice = 0;
+//     rt_attr.sched_priority = 0;
+//     rt_attr.sched_policy = SCHED_DEADLINE;
+//     // FRANK: NEED WCET() pragma
+//     rt_attr.sched_runtime = 10 * 1000000; // (task_args->task)->wcet;
+//     rt_attr.sched_period = (task_args->task)->period * 1000000UL;
+//     rt_attr.sched_deadline = rt_attr.sched_period;
+//     ret = sched_setattr(0, &rt_attr, 0);
+//     if(ret != 0) { // we are NOT running as EDF, quit! O/w would silently continue
+//       // __kmp_printf() does not work in this handler, nor does perror -> SEGV!!
+//       printf("\nERROR (not running as SCHED_DEADLINE) in sched_setattr(): %d errno %d\n", ret, errno);
+//       //perror("sched_setattr");
+//       exit(EXIT_FAILURE);
+//     }
+//     printf("DEADLINE task priority3 policy: %d period: %d wcet: %d\n", SCHED_DEADLINE, rt_attr.sched_period, rt_attr.sched_runtime);
+//     struct sched_attr check_attr;
+//     check_attr.size = sizeof(struct sched_attr);
+//     sched_getattr(0, &check_attr, check_attr.size, 0);
+//     printf("sched_getattr() returns %d %d %d\n", rt_attr.sched_policy, check_attr.sched_policy, SCHED_DEADLINE);
+//   }
+//   else // FIFO
+//     printf("FIFO task priority3 period: %d\n", period);
 
-  nextWake = global_start_time;
-  clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
+//   nextWake = global_start_time;
+//   clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
 
-  if ((task_args->task)->phase) {
-    phaseDelay.tv_sec  = (time_t)0;
-    phaseDelay.tv_nsec = (task_args->task)->phase * 1000000UL;
-    clock_gettime(CLOCK_MONOTONIC, &tm0);
-    nextWake = tm0;
-    TIMESPEC_ADD(nextWake, periodDelay);
-    clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
-  }
+//   if ((task_args->task)->phase) {
+//     phaseDelay.tv_sec  = (time_t)0;
+//     phaseDelay.tv_nsec = (task_args->task)->phase * 1000000UL;
+//     clock_gettime(CLOCK_MONOTONIC, &tm0);
+//     nextWake = tm0;
+//     TIMESPEC_ADD(nextWake, periodDelay);
+//     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
+//   }
 
-  periodDelay.tv_sec  = (time_t)0;
-  periodDelay.tv_nsec = period * 1000000UL;
-  clock_gettime(CLOCK_MONOTONIC, &tm0);
-  nextWake = tm0;
-  while(1){
-    TIMESPEC_ADD(nextWake, periodDelay);
-    clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
-    kmp_dep_in(task_args->task);
-    (task_args->task_routine)(task_args->gtid, task_args->task);
-    kmp_dep_out(task_args->task);
-    //i--;
-  }
-}
+//   periodDelay.tv_sec  = (time_t)0;
+//   periodDelay.tv_nsec = period * 1000000UL;
+//   clock_gettime(CLOCK_MONOTONIC, &tm0);
+//   nextWake = tm0;
+//   while(1){
+//     TIMESPEC_ADD(nextWake, periodDelay);
+//     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
+//     kmp_dep_in(task_args->task);
+//     (task_args->task_routine)(task_args->gtid, task_args->task);
+//     kmp_dep_out(task_args->task);
+//     //i--;
+//   }
+// }
 
 
 
@@ -1887,7 +1887,7 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
   kmp_info_t *thread;
   int discard = 0 /* false */;
   
-  __kmp_printf("+++++++checking for call to kmp_nvoke_task and taskname\n");// %d +++++++++++++++", task->data2.task_id);
+  __kmp_printf("+++++++checking for call to kmp_nvoke_task and taskname %d +++++++++++++++\n", task->data3.taskname);
 
   KA_TRACE(
       30, ("__kmp_invoke_task(enter): T#%d invoking task %p, current_task=%p\n",
@@ -2041,52 +2041,52 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
     if (task->routine != NULL) {
 #ifdef KMP_GOMP_COMPAT
       if (taskdata->td_flags.native) {
-        __kmp_printf("-------------------------------calling task routine ----------------------------------\n");
         ((void (*)(void *))(*(task->routine)))(task->shareds);
       } else
 #endif /* KMP_GOMP_COMPAT */
       {
-      //#ifdef KMP_TSK_RT
-      //brayden
-      // setup a shared launch time for all real-time threads
-      set_global_start(1); // wait for 1 second
+  //     //#ifdef KMP_TSK_RT
+  //     //brayden
+  //     // setup a shared launch time for all real-time threads
+  //     set_global_start(1); // wait for 1 second
       
-      struct sched_param param;
-      pthread_attr_t attr;
-      pthread_t thread;
-      int ret;
-      struct rt_args *task_args = (struct rt_args *)malloc(sizeof(struct rt_args));
-      task_args->gtid = gtid;
-      task_args->task = task;
-      task_args->task_routine = *(task->routine);
-      //check each pthread call
-      ret = pthread_attr_init(&attr);
-      if(ret != 0){__kmp_printf("\nERROR in attr_init: %d\n", ret);}
-      ret = pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN);
-      if(ret != 0){__kmp_printf("\nERROR in setstacksize: %d\n", ret);}
-      if(!((task_args->task)->is_edf)){ // static FIFO
-        ret = pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
-        if(ret != 0){__kmp_printf("\nERROR in setschedpolicy: %d\n", ret);}
-        param.sched_priority = 10;
-        // = (task_args->task)->rt_priority;
-        ret = pthread_attr_setschedparam(&attr, &param);
-        if(ret != 0){__kmp_printf("\nERROR in setschedparam: %d\n", ret);}
-	__kmp_printf("FIFO task priority: %d\n", param.sched_priority);
-      }
-      else {// EDF
-        __kmp_printf("FIFO task priority2: %d\n", (task_args->task)->rt_priority);
-      }
+  //     struct sched_param param;
+  //     pthread_attr_t attr;
+  //     pthread_t thread;
+  //     int ret;
+  //     struct rt_args *task_args = (struct rt_args *)malloc(sizeof(struct rt_args));
+  //     task_args->gtid = gtid;
+  //     task_args->task = task;
+  //     task_args->task_routine = *(task->routine);
+  //     //check each pthread call
+  //     ret = pthread_attr_init(&attr);
+  //     if(ret != 0){__kmp_printf("\nERROR in attr_init: %d\n", ret);}
+  //     ret = pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN);
+  //     if(ret != 0){__kmp_printf("\nERROR in setstacksize: %d\n", ret);}
+  //     if(!((task_args->task)->is_edf)){ // static FIFO
+  //       ret = pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
+  //       if(ret != 0){__kmp_printf("\nERROR in setschedpolicy: %d\n", ret);}
+  //       param.sched_priority = 10;
+  //       // = (task_args->task)->rt_priority;
+  //       ret = pthread_attr_setschedparam(&attr, &param);
+  //       if(ret != 0){__kmp_printf("\nERROR in setschedparam: %d\n", ret);}
+	// __kmp_printf("FIFO task priority: %d\n", param.sched_priority);
+  //     }
+  //     else {// EDF
+  //       __kmp_printf("FIFO task priority2: %d\n", (task_args->task)->rt_priority);
+  //     }
 
-      ret = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED);
-      if(ret != 0){__kmp_printf("\nERROR in pthread_attr_setinheritsched(): %d\n", ret);}
-      //task_id : mapp[task_id] <- phase, period and wcet for that task
-      //(*(task->routine))(gtid, task); //NOT REALTIME, FIXME!!!
-      ret = pthread_create(&thread, &attr, rt_handler, task_args);
-      __kmp_printf("---------------------- checking --------------------\n");
-      // calls ((void* (*)(void *))(*(task->routine)))
-      if(ret != 0){__kmp_printf("\nPTHREAD_CREATE FAILED: %d\n",ret);}
-      //brayden
-      //(*(task->routine))(gtid, task);
+  //     ret = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED);
+  //     if(ret != 0){__kmp_printf("\nERROR in pthread_attr_setinheritsched(): %d\n", ret);}
+  //     //task_id : mapp[task_id] <- phase, period and wcet for that task
+  //     //(*(task->routine))(gtid, task); //NOT REALTIME, FIXME!!!
+  //     ret = pthread_create(&thread, &attr, rt_handler, task_args);
+  //     __kmp_printf("---------------------- checking --------------------\n");
+  //     // calls ((void* (*)(void *))(*(task->routine)))
+  //     if(ret != 0){__kmp_printf("\nPTHREAD_CREATE FAILED: %d\n",ret);}
+  //     //brayden
+      __kmp_printf("-------------------------------calling task routine ----------------------------------\n");
+      (*(task->routine))(gtid, task);
      //#endif
       }
     }

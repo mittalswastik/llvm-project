@@ -2909,6 +2909,7 @@ createKmpTaskTRecordDecl(CodeGenModule &CGM, OpenMPDirectiveKind Kind,
   //         kmp_int32           part_id;
   //         kmp_cmplrdata_t data1;
   //         kmp_cmplrdata_t data2;
+  //         kmp_cmplrdata_t data3;
   // For taskloops additional fields:
   //         kmp_uint64          lb;
   //         kmp_uint64          ub;
@@ -2920,6 +2921,7 @@ createKmpTaskTRecordDecl(CodeGenModule &CGM, OpenMPDirectiveKind Kind,
   UD->startDefinition();
   addFieldToRecordDecl(C, UD, KmpInt32Ty);
   addFieldToRecordDecl(C, UD, KmpRoutineEntryPointerQTy);
+  addFieldToRecordDecl(C, UD, KmpInt32Ty); //swastik: taskname
   UD->completeDefinition();
   QualType KmpCmplrdataTy = C.getRecordType(UD);
   RecordDecl *RD = C.buildImplicitRecord("kmp_task_t");
@@ -2929,6 +2931,7 @@ createKmpTaskTRecordDecl(CodeGenModule &CGM, OpenMPDirectiveKind Kind,
   addFieldToRecordDecl(C, RD, KmpInt32Ty);
   addFieldToRecordDecl(C, RD, KmpCmplrdataTy);
   addFieldToRecordDecl(C, RD, KmpCmplrdataTy);
+  addFieldToRecordDecl(C, RD, KmpCmplrdataTy); //Swastik: TaskName -> data3
   if (isOpenMPTaskLoopDirective(Kind)) {
     QualType KmpUInt64Ty =
         CGM.getContext().getIntTypeForBitwidth(/*DestWidth=*/64, /*Signed=*/0);
@@ -3706,7 +3709,7 @@ CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
     DestructorsFlag = 0x8,
     PriorityFlag = 0x20,
     DetachableFlag = 0x40,
-    //TaskNameFlag = 0x80, // swastik
+    TaskNameFlag = 0x80, // swastik
   };
   unsigned Flags = Data.Tied ? TiedFlag : 0;
   bool NeedsCleanup = false;
@@ -3718,8 +3721,8 @@ CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
   }
   if (Data.Priority.getInt())
     Flags = Flags | PriorityFlag;
-  // if (Data.TaskName.getInt())
-  //   Flags |= TaskNameFlag;
+  if (Data.TaskName.getInt())
+    Flags |= TaskNameFlag;
   if (D.hasClausesOfKind<OMPDetachClause>())
     Flags = Flags | DetachableFlag;
   llvm::Value *TaskFlags =
@@ -3950,7 +3953,7 @@ CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
     }
   }
   // Fields of union "kmp_cmplrdata_t" for destructors and priority.
-  enum { Priority = 0, Destructors = 1 };
+  enum { Priority = 0, Destructors = 1, TaskName = 2 };
   // Provide pointer to function with destructors for privates.
   auto FI = std::next(KmpTaskTQTyRD->field_begin(), Data1);
   const RecordDecl *KmpCmplrdataUD =
@@ -3966,6 +3969,7 @@ CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
                               DestructorFn, KmpRoutineEntryPtrTy),
                           DestructorsLV);
   }
+
   // Set priority.
   if (Data.Priority.getInt()) {
     LValue Data2LV = CGF.EmitLValueForField(
@@ -3975,16 +3979,19 @@ CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
     CGF.EmitStoreOfScalar(Data.Priority.getPointer(), PriorityLV);
   }
 
-  // store taskname (integer example) into tt->data2.taskname
-  // if (Data.TaskName.getInt()) {
-  //   LValue Data3LV = CGF.EmitLValueForField(
-  //       TDBase, *std::next(KmpTaskTQTyRD->field_begin(), Data2));
-  //   // Reuse KmpCmplrdataUD (same union decl as above)
-  //   enum { TaskName = 2 /* index within the union fields: priority=0, destructors=1, taskname=2 */ };
-  //   LValue TaskNameLV = CGF.EmitLValueForField(
-  //       Data3LV, *std::next(KmpCmplrdataUD->field_begin(), TaskName));
-  //   CGF.EmitStoreOfScalar(Data.TaskName.getPointer(), TaskNameLV);
-  // }
+  auto FI_t = std::next(KmpTaskTQTyRD->field_begin(), Data3);
+  const RecordDecl *KmpCmplrdataUD_t = (*FI_t)->getType()->getAsUnionType()->getDecl();
+
+
+  //store taskname (integer example) into tt->data2.taskname
+  if (Data.TaskName.getInt()) {
+    LValue Data3LV = CGF.EmitLValueForField(
+        TDBase, *std::next(KmpTaskTQTyRD->field_begin(), Data3));
+   // enum { TaskName = 2 /* index within the union fields: priority=0, destructors=1, taskname=2 */ };
+    LValue TaskNameLV = CGF.EmitLValueForField(
+        Data3LV, *std::next(KmpCmplrdataUD_t->field_begin(), TaskName));
+    CGF.EmitStoreOfScalar(Data.TaskName.getPointer(), TaskNameLV);
+  }
   Result.NewTask = NewTask;
   Result.TaskEntry = TaskEntry;
   Result.NewTaskNewTaskTTy = NewTaskNewTaskTTy;

@@ -2464,7 +2464,7 @@ typedef union kmp_cmplrdata {
       destructors; /* pointer to function to invoke deconstructors of
                       firstprivate C++ objects */
   /* future data */
-  //kmp_int32 task_id;
+  kmp_int32 taskname;
 } kmp_cmplrdata_t;
 
 typedef struct kmp_rtdata {
@@ -2488,17 +2488,17 @@ typedef struct kmp_task { /* GEH: Shouldn't this be aligned somehow? */
   kmp_cmplrdata_t
       data1; /* Two known optional additions: destructors and priority */
   kmp_cmplrdata_t data2; /* Process destructors first, priority second */
-  // kmp_cmplrdata_t data3; /**task id*/
+  kmp_cmplrdata_t data3;
   /* future data */
   //kmp_int32 wcet2;
   //kmp_int32 task_id;
-  kmp_int32 period;
-  kmp_int32 rt_priority;
-  kmp_int32 deadline;
-  kmp_int32 phase;
-  kmp_int32 ndeps;
-  kmp_int32 is_edf;
-  kmp_int32 wcet;
+  // kmp_int32 period;
+  // kmp_int32 rt_priority;
+  // kmp_int32 deadline;
+  // kmp_int32 phase;
+  // kmp_int32 ndeps;
+  // kmp_int32 is_edf;
+  // kmp_int32 wcet;
   /*  private vars  */
 } kmp_task_t;
 
