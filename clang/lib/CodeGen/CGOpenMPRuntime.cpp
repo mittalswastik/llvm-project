@@ -37,6 +37,13 @@
 #include "llvm/IR/Value.h"
 #include "llvm/Support/AtomicOrdering.h"
 #include "llvm/Support/raw_ostream.h"
+
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/Support/MemoryBuffer.h"
+#include "llvm/Support/Path.h"
+#include "llvm/Support/JSON.h"
+
+
 #include <cassert>
 #include <cstdint>
 #include <numeric>
@@ -2761,6 +2768,12 @@ enum KmpTaskTFields {
   Data2,
   /// Task Name
   Data3,
+  /// Task priority
+  Data4,
+  /// Task Period
+  Data5,
+  /// Task Phase
+  Data6,
   /// (Taskloops only) Lower bound.
   KmpTaskTLowerBound,
   /// (Taskloops only) Upper bound.
@@ -2921,7 +2934,11 @@ createKmpTaskTRecordDecl(CodeGenModule &CGM, OpenMPDirectiveKind Kind,
   UD->startDefinition();
   addFieldToRecordDecl(C, UD, KmpInt32Ty);
   addFieldToRecordDecl(C, UD, KmpRoutineEntryPointerQTy);
+  /**rt_task details in kmp_cmplrdata_t*/
   addFieldToRecordDecl(C, UD, KmpInt32Ty); //swastik: taskname
+  addFieldToRecordDecl(C, UD, KmpInt32Ty); 
+  addFieldToRecordDecl(C, UD, KmpInt32Ty); 
+  addFieldToRecordDecl(C, UD, KmpInt32Ty); 
   UD->completeDefinition();
   QualType KmpCmplrdataTy = C.getRecordType(UD);
   RecordDecl *RD = C.buildImplicitRecord("kmp_task_t");
@@ -2931,7 +2948,11 @@ createKmpTaskTRecordDecl(CodeGenModule &CGM, OpenMPDirectiveKind Kind,
   addFieldToRecordDecl(C, RD, KmpInt32Ty);
   addFieldToRecordDecl(C, RD, KmpCmplrdataTy);
   addFieldToRecordDecl(C, RD, KmpCmplrdataTy);
+  /**swastik: rt_task details in kmp-task */
   addFieldToRecordDecl(C, RD, KmpCmplrdataTy); //Swastik: TaskName -> data3
+  addFieldToRecordDecl(C, RD, KmpCmplrdataTy);
+  addFieldToRecordDecl(C, RD, KmpCmplrdataTy);
+  addFieldToRecordDecl(C, RD, KmpCmplrdataTy);
   if (isOpenMPTaskLoopDirective(Kind)) {
     QualType KmpUInt64Ty =
         CGM.getContext().getIntTypeForBitwidth(/*DestWidth=*/64, /*Signed=*/0);
@@ -3595,6 +3616,73 @@ static void getKmpAffinityType(ASTContext &C, QualType &KmpTaskAffinityInfoTy) {
   }
 }
 
+/**
+ * 
+ * Swastik: Read config file
+ */
+
+struct TaskCfg { int Priority = 0; int Period = 0; };
+
+static std::once_flag CfgOnce;
+static llvm::DenseMap<unsigned, TaskCfg> Cfg;  // taskid -> {priority, period}
+
+static void loadConfigOnce() {
+  const char *Env = std::getenv("OMP_TASK_CONFIG");
+  std::string Path = Env ? Env : "config.txt";
+
+  auto MB = llvm::MemoryBuffer::getFile(Path);
+  if (!MB) return; // no file -> leave map empty (defaults remain 0)
+
+  llvm::Expected<llvm::json::Value> J = llvm::json::parse(MB.get()->getBuffer());
+  if (!J) {
+    llvm::errs() << "OpenMP task config: JSON parse error in '" << Path
+                 << "': " << llvm::toString(J.takeError()) << "\n";
+    return;
+  }
+  auto *Root = J->getAsObject();
+  if (!Root) {
+    llvm::errs() << "OpenMP task config: root must be a JSON object\n";
+    return;
+  }
+
+  for (const auto &KV : *Root) {
+    // keys are strings like "100", "101"
+    unsigned TaskID = 0;
+    llvm::StringRef Key = KV.first; 
+    if (Key.getAsInteger(10, TaskID)) {
+      // skip non-integer keys silently
+      continue;
+    }
+    const auto *Obj = KV.second.getAsObject();
+    if (!Obj) continue;
+
+    TaskCfg T;
+    if (auto *P = Obj->get("priority"))
+      if (auto I = P->getAsInteger())
+        T.Priority = static_cast<int>(*I);
+
+    if (auto *P = Obj->get("period"))
+      if (auto I = P->getAsInteger())
+        T.Period = static_cast<int>(*I);
+
+    Cfg.try_emplace(TaskID, T);
+  }
+}
+
+int getTaskPriority(unsigned TaskID) {
+  std::call_once(CfgOnce, loadConfigOnce);
+  if (auto It = Cfg.find(TaskID); It != Cfg.end()) return It->second.Priority;
+  return 0; // default
+}
+
+int getTaskPeriod(unsigned TaskID) {
+  std::call_once(CfgOnce, loadConfigOnce);
+  if (auto It = Cfg.find(TaskID); It != Cfg.end()) return It->second.Period;
+  return 0; // default
+}
+
+/**Swastik: read config end */
+
 CGOpenMPRuntime::TaskResultTy
 CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
                               const OMPExecutableDirective &D,
@@ -3953,7 +4041,7 @@ CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
     }
   }
   // Fields of union "kmp_cmplrdata_t" for destructors and priority.
-  enum { Priority = 0, Destructors = 1, TaskName = 2 };
+  enum { Priority = 0, Destructors = 1, TaskName = 2 , Task_Priority = 3, Period = 4, Phase =5 };
   // Provide pointer to function with destructors for privates.
   auto FI = std::next(KmpTaskTQTyRD->field_begin(), Data1);
   const RecordDecl *KmpCmplrdataUD =
@@ -3992,6 +4080,36 @@ CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
         Data3LV, *std::next(KmpCmplrdataUD_t->field_begin(), TaskName));
     CGF.EmitStoreOfScalar(Data.TaskName.getPointer(), TaskNameLV);
   }
+
+  unsigned TaskID = 0;
+  if (auto *CI = llvm::dyn_cast<llvm::ConstantInt>(Data.TaskName.getPointer()))
+    TaskID = (unsigned)CI->getZExtValue();
+
+  int PrioInt   = getTaskPriority(TaskID);
+  int PeriodInt = getTaskPeriod(TaskID);
+
+  // Convert ints to LLVM i32 constants:
+  llvm::Value *PrioV   = CGF.Builder.getInt32(PrioInt);
+  llvm::Value *PeriodV = CGF.Builder.getInt32(PeriodInt);
+
+  auto FI_t2 = std::next(KmpTaskTQTyRD->field_begin(), Data4);
+  const RecordDecl *KmpCmplrdataUD_t2 = (*FI_t2)->getType()->getAsUnionType()->getDecl();
+
+  LValue Data4LV = CGF.EmitLValueForField(
+      TDBase, *std::next(KmpTaskTQTyRD->field_begin(), Data4));
+  LValue TaskPrioLV = CGF.EmitLValueForField(
+      Data4LV, *std::next(KmpCmplrdataUD_t2->field_begin(), Task_Priority));
+  CGF.EmitStoreOfScalar(PrioV, TaskPrioLV);
+
+  auto FI_t3 = std::next(KmpTaskTQTyRD->field_begin(), Data5);
+  const RecordDecl *KmpCmplrdataUD_t3 = (*FI_t3)->getType()->getAsUnionType()->getDecl();
+
+  LValue Data5LV = CGF.EmitLValueForField(
+      TDBase, *std::next(KmpTaskTQTyRD->field_begin(), Data5));
+  LValue TaskPeriodLV = CGF.EmitLValueForField(
+      Data5LV, *std::next(KmpCmplrdataUD_t3->field_begin(), Period));
+  CGF.EmitStoreOfScalar(PeriodV, TaskPeriodLV);
+
   Result.NewTask = NewTask;
   Result.TaskEntry = TaskEntry;
   Result.NewTaskNewTaskTTy = NewTaskNewTaskTTy;
