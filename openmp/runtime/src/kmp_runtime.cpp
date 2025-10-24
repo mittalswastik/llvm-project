@@ -4436,67 +4436,72 @@ kmp_info_t *__kmp_allocate_thread(kmp_root_t *root, kmp_team_t *team,
   /* first, try to get one from the thread pool unless allocating thread is
    * the main hidden helper thread. The hidden helper team should always
    * allocate new OS threads. */
-  if (__kmp_thread_pool && !KMP_HIDDEN_HELPER_TEAM(team)) {
-    new_thr = CCAST(kmp_info_t *, __kmp_thread_pool);
-    __kmp_thread_pool = (volatile kmp_info_t *)new_thr->th.th_next_pool;
-    if (new_thr == __kmp_thread_pool_insert_pt) {
-      __kmp_thread_pool_insert_pt = NULL;
-    }
-    TCW_4(new_thr->th.th_in_pool, FALSE);
-    __kmp_suspend_initialize_thread(new_thr);
-    __kmp_lock_suspend_mx(new_thr);
-    if (new_thr->th.th_active_in_pool == TRUE) {
-      KMP_DEBUG_ASSERT(new_thr->th.th_active == TRUE);
-      KMP_ATOMIC_DEC(&__kmp_thread_pool_active_nth);
-      new_thr->th.th_active_in_pool = FALSE;
-    }
-    __kmp_unlock_suspend_mx(new_thr);
 
-    KA_TRACE(20, ("__kmp_allocate_thread: T#%d using thread T#%d\n",
-                  __kmp_get_gtid(), new_thr->th.th_info.ds.ds_gtid));
-    KMP_ASSERT(!new_thr->th.th_team);
-    KMP_DEBUG_ASSERT(__kmp_nth < __kmp_threads_capacity);
+  /**swastik: What if I comment this code?? - force to make new threads */ 
 
-    /* setup the thread structure */
-    __kmp_initialize_info(new_thr, team, new_tid,
-                          new_thr->th.th_info.ds.ds_gtid);
-    KMP_DEBUG_ASSERT(new_thr->th.th_serial_team);
+//   if (__kmp_thread_pool && !KMP_HIDDEN_HELPER_TEAM(team)) {
+//     new_thr = CCAST(kmp_info_t *, __kmp_thread_pool);
+//     __kmp_thread_pool = (volatile kmp_info_t *)new_thr->th.th_next_pool;
+//     if (new_thr == __kmp_thread_pool_insert_pt) {
+//       __kmp_thread_pool_insert_pt = NULL;
+//     }
+//     TCW_4(new_thr->th.th_in_pool, FALSE);
+//     __kmp_suspend_initialize_thread(new_thr);
+//     __kmp_lock_suspend_mx(new_thr);
+//     if (new_thr->th.th_active_in_pool == TRUE) {
+//       KMP_DEBUG_ASSERT(new_thr->th.th_active == TRUE);
+//       KMP_ATOMIC_DEC(&__kmp_thread_pool_active_nth);
+//       new_thr->th.th_active_in_pool = FALSE;
+//     }
+//     __kmp_unlock_suspend_mx(new_thr);
 
-    TCW_4(__kmp_nth, __kmp_nth + 1);
+//     KA_TRACE(20, ("__kmp_allocate_thread: T#%d using thread T#%d\n",
+//                   __kmp_get_gtid(), new_thr->th.th_info.ds.ds_gtid));
+//     KMP_ASSERT(!new_thr->th.th_team);
+//     KMP_DEBUG_ASSERT(__kmp_nth < __kmp_threads_capacity);
 
-    new_thr->th.th_task_state = 0;
+//     /* setup the thread structure */
+//     __kmp_initialize_info(new_thr, team, new_tid,
+//                           new_thr->th.th_info.ds.ds_gtid);
+//     KMP_DEBUG_ASSERT(new_thr->th.th_serial_team);
 
-    if (__kmp_barrier_gather_pattern[bs_forkjoin_barrier] == bp_dist_bar) {
-      // Make sure pool thread has transitioned to waiting on own thread struct
-      KMP_DEBUG_ASSERT(new_thr->th.th_used_in_team.load() == 0);
-      // Thread activated in __kmp_allocate_team when increasing team size
-    }
+//     TCW_4(__kmp_nth, __kmp_nth + 1);
 
-#ifdef KMP_ADJUST_BLOCKTIME
-    /* Adjust blocktime back to zero if necessary */
-    /* Middle initialization might not have occurred yet */
-    if (!__kmp_env_blocktime && (__kmp_avail_proc > 0)) {
-      if (__kmp_nth > __kmp_avail_proc) {
-        __kmp_zero_bt = TRUE;
-      }
-    }
-#endif /* KMP_ADJUST_BLOCKTIME */
+//     new_thr->th.th_task_state = 0;
 
-#if KMP_DEBUG
-    // If thread entered pool via __kmp_free_thread, wait_flag should !=
-    // KMP_BARRIER_PARENT_FLAG.
-    int b;
-    kmp_balign_t *balign = new_thr->th.th_bar;
-    for (b = 0; b < bs_last_barrier; ++b)
-      KMP_DEBUG_ASSERT(balign[b].bb.wait_flag != KMP_BARRIER_PARENT_FLAG);
-#endif
+//     if (__kmp_barrier_gather_pattern[bs_forkjoin_barrier] == bp_dist_bar) {
+//       // Make sure pool thread has transitioned to waiting on own thread struct
+//       KMP_DEBUG_ASSERT(new_thr->th.th_used_in_team.load() == 0);
+//       // Thread activated in __kmp_allocate_team when increasing team size
+//     }
 
-    KF_TRACE(10, ("__kmp_allocate_thread: T#%d using thread %p T#%d\n",
-                  __kmp_get_gtid(), new_thr, new_thr->th.th_info.ds.ds_gtid));
+// #ifdef KMP_ADJUST_BLOCKTIME
+//     /* Adjust blocktime back to zero if necessary */
+//     /* Middle initialization might not have occurred yet */
+//     if (!__kmp_env_blocktime && (__kmp_avail_proc > 0)) {
+//       if (__kmp_nth > __kmp_avail_proc) {
+//         __kmp_zero_bt = TRUE;
+//       }
+//     }
+// #endif /* KMP_ADJUST_BLOCKTIME */
 
-    KMP_MB();
-    return new_thr;
-  }
+// #if KMP_DEBUG
+//     // If thread entered pool via __kmp_free_thread, wait_flag should !=
+//     // KMP_BARRIER_PARENT_FLAG.
+//     int b;
+//     kmp_balign_t *balign = new_thr->th.th_bar;
+//     for (b = 0; b < bs_last_barrier; ++b)
+//       KMP_DEBUG_ASSERT(balign[b].bb.wait_flag != KMP_BARRIER_PARENT_FLAG);
+// #endif
+
+//     KF_TRACE(10, ("__kmp_allocate_thread: T#%d using thread %p T#%d\n",
+//                   __kmp_get_gtid(), new_thr, new_thr->th.th_info.ds.ds_gtid));
+
+//     KMP_MB();
+//     return new_thr;
+//   }
+
+// swastik - commented above code for not allowing reusing the thread pool
 
   /* no, well fork a new one */
   KMP_ASSERT(KMP_HIDDEN_HELPER_TEAM(team) || __kmp_nth == __kmp_all_nth);
