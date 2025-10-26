@@ -10,6 +10,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <sys/syscall.h>
+#include <sys/time.h>
+#include <unistd.h>
+#include <string.h>
 #include "kmp.h"
 #include "kmp_i18n.h"
 #include "kmp_itt.h"
@@ -18,6 +22,8 @@
 #include "kmp_taskdeps.h"
 #include "kmp_edf.h"
 #include "kmp_io.h"
+
+extern "C" void unique_task(const char*) __attribute__((weak));
 
 #if OMPT_SUPPORT
 #include "ompt-specific.h"
@@ -107,13 +113,30 @@ void set_global_start(int seconds) {
 // }
 
 void* rt_handler(void* args){
+  printf("---------- checking the function calll -----------------------\n");
   struct rt_args *task_args = (struct rt_args*)args;
+  if(unique_task){
+    char buf[32];
+    snprintf(buf, sizeof buf, "%d", (task_args->task)->data3.taskname);
+    const char* p = buf; 
+    unique_task(p);
+  }
   int period = (task_args->task)->data5.period;
   struct timespec phaseDelay, periodDelay, nextWake, tm0;
   int i = 0;
   int ret;
+
+  struct sched_param param;
+  int policy;
+  pthread_t thread;
+  pthread_attr_t attr;
+  pthread_attr_init(&attr);
+  thread = pthread_self();
+  int result = pthread_getschedparam(thread, &policy, &param);
+
   //__kmp_printf("------------------- executing handler------------------------\n");
-  printf("checking it out\n");
+  int32_t id = syscall(__NR_gettid);
+  printf("checking it out priority and id: %d %d\n", param.sched_priority, id);
 
   if((task_args->task)->data5.period == 0){ // dynamic EDF
     struct sched_attr rt_attr;
@@ -162,6 +185,7 @@ void* rt_handler(void* args){
     TIMESPEC_ADD(nextWake, periodDelay);
     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
     //kmp_dep_in(task_args->task);
+    printf("execute task routing\n");
     (task_args->task_routine)(task_args->gtid, task_args->task);
     //kmp_dep_out(task_args->task);
     //i--;
@@ -2060,9 +2084,11 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
       task_args->task = task;
       task_args->task_routine = *(task->routine);
       //check each pthread call
+      size_t stack_size =  KMP_BACKUP_STKSIZE + gtid *  KMP_DEFAULT_STKOFFSET;
       ret = pthread_attr_init(&attr);
       if(ret != 0){__kmp_printf("\nERROR in attr_init: %d\n", ret);}
-      ret = pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN);
+      //ret = pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN);
+      ret = pthread_attr_setstacksize(&attr, stack_size);
       if(ret != 0){__kmp_printf("\nERROR in setstacksize: %d\n", ret);}
       if((task_args->task)->data5.period != 0){ // static FIFO
         ret = pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
@@ -2080,14 +2106,14 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
       ret = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED);
       if(ret != 0){__kmp_printf("\nERROR in pthread_attr_setinheritsched(): %d\n", ret);}
       //task_id : mapp[task_id] <- phase, period and wcet for that task
-      //(*(task->routine))(gtid, task); //NOT REALTIME, FIXME!!!
-      ret = pthread_create(&thread, &attr, rt_handler, task_args);
+      //(*(task->routine))(gtid, task); //NOT REALTIME, FIXME!!
+      ret = pthread_create(&thread, &attr, rt_handler, (void*) task_args);
       __kmp_printf("---------------------- checking --------------------\n");
       // calls ((void* (*)(void *))(*(task->routine)))
       if(ret != 0){__kmp_printf("\nPTHREAD_CREATE FAILED: %d\n",ret);}
   //     //brayden
       __kmp_printf("-------------------------------calling task routine ----------------------------------\n");
-      (*(task->routine))(gtid, task);
+    //(*(task->routine))(gtid, task);
      //#endif
       }
     }
