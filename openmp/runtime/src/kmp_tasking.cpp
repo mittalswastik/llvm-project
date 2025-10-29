@@ -12,6 +12,7 @@
 
 #include <sys/syscall.h>
 #include <sys/time.h>
+#include <time.h>
 #include <unistd.h>
 #include <string.h>
 #include "kmp.h"
@@ -29,15 +30,117 @@ extern "C" void unique_task(const char*) __attribute__((weak));
 #include "ompt-specific.h"
 #endif
 
-#define TIMESPEC_ADD(A,B)              \
-do {                                   \
-    (A).tv_sec  += (B).tv_sec;         \
-    (A).tv_nsec += (B).tv_nsec;        \
-    if ( (A).tv_nsec >= 1000000000 ) { \
-        (A).tv_sec++;                  \
-        (A).tv_nsec -= 1000000000;     \
-    }                                  \
-} while (0)
+
+
+// #define TIMESPEC_ADD(A,B)              \
+// do {                                   \
+//     (A).tv_sec  += (B).tv_sec;         \
+//     (A).tv_nsec += (B).tv_nsec;        \
+//     if ( (A).tv_nsec >= 1000000000 ) { \
+//         (A).tv_sec++;                  \
+//         (A).tv_nsec -= 1000000000;     \
+//     }                                  \
+// } while (0)
+
+#define NSEC_PER_SEC 1000000000
+
+timespec timespec_normalise(timespec ts)
+{
+  while(ts.tv_nsec >= NSEC_PER_SEC)
+  {
+    ++(ts.tv_sec);
+    ts.tv_nsec -= NSEC_PER_SEC;
+  }
+  
+  while(ts.tv_nsec <= -NSEC_PER_SEC)
+  {
+    --(ts.tv_sec);
+    ts.tv_nsec += NSEC_PER_SEC;
+  }
+  
+  if(ts.tv_nsec < 0 && ts.tv_sec > 0)
+  {
+    /* Negative nanoseconds while seconds is positive.
+     * Decrement tv_sec and roll tv_nsec over.
+    */
+    
+    --(ts.tv_sec);
+    ts.tv_nsec = NSEC_PER_SEC - (-1 * ts.tv_nsec);
+  }
+  else if(ts.tv_nsec > 0 && ts.tv_sec < 0)
+  {
+    /* Positive nanoseconds while seconds is negative.
+     * Increment tv_sec and roll tv_nsec over.
+    */
+    
+    ++(ts.tv_sec);
+    ts.tv_nsec = -NSEC_PER_SEC - (-1 * ts.tv_nsec);
+  }
+  
+  return ts;
+}
+
+timespec timespec_higher(timespec ts1, timespec ts2) {
+    ts1 = timespec_normalise(ts1);
+    ts2 = timespec_normalise(ts2);
+
+    if(ts1.tv_sec > ts2.tv_sec){
+        return ts1;
+    }
+
+    else if(ts1.tv_sec < ts2.tv_sec){
+        return ts2;
+    }
+
+    else if(ts1.tv_nsec > ts2.tv_nsec){
+        return ts1;
+    }
+
+    else {
+        return ts2;
+    }
+}
+
+bool timespec_compare(timespec ts1, timespec ts2){
+    ts1 = timespec_normalise(ts1);
+    ts2 = timespec_normalise(ts2);
+
+    if(ts1.tv_nsec == ts2.tv_nsec && ts1.tv_sec == ts2.tv_sec){
+        return true;
+    }
+
+    else {
+        return false;
+    }
+}
+
+timespec timespec_add(timespec ts1, timespec ts2)
+{
+  /* Normalise inputs to prevent tv_nsec rollover if whole-second values
+   * are packed in it.
+  */
+  ts1 = timespec_normalise(ts1);
+  ts2 = timespec_normalise(ts2);
+  
+  ts1.tv_sec  += ts2.tv_sec;
+  ts1.tv_nsec += ts2.tv_nsec;
+  
+  return timespec_normalise(ts1);
+}
+
+timespec timespec_sub(timespec ts1, timespec ts2)
+{
+  /* Normalise inputs to prevent tv_nsec rollover if whole-second values
+   * are packed in it.
+  */
+  ts1 = timespec_normalise(ts1);
+  ts2 = timespec_normalise(ts2);
+  
+  ts1.tv_sec  -= ts2.tv_sec;
+  ts1.tv_nsec -= ts2.tv_nsec;
+  
+  return timespec_normalise(ts1);
+}
 
 #if ENABLE_LIBOMPTARGET
 static void (*tgt_target_nowait_query)(void **);
@@ -86,7 +189,7 @@ void set_global_start(int seconds) {
     setup_delay.tv_sec  = (time_t)(seconds);
     setup_delay.tv_nsec = 0 * 1000000UL;
     clock_gettime(CLOCK_MONOTONIC, &global_start_time);
-    TIMESPEC_ADD(global_start_time, setup_delay);
+    global_start_time = timespec_add(global_start_time, setup_delay);
     global_start_set = 1;
   }
 }
@@ -147,7 +250,7 @@ void* rt_handler(void* args){
     rt_attr.sched_policy = SCHED_DEADLINE;
     // FRANK: NEED WCET() pragma
     rt_attr.sched_runtime = 10 * 1000000; // (task_args->task)->wcet;
-    rt_attr.sched_period = (task_args->task)->data5.period * 1000000UL;
+    rt_attr.sched_period = (task_args->task)->data5.period * 1000000;
     rt_attr.sched_deadline = rt_attr.sched_period;
     ret = sched_setattr(0, &rt_attr, 0);
     if(ret != 0) { // we are NOT running as EDF, quit! O/w would silently continue
@@ -169,23 +272,23 @@ void* rt_handler(void* args){
   clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
 
   if ((task_args->task)->data6.phase) {
-    phaseDelay.tv_sec  = (time_t)0;
-    phaseDelay.tv_nsec = (task_args->task)->data6.phase * 1000000UL;
+    phaseDelay.tv_sec  = 0;
+    phaseDelay.tv_nsec = (task_args->task)->data6.phase * 1000000;
     clock_gettime(CLOCK_MONOTONIC, &tm0);
     nextWake = tm0;
-    TIMESPEC_ADD(nextWake, periodDelay);
+    nextWake = timespec_add(nextWake, periodDelay);
     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
   }
 
-  periodDelay.tv_sec  = (time_t)0;
-  periodDelay.tv_nsec = period * 1000000UL;
+  periodDelay.tv_sec  = 0;
+  periodDelay.tv_nsec = period * 1000000;
   clock_gettime(CLOCK_MONOTONIC, &tm0);
   nextWake = tm0;
   while(1){
-    TIMESPEC_ADD(nextWake, periodDelay);
+    nextWake = timespec_add(nextWake, periodDelay);
     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
     //kmp_dep_in(task_args->task);
-    printf("execute task routing\n");
+    printf(" ++++++++++++++++++++ execute task routing ++++++++++++++\n");
     (task_args->task_routine)(task_args->gtid, task_args->task);
     //kmp_dep_out(task_args->task);
     //i--;
@@ -2093,7 +2196,7 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
       if((task_args->task)->data5.period != 0){ // static FIFO
         ret = pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
         if(ret != 0){__kmp_printf("\nERROR in setschedpolicy: %d\n", ret);}
-        param.sched_priority = 10;
+        param.sched_priority = (task_args->task)->data4.task_priority;
         // = (task_args->task)->rt_priority;
         ret = pthread_attr_setschedparam(&attr, &param);
         if(ret != 0){__kmp_printf("\nERROR in setschedparam: %d\n", ret);}
