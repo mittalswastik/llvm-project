@@ -2468,6 +2468,8 @@ typedef union kmp_cmplrdata {
   kmp_int32 task_priority;
   kmp_int32 period;
   kmp_int32 phase;
+  kmp_int32 deadline;
+  kmp_int32 edf;
 } kmp_cmplrdata_t;
 
 typedef struct kmp_rtdata {
@@ -2492,13 +2494,15 @@ typedef struct kmp_task { /* GEH: Shouldn't this be aligned somehow? */
       data1; /* Two known optional additions: destructors and priority */
   kmp_cmplrdata_t data2; /* Process destructors first, priority second */
   /**Swastik: add rt_task info*/
-  kmp_cmplrdata_t data3;
-  kmp_cmplrdata_t data4;
-  kmp_cmplrdata_t data5;
-  kmp_cmplrdata_t data6;
+  kmp_cmplrdata_t data3; //taskname
+  kmp_cmplrdata_t data4; //task priority
+  kmp_cmplrdata_t data5; //task period
+  kmp_cmplrdata_t data6; //task phase
+  kmp_cmplrdata_t data7; //task deadline
+  kmp_cmplrdata_t data8; //edf or not
   /* future data */
-  //kmp_int32 wcet2;
-  //kmp_int32 task_id;
+  // kmp_int32 wcet2;
+  // kmp_int32 task_id;
   // kmp_int32 period;
   // kmp_int32 rt_priority;
   // kmp_int32 deadline;

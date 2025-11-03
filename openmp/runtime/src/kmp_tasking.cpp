@@ -241,7 +241,7 @@ void* rt_handler(void* args){
   int32_t id = syscall(__NR_gettid);
   printf("checking it out priority and id: %d %d\n", param.sched_priority, id);
 
-  if((task_args->task)->data5.period == 0){ // dynamic EDF
+  if((task_args->task)->data8.edf == 1){ // dynamic EDF
     struct sched_attr rt_attr;
     rt_attr.size = sizeof(rt_attr);
     rt_attr.sched_flags = SCHED_FLAG_RECLAIM;
@@ -288,7 +288,7 @@ void* rt_handler(void* args){
     nextWake = timespec_add(nextWake, periodDelay);
     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
     //kmp_dep_in(task_args->task);
-    printf(" ++++++++++++++++++++ execute task routing ++++++++++++++\n");
+    //printf(" ++++++++++++++++++++ execute task routing ++++++++++++++\n");
     (task_args->task_routine)(task_args->gtid, task_args->task);
     //kmp_dep_out(task_args->task);
     //i--;
@@ -2193,7 +2193,7 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
       //ret = pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN);
       ret = pthread_attr_setstacksize(&attr, stack_size);
       if(ret != 0){__kmp_printf("\nERROR in setstacksize: %d\n", ret);}
-      if((task_args->task)->data5.period != 0){ // static FIFO
+      if((task_args->task)->data8.edf == 0){ // static FIFO
         ret = pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
         if(ret != 0){__kmp_printf("\nERROR in setschedpolicy: %d\n", ret);}
         param.sched_priority = (task_args->task)->data4.task_priority;

@@ -2774,6 +2774,10 @@ enum KmpTaskTFields {
   Data5,
   /// Task Phase
   Data6,
+  /// Task Deadline
+  Data7,
+  /// Edf or not
+  Data8,
   /// (Taskloops only) Lower bound.
   KmpTaskTLowerBound,
   /// (Taskloops only) Upper bound.
@@ -2938,7 +2942,9 @@ createKmpTaskTRecordDecl(CodeGenModule &CGM, OpenMPDirectiveKind Kind,
   addFieldToRecordDecl(C, UD, KmpInt32Ty); //swastik: taskname
   addFieldToRecordDecl(C, UD, KmpInt32Ty); 
   addFieldToRecordDecl(C, UD, KmpInt32Ty); 
-  addFieldToRecordDecl(C, UD, KmpInt32Ty); 
+  addFieldToRecordDecl(C, UD, KmpInt32Ty);
+  addFieldToRecordDecl(C, UD, KmpInt32Ty);
+  addFieldToRecordDecl(C, UD, KmpInt32Ty);
   UD->completeDefinition();
   QualType KmpCmplrdataTy = C.getRecordType(UD);
   RecordDecl *RD = C.buildImplicitRecord("kmp_task_t");
@@ -2950,6 +2956,8 @@ createKmpTaskTRecordDecl(CodeGenModule &CGM, OpenMPDirectiveKind Kind,
   addFieldToRecordDecl(C, RD, KmpCmplrdataTy);
   /**swastik: rt_task details in kmp-task */
   addFieldToRecordDecl(C, RD, KmpCmplrdataTy); //Swastik: TaskName -> data3
+  addFieldToRecordDecl(C, RD, KmpCmplrdataTy);
+  addFieldToRecordDecl(C, RD, KmpCmplrdataTy);
   addFieldToRecordDecl(C, RD, KmpCmplrdataTy);
   addFieldToRecordDecl(C, RD, KmpCmplrdataTy);
   addFieldToRecordDecl(C, RD, KmpCmplrdataTy);
@@ -3621,7 +3629,7 @@ static void getKmpAffinityType(ASTContext &C, QualType &KmpTaskAffinityInfoTy) {
  * Swastik: Read config file
  */
 
-struct TaskCfg { int Priority = 0; int Period = 0; };
+struct TaskCfg { int Priority = 0; int Period = 0; int Phase = 0; int Deadline = 0; int Edf = 0;};
 
 static std::once_flag CfgOnce;
 static llvm::DenseMap<unsigned, TaskCfg> Cfg;  // taskid -> {priority, period}
@@ -3664,6 +3672,18 @@ static void loadConfigOnce() {
     if (auto *P = Obj->get("period"))
       if (auto I = P->getAsInteger())
         T.Period = static_cast<int>(*I);
+    
+    if (auto *P = Obj->get("phase"))
+      if (auto I = P->getAsInteger())
+        T.Period = static_cast<int>(*I);
+
+    if (auto *P = Obj->get("deadine"))
+      if (auto I = P->getAsInteger())
+        T.Period = static_cast<int>(*I);
+
+    if (auto *P = Obj->get("edf"))
+      if (auto I = P->getAsInteger())
+        T.Period = static_cast<int>(*I);
 
     Cfg.try_emplace(TaskID, T);
   }
@@ -3678,6 +3698,24 @@ int getTaskPriority(unsigned TaskID) {
 int getTaskPeriod(unsigned TaskID) {
   std::call_once(CfgOnce, loadConfigOnce);
   if (auto It = Cfg.find(TaskID); It != Cfg.end()) return It->second.Period;
+  return 0; // default
+}
+
+int getTaskPhase(unsigned TaskID) {
+  std::call_once(CfgOnce, loadConfigOnce);
+  if (auto It = Cfg.find(TaskID); It != Cfg.end()) return It->second.Phase;
+  return 0; // default
+}
+
+int getTaskDeadline(unsigned TaskID) {
+  std::call_once(CfgOnce, loadConfigOnce);
+  if (auto It = Cfg.find(TaskID); It != Cfg.end()) return It->second.Deadline;
+  return 0; // default
+}
+
+int getTaskEdf(unsigned TaskID) {
+  std::call_once(CfgOnce, loadConfigOnce);
+  if (auto It = Cfg.find(TaskID); It != Cfg.end()) return It->second.Edf;
   return 0; // default
 }
 
@@ -4041,7 +4079,7 @@ CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
     }
   }
   // Fields of union "kmp_cmplrdata_t" for destructors and priority.
-  enum { Priority = 0, Destructors = 1, TaskName = 2 , Task_Priority = 3, Period = 4, Phase =5 };
+  enum { Priority = 0, Destructors = 1, TaskName = 2 , Task_Priority = 3, Period = 4, Phase =5, Deadline=6, Edf=7 };
   // Provide pointer to function with destructors for privates.
   auto FI = std::next(KmpTaskTQTyRD->field_begin(), Data1);
   const RecordDecl *KmpCmplrdataUD =
@@ -4087,10 +4125,16 @@ CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
 
   int PrioInt   = getTaskPriority(TaskID);
   int PeriodInt = getTaskPeriod(TaskID);
+  int PhaseInt = getTaskPhase(TaskID);
+  int DeadlineInt   = getTaskDeadline(TaskID);
+  int EdfInt = getTaskEdf(TaskID);
 
   // Convert ints to LLVM i32 constants:
   llvm::Value *PrioV   = CGF.Builder.getInt32(PrioInt);
   llvm::Value *PeriodV = CGF.Builder.getInt32(PeriodInt);
+  llvm::Value *PhaseV   = CGF.Builder.getInt32(PhaseInt);
+  llvm::Value *DeadlineV = CGF.Builder.getInt32(DeadlineInt);
+  llvm::Value *EdfV   = CGF.Builder.getInt32(EdfInt);
 
   auto FI_t2 = std::next(KmpTaskTQTyRD->field_begin(), Data4);
   const RecordDecl *KmpCmplrdataUD_t2 = (*FI_t2)->getType()->getAsUnionType()->getDecl();
@@ -4109,6 +4153,33 @@ CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
   LValue TaskPeriodLV = CGF.EmitLValueForField(
       Data5LV, *std::next(KmpCmplrdataUD_t3->field_begin(), Period));
   CGF.EmitStoreOfScalar(PeriodV, TaskPeriodLV);
+
+  auto FI_t4 = std::next(KmpTaskTQTyRD->field_begin(), Data6);
+  const RecordDecl *KmpCmplrdataUD_t4 = (*FI_t4)->getType()->getAsUnionType()->getDecl();
+
+  LValue Data6LV = CGF.EmitLValueForField(
+      TDBase, *std::next(KmpTaskTQTyRD->field_begin(), Data6));
+  LValue TaskPhaseLV = CGF.EmitLValueForField(
+      Data6LV, *std::next(KmpCmplrdataUD_t4->field_begin(), Phase));
+  CGF.EmitStoreOfScalar(PhaseV, TaskPhaseLV);
+
+  auto FI_t5 = std::next(KmpTaskTQTyRD->field_begin(), Data7);
+  const RecordDecl *KmpCmplrdataUD_t5 = (*FI_t5)->getType()->getAsUnionType()->getDecl();
+
+  LValue Data7LV = CGF.EmitLValueForField(
+      TDBase, *std::next(KmpTaskTQTyRD->field_begin(), Data7));
+  LValue TaskDeadlineLV = CGF.EmitLValueForField(
+      Data7LV, *std::next(KmpCmplrdataUD_t5->field_begin(), Deadline));
+  CGF.EmitStoreOfScalar(DeadlineV, TaskDeadlineLV);
+
+  auto FI_t6 = std::next(KmpTaskTQTyRD->field_begin(), Data8);
+  const RecordDecl *KmpCmplrdataUD_t6 = (*FI_t6)->getType()->getAsUnionType()->getDecl();
+
+  LValue Data8LV = CGF.EmitLValueForField(
+      TDBase, *std::next(KmpTaskTQTyRD->field_begin(), Data8));
+  LValue TaskEdfLV = CGF.EmitLValueForField(
+      Data8LV, *std::next(KmpCmplrdataUD_t6->field_begin(), Edf));
+  CGF.EmitStoreOfScalar(EdfV, TaskEdfLV);
 
   Result.NewTask = NewTask;
   Result.TaskEntry = TaskEntry;
