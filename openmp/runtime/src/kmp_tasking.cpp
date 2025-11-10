@@ -42,7 +42,7 @@ extern "C" void unique_task(const char*) __attribute__((weak));
 //     }                                  \
 // } while (0)
 
-#define NSEC_PER_SEC 1000000000
+#define NSEC_PER_SEC 1000000000LL
 
 timespec timespec_normalise(timespec ts)
 {
@@ -187,7 +187,7 @@ void set_global_start(int seconds) {
   } else {
     struct timespec setup_delay;
     setup_delay.tv_sec  = (time_t)(seconds);
-    setup_delay.tv_nsec = 0 * 1000000UL;
+    setup_delay.tv_nsec = 0;
     clock_gettime(CLOCK_MONOTONIC, &global_start_time);
     global_start_time = timespec_add(global_start_time, setup_delay);
     global_start_set = 1;
@@ -249,8 +249,8 @@ void* rt_handler(void* args){
     rt_attr.sched_priority = 0;
     rt_attr.sched_policy = SCHED_DEADLINE;
     // FRANK: NEED WCET() pragma
-    rt_attr.sched_runtime = 10 * 1000000; // (task_args->task)->wcet;
-    rt_attr.sched_period = (task_args->task)->data5.period * 1000000;
+    rt_attr.sched_runtime = 10 * 1000000LL; // (task_args->task)->wcet;
+    rt_attr.sched_period = (task_args->task)->data5.period * 1000000LL;
     rt_attr.sched_deadline = rt_attr.sched_period;
     ret = sched_setattr(0, &rt_attr, 0);
     if(ret != 0) { // we are NOT running as EDF, quit! O/w would silently continue
@@ -271,25 +271,27 @@ void* rt_handler(void* args){
   nextWake = global_start_time;
   clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
 
-  if ((task_args->task)->data6.phase) {
+  if ((task_args->task)->data6.phase != 0) {
+    printf("Phase value is: %d\n", (task_args->task)->data6.phase);
     phaseDelay.tv_sec  = 0;
-    phaseDelay.tv_nsec = (task_args->task)->data6.phase * 1000000;
+    phaseDelay.tv_nsec = (task_args->task)->data6.phase * 1000000LL;
     clock_gettime(CLOCK_MONOTONIC, &tm0);
     nextWake = tm0;
-    nextWake = timespec_add(nextWake, periodDelay);
+    nextWake = timespec_add(nextWake, phaseDelay);
     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
   }
 
   periodDelay.tv_sec  = 0;
-  periodDelay.tv_nsec = period * 1000000;
+  periodDelay.tv_nsec = period * 1000000LL;
   clock_gettime(CLOCK_MONOTONIC, &tm0);
   nextWake = tm0;
-  while(1){
+  int t = 50;
+  while(t--){
+    (task_args->task_routine)(task_args->gtid, task_args->task);
     nextWake = timespec_add(nextWake, periodDelay);
     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
     //kmp_dep_in(task_args->task);
     //printf(" ++++++++++++++++++++ execute task routing ++++++++++++++\n");
-    (task_args->task_routine)(task_args->gtid, task_args->task);
     //kmp_dep_out(task_args->task);
     //i--;
   }

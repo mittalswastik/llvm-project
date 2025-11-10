@@ -3675,15 +3675,15 @@ static void loadConfigOnce() {
     
     if (auto *P = Obj->get("phase"))
       if (auto I = P->getAsInteger())
-        T.Period = static_cast<int>(*I);
+        T.Phase = static_cast<int>(*I);
 
     if (auto *P = Obj->get("deadine"))
       if (auto I = P->getAsInteger())
-        T.Period = static_cast<int>(*I);
+        T.Deadline = static_cast<int>(*I);
 
     if (auto *P = Obj->get("edf"))
       if (auto I = P->getAsInteger())
-        T.Period = static_cast<int>(*I);
+        T.Edf = static_cast<int>(*I);
 
     Cfg.try_emplace(TaskID, T);
   }
@@ -4079,7 +4079,7 @@ CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
     }
   }
   // Fields of union "kmp_cmplrdata_t" for destructors and priority.
-  enum { Priority = 0, Destructors = 1, TaskName = 2 , Task_Priority = 3, Period = 4, Phase =5, Deadline=6, Edf=7 };
+  enum { Priority = 0, Destructors = 1, TaskName = 2 , Task_Priority = 3, Period = 4, Phase = 5, Deadline=6, Edf=7 };
   // Provide pointer to function with destructors for privates.
   auto FI = std::next(KmpTaskTQTyRD->field_begin(), Data1);
   const RecordDecl *KmpCmplrdataUD =
