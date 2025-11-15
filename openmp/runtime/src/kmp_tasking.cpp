@@ -286,7 +286,7 @@ void* rt_handler(void* args){
   clock_gettime(CLOCK_MONOTONIC, &tm0);
   nextWake = tm0;
   int t = 50;
-  while(t--){
+  while(1){
     (task_args->task_routine)(task_args->gtid, task_args->task);
     nextWake = timespec_add(nextWake, periodDelay);
     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
