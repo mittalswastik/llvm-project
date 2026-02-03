@@ -216,8 +216,8 @@ void set_global_start(int seconds) {
 // }
 
 void* rt_handler(void* args){
-  printf("---------- checking the function calll -----------------------\n");
-  struct rt_args *task_args = (struct rt_args*)args;
+  struct rt_args *task_args = (struct rt_args*) args;
+  printf("---------- checking the function call ----------------------- %d \n", (task_args->task)->data3.taskname);
   if(unique_task){
     char buf[32];
     snprintf(buf, sizeof buf, "%d", (task_args->task)->data3.taskname);
@@ -2017,7 +2017,7 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
   kmp_info_t *thread;
   int discard = 0 /* false */;
   
-  __kmp_printf("+++++++checking for call to kmp_nvoke_task and taskname %d +++++++++++++++\n", task->data3.taskname);
+  printf("+++++++checking for call to kmp_nvoke_task and taskname %d +++++++++++++++\n", task->data3.taskname);
 
   KA_TRACE(
       30, ("__kmp_invoke_task(enter): T#%d invoking task %p, current_task=%p\n",
@@ -2186,7 +2186,8 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
       int ret;
       struct rt_args *task_args = (struct rt_args *)malloc(sizeof(struct rt_args));
       task_args->gtid = gtid;
-      task_args->task = task;
+      task_args->task = (kmp_task_t *)malloc(sizeof(kmp_task_t));
+      memcpy(task_args->task, task, sizeof(kmp_task_t));
       task_args->task_routine = *(task->routine);
       //check each pthread call
       size_t stack_size =  KMP_BACKUP_STKSIZE + gtid *  KMP_DEFAULT_STKOFFSET;
@@ -2212,8 +2213,9 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
       if(ret != 0){__kmp_printf("\nERROR in pthread_attr_setinheritsched(): %d\n", ret);}
       //task_id : mapp[task_id] <- phase, period and wcet for that task
       //(*(task->routine))(gtid, task); //NOT REALTIME, FIXME!!
+      printf("---------------------- calling rt_handler for task name %d --------------------\n", task_args->task->data3.taskname);
       ret = pthread_create(&thread, &attr, rt_handler, (void*) task_args);
-      __kmp_printf("---------------------- checking --------------------\n");
+      printf("---------------------- checking %d : %d--------------------\n", ret, task_args->task->data3.taskname);
       // calls ((void* (*)(void *))(*(task->routine)))
       if(ret != 0){__kmp_printf("\nPTHREAD_CREATE FAILED: %d\n",ret);}
   //     //brayden
