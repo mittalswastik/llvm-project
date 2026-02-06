@@ -971,7 +971,7 @@ void __kmp_create_worker(int gtid, kmp_info_t *th, size_t stack_size) {
   int result = pthread_getschedparam(thread, &policy, &param);
 
   //__kmp_printf("------------------- executing handler------------------------\n");
-  printf("pthread create for parallel region - priority of parent thread is ============ : %d\n", param.sched_priority);
+  //printf("pthread create for parallel region - priority of parent thread is ============ : %d\n", param.sched_priority);
   status =
       pthread_create(&handle, &thread_attr, __kmp_launch_worker, (void *)th);
   if (status != 0 || !handle) { // ??? Why do we check handle??

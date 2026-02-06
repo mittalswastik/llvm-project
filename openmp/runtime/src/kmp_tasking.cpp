@@ -15,6 +15,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <string.h>
+#include <semaphore.h>
 #include "kmp.h"
 #include "kmp_i18n.h"
 #include "kmp_itt.h"
@@ -30,6 +31,7 @@ extern "C" void unique_task(const char*) __attribute__((weak));
 #include "ompt-specific.h"
 #endif
 
+sem_t g_handshake_sem;
 
 
 // #define TIMESPEC_ADD(A,B)              \
@@ -271,6 +273,8 @@ void* rt_handler(void* args){
   nextWake = global_start_time;
   clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
 
+  //sem_post(&g_handshake_sem);
+
   if ((task_args->task)->data6.phase != 0) {
     printf("Phase value is: %d\n", (task_args->task)->data6.phase);
     phaseDelay.tv_sec  = 0;
@@ -288,10 +292,10 @@ void* rt_handler(void* args){
   int t = 50;
   while(1){
     (task_args->task_routine)(task_args->gtid, task_args->task);
+    //printf("executing task %d with pid %d\n", (task_args->task)->data3.taskname, syscall(__NR_gettid));
     nextWake = timespec_add(nextWake, periodDelay);
     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
     //kmp_dep_in(task_args->task);
-    //printf(" ++++++++++++++++++++ execute task routing ++++++++++++++\n");
     //kmp_dep_out(task_args->task);
     //i--;
   }
@@ -2180,15 +2184,29 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
       // setup a shared launch time for all real-time threads
       set_global_start(1); // wait for 1 second
       
+      //sem_init(&g_handshake_sem, 0, 0);
       struct sched_param param;
       pthread_attr_t attr;
       pthread_t thread;
       int ret;
       struct rt_args *task_args = (struct rt_args *)malloc(sizeof(struct rt_args));
+      
+      /**swastik: fixing the overwrite */
+      kmp_taskdata_t *taskdata = KMP_TASK_TO_TASKDATA(task);
+      
+      // 3. THE DEEP COPY: Copy the entire task footprint (Header + Shareds + DataX)
+      size_t total_size = taskdata->td_size_alloc;
+      void* task_snapshot = malloc(total_size);
+      memcpy(task_snapshot, taskdata, total_size);
+
       task_args->gtid = gtid;
-      task_args->task = (kmp_task_t *)malloc(sizeof(kmp_task_t));
-      memcpy(task_args->task, task, sizeof(kmp_task_t));
+      task_args->task = KMP_TASKDATA_TO_TASK((kmp_taskdata_t*)task_snapshot);
+      //task_args->task = task;
+      //task_args->task = (kmp_task_t *)malloc(sizeof(kmp_task_t));
+      //memcpy(task_args->task, task, sizeof(kmp_task_t));
+      //task_args->task_routine = *(task_args->task->routine);
       task_args->task_routine = *(task->routine);
+      
       //check each pthread call
       size_t stack_size =  KMP_BACKUP_STKSIZE + gtid *  KMP_DEFAULT_STKOFFSET;
       ret = pthread_attr_init(&attr);
@@ -2215,6 +2233,7 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
       //(*(task->routine))(gtid, task); //NOT REALTIME, FIXME!!
       printf("---------------------- calling rt_handler for task name %d --------------------\n", task_args->task->data3.taskname);
       ret = pthread_create(&thread, &attr, rt_handler, (void*) task_args);
+      //sem_wait(&g_handshake_sem);
       printf("---------------------- checking %d : %d--------------------\n", ret, task_args->task->data3.taskname);
       // calls ((void* (*)(void *))(*(task->routine)))
       if(ret != 0){__kmp_printf("\nPTHREAD_CREATE FAILED: %d\n",ret);}
