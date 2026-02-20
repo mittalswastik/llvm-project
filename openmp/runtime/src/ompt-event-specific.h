@@ -76,6 +76,8 @@
 #define ompt_callback_sync_region_wait_implemented                             \
   ompt_event_MAY_ALWAYS_OPTIONAL
 
+#define ompt_callback_ompt_test_implemented ompt_event_MAY_ALWAYS_OPTIONAL
+
 #define ompt_callback_mutex_released_implemented ompt_event_MAY_ALWAYS_OPTIONAL
 
 #define ompt_callback_dependences_implemented ompt_event_MAY_ALWAYS_OPTIONAL

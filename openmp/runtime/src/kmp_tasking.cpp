@@ -217,6 +217,8 @@ void set_global_start(int seconds) {
 
 // }
 
+#define TIMESPEC_GT(t1, t2) ((t1).tv_sec > (t2).tv_sec || ((t1).tv_sec == (t2).tv_sec && (t1).tv_nsec > (t2).tv_nsec))
+
 void* rt_handler(void* args){
   struct rt_args *task_args = (struct rt_args*) args;
   printf("---------- checking the function call ----------------------- %d \n", (task_args->task)->data3.taskname);
@@ -291,8 +293,16 @@ void* rt_handler(void* args){
   nextWake = tm0;
   int t = 50;
   while(1){
+    struct timespec absolute_deadline = timespec_add(nextWake, periodDelay);
     (task_args->task_routine)(task_args->gtid, task_args->task);
     //printf("executing task %d with pid %d\n", (task_args->task)->data3.taskname, syscall(__NR_gettid));
+    struct timespec finish_time;
+    clock_gettime(CLOCK_MONOTONIC, &finish_time);
+    if(TIMESPEC_GT(finish_time, absolute_deadline))
+      ompt_callbacks.ompt_callback(ompt_callback_ompt_test)((task_args->task)->data3.taskname, 0);
+    else
+      ompt_callbacks.ompt_callback(ompt_callback_ompt_test)((task_args->task)->data3.taskname, 1);
+    
     nextWake = timespec_add(nextWake, periodDelay);
     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
     //kmp_dep_in(task_args->task);

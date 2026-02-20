@@ -154,7 +154,8 @@
     macro (ompt_callback_reduction,         ompt_callback_sync_region_t,       31) /* reduction                       */ \
                                                                                                                          \
     macro (ompt_callback_dispatch,          ompt_callback_dispatch_t,          32) /* dispatch of work                */ \
-    macro (ompt_callback_error,             ompt_callback_error_t,             37) /* error                           */
+    macro (ompt_callback_error,             ompt_callback_error_t,             37) /* error                           */ \
+    macro (ompt_callback_ompt_test, ompt_callback_ompt_test_t, 38) /* test custom callback */ 
 
 #define FOREACH_OMPT_DEVICE_EVENT(macro)                                                                                 \
     /*--- Mandatory Events ---*/                                                                                         \
@@ -255,7 +256,8 @@ typedef enum ompt_callbacks_t {
   ompt_callback_target_data_op_emi       = 34,
   ompt_callback_target_submit_emi        = 35,
   ompt_callback_target_map_emi           = 36,
-  ompt_callback_error                    = 37
+  ompt_callback_error                    = 37,
+  ompt_callback_ompt_test                = 38
 } ompt_callbacks_t;
 
 typedef enum ompt_record_t {
@@ -750,6 +752,11 @@ typedef ompt_record_abstract_t *
 typedef void (*ompt_callback_thread_begin_t) (
   ompt_thread_t thread_type,
   ompt_data_t *thread_data
+);
+
+typedef void (*ompt_callback_ompt_test_t) (
+  int id,
+  int val
 );
 
 typedef struct ompt_record_thread_begin_t {
