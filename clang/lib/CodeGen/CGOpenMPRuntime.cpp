@@ -42,7 +42,7 @@
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/JSON.h"
-
+#include <iostream>
 
 #include <cassert>
 #include <cstdint>
@@ -3677,7 +3677,7 @@ static void loadConfigOnce() {
       if (auto I = P->getAsInteger())
         T.Phase = static_cast<int>(*I);
 
-    if (auto *P = Obj->get("deadine"))
+    if (auto *P = Obj->get("deadline"))
       if (auto I = P->getAsInteger())
         T.Deadline = static_cast<int>(*I);
 
@@ -4127,7 +4127,10 @@ CGOpenMPRuntime::emitTaskInit(CodeGenFunction &CGF, SourceLocation Loc,
   int PeriodInt = getTaskPeriod(TaskID);
   int PhaseInt = getTaskPhase(TaskID);
   int DeadlineInt   = getTaskDeadline(TaskID);
+  std::cout<<"=========================================================== "<<DeadlineInt<<" "<<PeriodInt<<" "<<PhaseInt<<std::endl;
   int EdfInt = getTaskEdf(TaskID);
+
+  
 
   // Convert ints to LLVM i32 constants:
   llvm::Value *PrioV   = CGF.Builder.getInt32(PrioInt);

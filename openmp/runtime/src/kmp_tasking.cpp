@@ -219,8 +219,20 @@ void set_global_start(int seconds) {
 
 #define TIMESPEC_GT(t1, t2) ((t1).tv_sec > (t2).tv_sec || ((t1).tv_sec == (t2).tv_sec && (t1).tv_nsec > (t2).tv_nsec))
 
+extern "C" int my_core_id() // to assign unique id's to thread (openmp might assign an id of finished thread to another)
+{
+  static uint64_t ID=0;
+  int ret = (int) __sync_fetch_and_add(&ID,1);
+  //assert(ret<MAX_THREADS && "Maximum number of allowed threads is limited by MAX_THREADS");
+  return ret;
+}
+
 void* rt_handler(void* args){
   struct rt_args *task_args = (struct rt_args*) args;
+  int core_id = my_core_id()%24;
+  cpu_set_t cpuset;
+  CPU_ZERO(&cpuset);
+  CPU_SET(core_id, &cpuset);
   printf("---------- checking the function call ----------------------- %d \n", (task_args->task)->data3.taskname);
   if(unique_task){
     char buf[32];
@@ -229,7 +241,9 @@ void* rt_handler(void* args){
     unique_task(p);
   }
   int period = (task_args->task)->data5.period;
-  struct timespec phaseDelay, periodDelay, nextWake, tm0;
+  int deadline = (task_args->task)->data7.deadline;
+  //printf("Deadline Value Is %d %d %d %d %d\n", (task_args->task)->data7.deadline, (task_args->task)->data6.deadline, (task_args->task)->data5.deadline, (task_args->task)->data4.deadline, (task_args->task)->data8.deadline);
+  struct timespec phaseDelay, periodDelay, deadlineCheck, nextWake, tm0;
   int i = 0;
   int ret;
 
@@ -243,7 +257,7 @@ void* rt_handler(void* args){
 
   //__kmp_printf("------------------- executing handler------------------------\n");
   int32_t id = syscall(__NR_gettid);
-  printf("checking it out priority and id: %d %d\n", param.sched_priority, id);
+  //printf("checking it out priority and id: %d %d\n", param.sched_priority, id);
 
   if((task_args->task)->data8.edf == 1){ // dynamic EDF
     struct sched_attr rt_attr;
@@ -289,16 +303,29 @@ void* rt_handler(void* args){
 
   periodDelay.tv_sec  = 0;
   periodDelay.tv_nsec = period * 1000000LL;
+
+  deadlineCheck.tv_sec  = 0;
+  deadlineCheck.tv_nsec = deadline * 1000000LL;
+
+  timespec_normalise(deadlineCheck);
+
   clock_gettime(CLOCK_MONOTONIC, &tm0);
   nextWake = tm0;
+
+  struct timespec absolute_deadline, finish_time;
   int t = 50;
+  int pid = gettid();
   while(1){
-    struct timespec absolute_deadline = timespec_add(nextWake, periodDelay);
+    struct timespec current_time;
+    clock_gettime(CLOCK_MONOTONIC, &current_time);
     (task_args->task_routine)(task_args->gtid, task_args->task);
-    //printf("executing task %d with pid %d\n", (task_args->task)->data3.taskname, syscall(__NR_gettid));
-    struct timespec finish_time;
     clock_gettime(CLOCK_MONOTONIC, &finish_time);
-    if(TIMESPEC_GT(finish_time, absolute_deadline))
+    struct timespec total_time = timespec_sub(finish_time, current_time);
+    double total = total_time.tv_sec*1000.0 + total_time.tv_nsec/1000000.0;
+    double deadline_eval = deadlineCheck.tv_sec*1000.0 + deadlineCheck.tv_nsec/1000000.0;
+    //if((task_args->task)->data3.taskname == 101)
+    printf("TID %d Execution time of the task id %d is %f \n", pid, (task_args->task)->data3.taskname, total);
+    if(TIMESPEC_GT(total_time, deadlineCheck))
       ompt_callbacks.ompt_callback(ompt_callback_ompt_test)((task_args->task)->data3.taskname, 0);
     else
       ompt_callbacks.ompt_callback(ompt_callback_ompt_test)((task_args->task)->data3.taskname, 1);
@@ -2031,7 +2058,11 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
   kmp_info_t *thread;
   int discard = 0 /* false */;
   
-  printf("+++++++checking for call to kmp_nvoke_task and taskname %d +++++++++++++++\n", task->data3.taskname);
+  // printf("+++++++checking for call to kmp_nvoke_task and taskname%d +++++++++++++++\n", task->data3.taskname);
+  // printf("+++++++checking for call to kmp_nvoke_task and deadline value %d +++++++++++++++\n", task->data4.deadline);
+  // printf("+++++++checking for call to kmp_nvoke_task and phase value %d +++++++++++++++\n", task->data4.phase);
+  // printf("+++++++checking for call to kmp_nvoke_task and priority value %d +++++++++++++++\n", task->data4.priority);          
+
 
   KA_TRACE(
       30, ("__kmp_invoke_task(enter): T#%d invoking task %p, current_task=%p\n",
@@ -2242,6 +2273,7 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
       //task_id : mapp[task_id] <- phase, period and wcet for that task
       //(*(task->routine))(gtid, task); //NOT REALTIME, FIXME!!
       printf("---------------------- calling rt_handler for task name %d --------------------\n", task_args->task->data3.taskname);
+
       ret = pthread_create(&thread, &attr, rt_handler, (void*) task_args);
       //sem_wait(&g_handshake_sem);
       printf("---------------------- checking %d : %d--------------------\n", ret, task_args->task->data3.taskname);
