@@ -229,10 +229,6 @@ extern "C" int my_core_id() // to assign unique id's to thread (openmp might ass
 
 void* rt_handler(void* args){
   struct rt_args *task_args = (struct rt_args*) args;
-  int core_id = my_core_id()%24;
-  cpu_set_t cpuset;
-  CPU_ZERO(&cpuset);
-  CPU_SET(core_id, &cpuset);
   printf("---------- checking the function call ----------------------- %d \n", (task_args->task)->data3.taskname);
   if(unique_task){
     char buf[32];
@@ -2268,6 +2264,12 @@ __kmp_invoke_task(kmp_int32 gtid, kmp_task_t *task,
         __kmp_printf("FIFO task priority2: %d\n", (task_args->task)->data4.task_priority); //task->data3.taskname
       }
 
+      int core_id = my_core_id()%24;
+      cpu_set_t cpuset;
+      CPU_ZERO(&cpuset);
+      CPU_SET(core_id, &cpuset);
+      pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpuset);
+      
       ret = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED);
       if(ret != 0){__kmp_printf("\nERROR in pthread_attr_setinheritsched(): %d\n", ret);}
       //task_id : mapp[task_id] <- phase, period and wcet for that task
