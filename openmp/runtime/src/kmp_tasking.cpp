@@ -321,10 +321,10 @@ void* rt_handler(void* args){
     double deadline_eval = deadlineCheck.tv_sec*1000.0 + deadlineCheck.tv_nsec/1000000.0;
     //if((task_args->task)->data3.taskname == 101)
     printf("TID %d Execution time of the task id %d is %f \n", pid, (task_args->task)->data3.taskname, total);
-    if(TIMESPEC_GT(total_time, deadlineCheck))
-      ompt_callbacks.ompt_callback(ompt_callback_ompt_test)((task_args->task)->data3.taskname, 0);
-    else
-      ompt_callbacks.ompt_callback(ompt_callback_ompt_test)((task_args->task)->data3.taskname, 1);
+    // if(TIMESPEC_GT(total_time, deadlineCheck))
+    //   ompt_callbacks.ompt_callback(ompt_callback_ompt_test)((task_args->task)->data3.taskname, 0);
+    // else
+    //   ompt_callbacks.ompt_callback(ompt_callback_ompt_test)((task_args->task)->data3.taskname, 1);
     
     nextWake = timespec_add(nextWake, periodDelay);
     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextWake, NULL);
