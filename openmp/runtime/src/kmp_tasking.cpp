@@ -31,6 +31,10 @@ extern "C" void unique_task(const char*) __attribute__((weak));
 #include "ompt-specific.h"
 #endif
 
+#if defined(__GLIBC__) && ((__GLIBC__ < 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 30))
+#define gettid() ((pid_t)syscall(SYS_gettid))
+#endif
+
 sem_t g_handshake_sem;
 
 
